@@ -21,14 +21,14 @@ public class BotStatusListener extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
 
         String botName = event.getJDA().getSelfUser().getName();
-        LOG.info("{} is ready to chat.", botName);
+        LOG.info("{}'s Discord session has been established.", botName);
     }
 
     @Override
     public void onSessionDisconnect(SessionDisconnectEvent event) {
 
         String botName = event.getJDA().getSelfUser().getName();
-        LOG.info("{}'s session has been disconnected'.", botName);
+        LOG.info("{}'s Discord session has been disconnected'.", botName);
 
     }
 
@@ -36,14 +36,14 @@ public class BotStatusListener extends ListenerAdapter {
     public void onSessionResume(SessionResumeEvent event) {
 
         String botName = event.getJDA().getSelfUser().getName();
-        LOG.info("{}'s session has been reconnected.", botName);
+        LOG.info("{}'s Discord session has been reconnected.", botName);
     }
 
     @Override
     public void onSessionInvalidate(SessionInvalidateEvent event) {
 
         String botName = event.getJDA().getSelfUser().getName();
-        LOG.info("{}'s session has been invalidated.", botName);
+        LOG.info("{}'s Discord session has been invalidated.", botName);
     }
 
     @Override

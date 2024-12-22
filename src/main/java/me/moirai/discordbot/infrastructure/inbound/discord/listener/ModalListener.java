@@ -1,7 +1,5 @@
 package me.moirai.discordbot.infrastructure.inbound.discord.listener;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +28,16 @@ public class ModalListener extends ListenerAdapter {
     private static final String MESSAGE_ID = "messageId";
     private static final String MESSAGE_CONTENT = "content";
     private static final String INPUT_SENT = "Input sent.";
-    private static final int EPHEMERAL_MESSAGE_TTL = 10;
 
     private final UseCaseRunner useCaseRunner;
+    private final DiscordListenerHelper discordListenerHelper;
 
-    public ModalListener(UseCaseRunner useCaseRunner) {
+    public ModalListener(
+            UseCaseRunner useCaseRunner,
+            DiscordListenerHelper discordListenerHelper) {
+
         this.useCaseRunner = useCaseRunner;
+        this.discordListenerHelper = discordListenerHelper;
     }
 
     @Override
@@ -50,23 +52,23 @@ public class ModalListener extends ListenerAdapter {
         if (!author.isBot()) {
             switch (modalId) {
                 case "sayAsBot" -> {
-                    InteractionHook interactionHook = sendNotification(event, WAITING_FOR_INPUT);
+                    InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
                     String messageContent = event.getValue(MESSAGE_CONTENT).getAsString();
 
                     SayCommand useCase = SayCommand.build(textChannel.getId(), messageContent);
 
                     useCaseRunner.run(useCase);
 
-                    updateNotification(interactionHook, INPUT_SENT);
+                    discordListenerHelper.updateNotification(interactionHook, INPUT_SENT);
                 }
                 case "editMessage" -> {
-                    InteractionHook interactionHook = sendNotification(event, WAITING_FOR_INPUT);
+                    InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
                     String messageContent = event.getValue(MESSAGE_CONTENT).getAsString();
                     String messageId = event.getValue(MESSAGE_ID).getAsString();
                     Message message = textChannel.retrieveMessageById(messageId).complete();
 
                     if (!message.getAuthor().getId().equals(bot.getId())) {
-                        updateNotification(interactionHook,
+                        discordListenerHelper.updateNotification(interactionHook,
                                 "It's only possible to edit messages sent by " + getBotNickname(bot));
                         return;
                     }
@@ -75,35 +77,35 @@ public class ModalListener extends ListenerAdapter {
 
                     useCaseRunner.run(useCase);
 
-                    updateNotification(interactionHook, MESSAGE_EDITED);
+                    discordListenerHelper.updateNotification(interactionHook, MESSAGE_EDITED);
                 }
                 case "remember" -> {
-                    InteractionHook interactionHook = sendNotification(event, WAITING_FOR_INPUT);
+                    InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
                     String rememberContent = event.getValue("rememberContent").getAsString();
 
                     useCaseRunner.run(UpdateAdventureRememberByChannelId.build(rememberContent, textChannel.getId()));
 
-                    updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
+                    discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
                 }
                 case "authorsNote" -> {
-                    InteractionHook interactionHook = sendNotification(event, WAITING_FOR_INPUT);
+                    InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
                     String authorsNoteContent = event.getValue("authorsNoteContent").getAsString();
 
                     useCaseRunner
                             .run(UpdateAdventureAuthorsNoteByChannelId.build(authorsNoteContent, textChannel.getId()));
 
-                    updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
+                    discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
                 }
                 case "nudge" -> {
-                    InteractionHook interactionHook = sendNotification(event, WAITING_FOR_INPUT);
+                    InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
                     String nudgeContent = event.getValue("nudgeContent").getAsString();
 
                     useCaseRunner.run(UpdateAdventureNudgeByChannelId.build(nudgeContent, textChannel.getId()));
 
-                    updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
+                    discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
                 }
                 case "bump" -> {
-                    InteractionHook interactionHook = sendNotification(event, WAITING_FOR_INPUT);
+                    InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
                     String bumpContent = event.getValue("bumpContent").getAsString();
                     int bumpFrequency = Integer.valueOf(event.getValue("bumpFrequency").getAsString());
 
@@ -113,7 +115,7 @@ public class ModalListener extends ListenerAdapter {
                             .channelId(textChannel.getId())
                             .build());
 
-                    updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
+                    discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
                 }
             }
         }
@@ -123,16 +125,5 @@ public class ModalListener extends ListenerAdapter {
 
         return StringUtils.isNotBlank(bot.getNickname()) ? bot.getNickname()
                 : bot.getUser().getName();
-    }
-
-    private InteractionHook sendNotification(ModalInteractionEvent event, String message) {
-        return event.reply(message).setEphemeral(true).complete();
-    }
-
-    private void updateNotification(InteractionHook interactionHook, String newContent) {
-
-        interactionHook.editOriginal(newContent)
-                .onSuccess(msg -> msg.delete().completeAfter(EPHEMERAL_MESSAGE_TTL, SECONDS))
-                .complete();
     }
 }

@@ -5,46 +5,33 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.helper.AdventureHelper;
-import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.discord.messagereceived.AuthorModeRequest;
 import me.moirai.discordbot.core.application.usecase.discord.messagereceived.ChatModeRequest;
 import me.moirai.discordbot.core.application.usecase.discord.messagereceived.RpgModeRequest;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest.Color;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 @Component
 public class MessageReceivedListener extends ListenerAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageReceivedListener.class);
-
-    private static final String COMMA_DELIMITER = ", ";
-    private static final String CONTENT_FLAGGED_MESSAGE = "Message content was flagged by moderation. The following topics were blocked: %s";
-    private static final String SOMETHING_WENT_WRONG = "Something went wrong. Please try again.";
-    private static final int ERROR_MESSAGE_TTL = 10;
-
     private final UseCaseRunner useCaseRunner;
     private final AdventureHelper adventureHelper;
-    private final DiscordChannelPort discordChannelPort;
+    private final DiscordListenerErrorHandler errorHandler;
 
     public MessageReceivedListener(UseCaseRunner useCaseRunner,
             AdventureHelper adventureHelper,
-            DiscordChannelPort discordChannelPort) {
+            DiscordListenerErrorHandler errorHandler) {
 
         this.useCaseRunner = useCaseRunner;
         this.adventureHelper = adventureHelper;
-        this.discordChannelPort = discordChannelPort;
+        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -85,7 +72,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 .build();
 
                         useCaseRunner.run(request)
-                                .doOnError(error -> errorNotification(event, error))
+                                .doOnError(error -> handleError(event, error))
                                 .subscribe();
                     }
                     case "RPG" -> {
@@ -101,7 +88,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 .build();
 
                         useCaseRunner.run(request)
-                                .doOnError(error -> errorNotification(event, error))
+                                .doOnError(error -> handleError(event, error))
                                 .subscribe();
                     }
                     case "AUTHOR" -> {
@@ -117,55 +104,20 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 .build();
 
                         useCaseRunner.run(request)
-                                .doOnError(error -> errorNotification(event, error))
+                                .doOnError(error -> handleError(event, error))
                                 .subscribe();
                     }
                 }
             }
         } catch (Exception e) {
-            errorNotification(event, e);
+            handleError(event, e);
         }
     }
 
-    private void errorNotification(MessageReceivedEvent event, Throwable error) {
+    private void handleError(MessageReceivedEvent event, Throwable error) {
 
-        LOG.error("An error occured while processing message received from Discord", error);
-        String authorNickname = isNotBlank(event.getMember().getNickname()) ? event.getMember().getNickname()
-                : event.getMember().getUser().getGlobalName();
-
-        DiscordEmbeddedMessageRequest.Builder embedBuilder = DiscordEmbeddedMessageRequest.builder()
-                .authorName(authorNickname)
-                .authorIconUrl(event.getAuthor().getAvatarUrl())
-                .embedColor(Color.RED);
-
-        if (error instanceof ModerationException moderationException) {
-            String flaggedTopics = String.join(COMMA_DELIMITER, moderationException.getFlaggedTopics());
-            String message = String.format(CONTENT_FLAGGED_MESSAGE, flaggedTopics);
-
-            DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(message)
-                    .titleText("Inappropriate content detected")
-                    .footerText("MoirAI content moderation")
-                    .build();
-
-            discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
-            return;
-        }
-
-        else if (error instanceof AssetNotFoundException assetNotFoundException) {
-            DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(assetNotFoundException.getMessage())
-                    .titleText("Asset requested was not found")
-                    .footerText("MoirAI asset management")
-                    .build();
-
-            discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
-            return;
-        }
-
-        DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(SOMETHING_WENT_WRONG)
-                .titleText("An error occurred")
-                .footerText("MoirAI error handling")
-                .build();
-
-        discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
+        Member member = event.getMember();
+        MessageChannelUnion channel = event.getChannel();
+        errorHandler.handleError(member, channel, error);
     }
 }

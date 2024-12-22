@@ -1,21 +1,15 @@
 package me.moirai.discordbot.infrastructure.inbound.discord.listener;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
-import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.adventure.request.GetAdventureByChannelId;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResult;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.GoCommand;
@@ -23,12 +17,11 @@ import me.moirai.discordbot.core.application.usecase.discord.slashcommands.Retry
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.StartCommand;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeInput;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResult;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest.Color;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -40,20 +33,14 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 @Component
 public class SlashCommandListener extends ListenerAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SlashCommandListener.class);
-
     private static final String CONTENT = "Content";
-    private static final String COMMA_DELIMITER = ", ";
-    private static final String CONTENT_FLAGGED_MESSAGE = "Message content was flagged by moderation. The following topics were blocked: %s";
-    private static final String SOMETHING_WENT_WRONG = "Something went wrong. Please try again.";
     private static final String TOKEN_REPLY_MESSAGE = "**Characters:** %s\n**Tokens:** %s\n**Token IDs:** %s (contains %s total tokens).";
     private static final String TOO_MUCH_CONTENT_TO_TOKENIZE = "Could not tokenize content. Too much content. Please use the web UI to tokenize large text";
     private static final int DISCORD_MAX_LENGTH = 2000;
-    private static final int EPHEMERAL_MESSAGE_TTL = 10;
-    private static final int ERROR_MESSAGE_TTL = 10;
 
     private final UseCaseRunner useCaseRunner;
-    private final DiscordChannelPort discordChannelPort;
+    private final DiscordListenerErrorHandler errorHandler;
+    private final DiscordListenerHelper discordListenerHelper;
     private final List<String> goCommandPhrasesBeforeRunning;
     private final List<String> goCommandPhrasesAfterRunning;
     private final List<String> retryCommandPhrasesBeforeRunning;
@@ -63,7 +50,8 @@ public class SlashCommandListener extends ListenerAdapter {
 
     public SlashCommandListener(
             UseCaseRunner useCaseRunner,
-            DiscordChannelPort discordChannelPort,
+            DiscordListenerErrorHandler errorHandler,
+            DiscordListenerHelper discordListenerHelper,
             @Value("${moirai.discord.bot.commands.go.before-running}") List<String> goCommandPhrasesBeforeRunning,
             @Value("${moirai.discord.bot.commands.go.after-running}") List<String> goCommandPhrasesAfterRunning,
             @Value("${moirai.discord.bot.commands.retry.before-running}") List<String> retryCommandPhrasesBeforeRunning,
@@ -72,7 +60,8 @@ public class SlashCommandListener extends ListenerAdapter {
             @Value("${moirai.discord.bot.commands.start.after-running}") List<String> startCommandPhrasesAfterRunning) {
 
         this.useCaseRunner = useCaseRunner;
-        this.discordChannelPort = discordChannelPort;
+        this.errorHandler = errorHandler;
+        this.discordListenerHelper = discordListenerHelper;
         this.goCommandPhrasesBeforeRunning = goCommandPhrasesBeforeRunning;
         this.goCommandPhrasesAfterRunning = goCommandPhrasesAfterRunning;
         this.retryCommandPhrasesBeforeRunning = retryCommandPhrasesBeforeRunning;
@@ -96,7 +85,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
                 switch (command) {
                     case "retry" -> {
-                        InteractionHook interactionHook = sendNotification(event,
+                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
                                 getCommandPhrase(retryCommandPhrasesBeforeRunning));
 
                         String botUsername = bot.getUser().getName();
@@ -112,13 +101,13 @@ public class SlashCommandListener extends ListenerAdapter {
                                 .build();
 
                         useCaseRunner.run(useCase)
-                                .doOnSuccess(__ -> updateNotification(interactionHook,
+                                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
                                         getCommandPhrase(retryCommandPhrasesAfterRunning)))
-                                .doOnError(error -> errorNotification(interactionHook, error))
+                                .doOnError(error -> errorHandler.handleError(interactionHook, error))
                                 .subscribe();
                     }
                     case "go" -> {
-                        InteractionHook interactionHook = sendNotification(event,
+                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
                                 getCommandPhrase(goCommandPhrasesBeforeRunning));
 
                         String botUsername = bot.getUser().getName();
@@ -134,13 +123,13 @@ public class SlashCommandListener extends ListenerAdapter {
                                 .build();
 
                         useCaseRunner.run(useCase)
-                                .doOnSuccess(__ -> updateNotification(interactionHook,
+                                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
                                         getCommandPhrase(goCommandPhrasesAfterRunning)))
-                                .doOnError(error -> errorNotification(interactionHook, error))
+                                .doOnError(error -> errorHandler.handleError(interactionHook, error))
                                 .subscribe();
                     }
                     case "start" -> {
-                        InteractionHook interactionHook = sendNotification(event,
+                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
                                 getCommandPhrase(startCommandPhrasesBeforeRunning));
 
                         String botUsername = bot.getUser().getName();
@@ -156,9 +145,10 @@ public class SlashCommandListener extends ListenerAdapter {
                                 .build();
 
                         useCaseRunner.run(useCase)
-                                .doOnSuccess(__ -> updateNotification(interactionHook,
+                                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
                                         getCommandPhrase(startCommandPhrasesAfterRunning)))
-                                .doOnError(error -> updateNotification(interactionHook, error.getMessage()))
+                                .doOnError(error -> discordListenerHelper.updateNotification(interactionHook,
+                                        error.getMessage()))
                                 .subscribe();
                     }
                     case "say" -> {
@@ -175,7 +165,8 @@ public class SlashCommandListener extends ListenerAdapter {
                         event.replyModal(modal).complete();
                     }
                     case "tokenize" -> {
-                        InteractionHook interactionHook = sendNotification(event, "Tokenizing input...");
+                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
+                                "Tokenizing input...");
                         String inputToBeTokenized = event.getOption("input").getAsString();
 
                         TokenizeResult tokenizationResult = useCaseRunner.run(TokenizeInput.build(inputToBeTokenized))
@@ -184,11 +175,11 @@ public class SlashCommandListener extends ListenerAdapter {
                         String finalResult = mapTokenizationResultToMessage(tokenizationResult);
 
                         if (finalResult.length() > DISCORD_MAX_LENGTH) {
-                            updateNotification(interactionHook, TOO_MUCH_CONTENT_TO_TOKENIZE);
+                            discordListenerHelper.updateNotification(interactionHook, TOO_MUCH_CONTENT_TO_TOKENIZE);
                             return;
                         }
 
-                        updateNotification(interactionHook, finalResult);
+                        discordListenerHelper.updateNotification(interactionHook, finalResult);
                     }
                     case "remember" -> {
                         GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
@@ -271,7 +262,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 }
             }
         } catch (Exception e) {
-            errorNotification(event, e);
+            handleError(event, e);
         }
     }
 
@@ -282,79 +273,16 @@ public class SlashCommandListener extends ListenerAdapter {
                 tokenizationResult.getTokenCount());
     }
 
-    private InteractionHook sendNotification(SlashCommandInteractionEvent event, String message) {
-        return event.reply(message).setEphemeral(true).complete();
-    }
-
-    private void updateNotification(InteractionHook interactionHook, String newContent) {
-
-        interactionHook.editOriginal(newContent)
-                .onSuccess(msg -> msg.delete().completeAfter(EPHEMERAL_MESSAGE_TTL, SECONDS))
-                .complete();
-    }
-
     private String getCommandPhrase(List<String> phraseList) {
 
         int randomIndex = new Random().nextInt(phraseList.size());
         return phraseList.get(randomIndex);
     }
 
-    private void errorNotification(InteractionHook interactionHook, Throwable error) {
+    private void handleError(SlashCommandInteractionEvent event, Throwable error) {
 
-        if (error instanceof ModerationException moderationException) {
-            String flaggedTopics = String.join(COMMA_DELIMITER, moderationException.getFlaggedTopics());
-            String message = String.format(CONTENT_FLAGGED_MESSAGE, flaggedTopics);
-
-            updateNotification(interactionHook, message);
-        }
-
-        else if (error instanceof AssetNotFoundException assetNotFoundException) {
-            updateNotification(interactionHook, assetNotFoundException.getMessage());
-        }
-
-        updateNotification(interactionHook, SOMETHING_WENT_WRONG);
-    }
-
-    private void errorNotification(SlashCommandInteractionEvent event, Throwable error) {
-
-        LOG.error("An error occured while processing message received from Discord", error);
-        String authorNickname = isNotBlank(event.getMember().getNickname()) ? event.getMember().getNickname()
-                : event.getMember().getUser().getGlobalName();
-
-        DiscordEmbeddedMessageRequest.Builder embedBuilder = DiscordEmbeddedMessageRequest.builder()
-                .authorName(authorNickname)
-                .authorIconUrl(event.getMember().getAvatarUrl())
-                .embedColor(Color.RED);
-
-        if (error instanceof ModerationException) {
-            ModerationException moderationException = (ModerationException) error;
-            String flaggedTopics = String.join(COMMA_DELIMITER, moderationException.getFlaggedTopics());
-            String message = String.format(CONTENT_FLAGGED_MESSAGE, flaggedTopics);
-
-            DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(message)
-                    .titleText("Inappropriate content detected")
-                    .footerText("MoirAI content moderation")
-                    .build();
-
-            discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
-            return;
-        }
-
-        else if (error instanceof AssetNotFoundException) {
-            DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(error.getMessage())
-                    .titleText("Asset requested was not found")
-                    .footerText("MoirAI asset management")
-                    .build();
-
-            discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
-            return;
-        }
-
-        DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(SOMETHING_WENT_WRONG)
-                .titleText("An error occurred")
-                .footerText("MoirAI error handling")
-                .build();
-
-        discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
+        Member member = event.getMember();
+        MessageChannelUnion channel = event.getChannel();
+        errorHandler.handleError(member, channel, error);
     }
 }
