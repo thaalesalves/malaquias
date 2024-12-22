@@ -33,6 +33,16 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 @Component
 public class SlashCommandListener extends ListenerAdapter {
 
+    private static final String RETRY_COMMAND = "retry";
+    private static final String GO_COMMAND = "go";
+    private static final String START_COMMAND = "start";
+    private static final String SAY_COMMAND = "say";
+    private static final String TOKENIZE_COMMAND = "tokenize";
+    private static final String REMEMBER_COMMAND = "remember";
+    private static final String NUDGE_COMMAND = "nudge";
+    private static final String AUTHORS_NOTE_COMMAND = "authorsnote";
+    private static final String BUMP_COMMAND = "bump";
+
     private static final String CONTENT = "Content";
     private static final String TOKEN_REPLY_MESSAGE = "**Characters:** %s\n**Tokens:** %s\n**Token IDs:** %s (contains %s total tokens).";
     private static final String TOO_MUCH_CONTENT_TO_TOKENIZE = "Could not tokenize content. Too much content. Please use the web UI to tokenize large text";
@@ -81,189 +91,219 @@ public class SlashCommandListener extends ListenerAdapter {
             User author = event.getMember().getUser();
 
             if (!author.isBot()) {
-                event.getChannel().sendTyping().complete();
-
                 switch (command) {
-                    case "retry" -> {
-                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
-                                getCommandPhrase(retryCommandPhrasesBeforeRunning));
-
-                        String botUsername = bot.getUser().getName();
-                        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
-                                : botUsername;
-
-                        RetryCommand useCase = RetryCommand.builder()
-                                .botId(bot.getId())
-                                .botNickname(botNickname)
-                                .botUsername(botUsername)
-                                .guildId(guild.getId())
-                                .channelId(textChannel.getId())
-                                .build();
-
-                        useCaseRunner.run(useCase)
-                                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
-                                        getCommandPhrase(retryCommandPhrasesAfterRunning)))
-                                .doOnError(error -> errorHandler.handleError(interactionHook, error))
-                                .subscribe();
-                    }
-                    case "go" -> {
-                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
-                                getCommandPhrase(goCommandPhrasesBeforeRunning));
-
-                        String botUsername = bot.getUser().getName();
-                        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
-                                : botUsername;
-
-                        GoCommand useCase = GoCommand.builder()
-                                .botId(bot.getId())
-                                .botNickname(botNickname)
-                                .botUsername(botUsername)
-                                .guildId(guild.getId())
-                                .channelId(textChannel.getId())
-                                .build();
-
-                        useCaseRunner.run(useCase)
-                                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
-                                        getCommandPhrase(goCommandPhrasesAfterRunning)))
-                                .doOnError(error -> errorHandler.handleError(interactionHook, error))
-                                .subscribe();
-                    }
-                    case "start" -> {
-                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
-                                getCommandPhrase(startCommandPhrasesBeforeRunning));
-
-                        String botUsername = bot.getUser().getName();
-                        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
-                                : botUsername;
-
-                        StartCommand useCase = StartCommand.builder()
-                                .botId(bot.getId())
-                                .botNickname(botNickname)
-                                .botUsername(botUsername)
-                                .guildId(guild.getId())
-                                .channelId(textChannel.getId())
-                                .build();
-
-                        useCaseRunner.run(useCase)
-                                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
-                                        getCommandPhrase(startCommandPhrasesAfterRunning)))
-                                .doOnError(error -> discordListenerHelper.updateNotification(interactionHook,
-                                        error.getMessage()))
-                                .subscribe();
-                    }
-                    case "say" -> {
-                        TextInput content = TextInput.create("content", CONTENT, TextInputStyle.PARAGRAPH)
-                                .setPlaceholder("Message to be sent as the bot")
-                                .setMinLength(1)
-                                .setMaxLength(2000)
-                                .build();
-
-                        Modal modal = Modal.create("sayAsBot", "Say as bot")
-                                .addComponents(ActionRow.of(content))
-                                .build();
-
-                        event.replyModal(modal).complete();
-                    }
-                    case "tokenize" -> {
-                        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
-                                "Tokenizing input...");
-                        String inputToBeTokenized = event.getOption("input").getAsString();
-
-                        TokenizeResult tokenizationResult = useCaseRunner.run(TokenizeInput.build(inputToBeTokenized))
-                                .orElseThrow(() -> new IllegalStateException("Error tokenizing input"));
-
-                        String finalResult = mapTokenizationResultToMessage(tokenizationResult);
-
-                        if (finalResult.length() > DISCORD_MAX_LENGTH) {
-                            discordListenerHelper.updateNotification(interactionHook, TOO_MUCH_CONTENT_TO_TOKENIZE);
-                            return;
-                        }
-
-                        discordListenerHelper.updateNotification(interactionHook, finalResult);
-                    }
-                    case "remember" -> {
-                        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
-                        GetAdventureResult result = useCaseRunner.run(request);
-
-                        TextInput rememberContent = TextInput
-                                .create("rememberContent", CONTENT, TextInputStyle.PARAGRAPH)
-                                .setPlaceholder("Important piece of information the AI has to remember about")
-                                .setMinLength(1)
-                                .setMaxLength(50)
-                                .setValue(result.getRemember())
-                                .build();
-
-                        Modal modal = Modal.create("remember", "Context modifier: remember")
-                                .addComponents(ActionRow.of(rememberContent))
-                                .build();
-
-                        event.replyModal(modal).complete();
-                    }
-                    case "nudge" -> {
-                        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
-                        GetAdventureResult result = useCaseRunner.run(request);
-
-                        TextInput nudgeContent = TextInput.create("nudgeContent", CONTENT, TextInputStyle.PARAGRAPH)
-                                .setPlaceholder("General instructions for the AI to follow")
-                                .setMinLength(1)
-                                .setMaxLength(50)
-                                .setValue(result.getNudge())
-                                .build();
-
-                        Modal modal = Modal.create("nudge", "Context modifier: nudge")
-                                .addComponents(ActionRow.of(nudgeContent))
-                                .build();
-
-                        event.replyModal(modal).complete();
-                    }
-                    case "authorsnote" -> {
-                        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
-                        GetAdventureResult result = useCaseRunner.run(request);
-
-                        TextInput authorsNoteContent = TextInput
-                                .create("authorsNoteContent", CONTENT, TextInputStyle.PARAGRAPH)
-                                .setPlaceholder("Instructions from the author on how the story should be told")
-                                .setMinLength(1)
-                                .setMaxLength(50)
-                                .setValue(result.getAuthorsNote())
-                                .build();
-
-                        Modal modal = Modal.create("authorsNote", "Context modifier: author's note")
-                                .addComponents(ActionRow.of(authorsNoteContent))
-                                .build();
-
-                        event.replyModal(modal).complete();
-                    }
-                    case "bump" -> {
-                        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
-                        GetAdventureResult result = useCaseRunner.run(request);
-
-                        TextInput bumpContent = TextInput.create("bumpContent", CONTENT, TextInputStyle.PARAGRAPH)
-                                .setPlaceholder("Reminders inserted between messages to keep AI's act on track")
-                                .setMinLength(1)
-                                .setMaxLength(50)
-                                .setValue(result.getBump())
-                                .build();
-
-                        TextInput bumpFrequency = TextInput
-                                .create("bumpFrequency", "Insert bump every # messages", TextInputStyle.SHORT)
-                                .setPlaceholder("3")
-                                .setMinLength(1)
-                                .setMaxLength(2)
-                                .setValue(String.valueOf(result.getBumpFrequency()))
-                                .build();
-
-                        Modal modal = Modal.create("bump", "Context modifier: bump")
-                                .addComponents(ActionRow.of(bumpContent), ActionRow.of(bumpFrequency))
-                                .build();
-
-                        event.replyModal(modal).complete();
-                    }
+                    case RETRY_COMMAND -> processRetryCommand(event, textChannel, guild, bot);
+                    case GO_COMMAND -> processGoCommand(event, textChannel, guild, bot);
+                    case START_COMMAND -> processStartCommand(event, textChannel, guild, bot);
+                    case SAY_COMMAND -> processSayCommand(event);
+                    case TOKENIZE_COMMAND -> processTokenizeCommand(event);
+                    case REMEMBER_COMMAND -> processRememberCommand(event, textChannel);
+                    case NUDGE_COMMAND -> processNudgeCommand(event, textChannel);
+                    case AUTHORS_NOTE_COMMAND -> processAuthorsNoteCommand(event, textChannel);
+                    case BUMP_COMMAND -> processBumpCommand(event, textChannel);
                 }
             }
         } catch (Exception e) {
             handleError(event, e);
         }
+    }
+
+    private void processTokenizeCommand(SlashCommandInteractionEvent event) {
+
+        InteractionHook interactionHook = discordListenerHelper.sendNotification(event, "Tokenizing input...");
+        String inputToBeTokenized = event.getOption("input").getAsString();
+        TokenizeResult tokenizationResult = useCaseRunner.run(TokenizeInput.build(inputToBeTokenized))
+                .orElseThrow(() -> new IllegalStateException("Error tokenizing input"));
+
+        String finalResult = mapTokenizationResultToMessage(tokenizationResult);
+
+        if (finalResult.length() > DISCORD_MAX_LENGTH) {
+            discordListenerHelper.updateNotification(interactionHook, TOO_MUCH_CONTENT_TO_TOKENIZE);
+            return;
+        }
+
+        discordListenerHelper.updateNotification(interactionHook, finalResult);
+    }
+
+    private void processBumpCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
+
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureResult result = useCaseRunner.run(request);
+
+        TextInput bumpContent = TextInput.create("bumpContent", CONTENT, TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Reminders inserted between messages to keep AI's act on track")
+                .setMinLength(1)
+                .setMaxLength(50)
+                .setValue(result.getBump())
+                .build();
+
+        TextInput bumpFrequency = TextInput
+                .create("bumpFrequency", "Insert bump every # messages", TextInputStyle.SHORT)
+                .setPlaceholder("3")
+                .setMinLength(1)
+                .setMaxLength(2)
+                .setValue(String.valueOf(result.getBumpFrequency()))
+                .build();
+
+        Modal modal = Modal.create(BUMP_COMMAND, "Context modifier: bump")
+                .addComponents(ActionRow.of(bumpContent), ActionRow.of(bumpFrequency))
+                .build();
+
+        event.replyModal(modal).complete();
+    }
+
+    private void processAuthorsNoteCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
+
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureResult result = useCaseRunner.run(request);
+
+        TextInput authorsNoteContent = TextInput
+                .create("authorsNoteContent", CONTENT, TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Instructions from the author on how the story should be told")
+                .setMinLength(1)
+                .setMaxLength(50)
+                .setValue(result.getAuthorsNote())
+                .build();
+
+        Modal modal = Modal.create("authorsNote", "Context modifier: author's note")
+                .addComponents(ActionRow.of(authorsNoteContent))
+                .build();
+
+        event.replyModal(modal).complete();
+    }
+
+    private void processNudgeCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
+
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureResult result = useCaseRunner.run(request);
+
+        TextInput nudgeContent = TextInput.create("nudgeContent", CONTENT, TextInputStyle.PARAGRAPH)
+                .setPlaceholder("General instructions for the AI to follow")
+                .setMinLength(1)
+                .setMaxLength(50)
+                .setValue(result.getNudge())
+                .build();
+
+        Modal modal = Modal.create(NUDGE_COMMAND, "Context modifier: nudge")
+                .addComponents(ActionRow.of(nudgeContent))
+                .build();
+
+        event.replyModal(modal).complete();
+    }
+
+    private void processRememberCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
+
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureResult result = useCaseRunner.run(request);
+
+        TextInput rememberContent = TextInput
+                .create("rememberContent", CONTENT, TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Important piece of information the AI has to remember about")
+                .setMinLength(1)
+                .setMaxLength(50)
+                .setValue(result.getRemember())
+                .build();
+
+        Modal modal = Modal.create(REMEMBER_COMMAND, "Context modifier: remember")
+                .addComponents(ActionRow.of(rememberContent))
+                .build();
+
+        event.replyModal(modal).complete();
+    }
+
+    private void processSayCommand(SlashCommandInteractionEvent event) {
+
+        event.getChannel().sendTyping().complete();
+        TextInput content = TextInput.create("content", CONTENT, TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Message to be sent as the bot")
+                .setMinLength(1)
+                .setMaxLength(2000)
+                .build();
+
+        Modal modal = Modal.create("sayAsBot", "Say as bot")
+                .addComponents(ActionRow.of(content))
+                .build();
+
+        event.replyModal(modal).complete();
+    }
+
+    private void processStartCommand(SlashCommandInteractionEvent event,
+            TextChannel textChannel, Guild guild, Member bot) {
+
+        event.getChannel().sendTyping().complete();
+        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
+                getCommandPhrase(startCommandPhrasesBeforeRunning));
+
+        String botUsername = bot.getUser().getName();
+        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
+                : botUsername;
+
+        StartCommand useCase = StartCommand.builder()
+                .botId(bot.getId())
+                .botNickname(botNickname)
+                .botUsername(botUsername)
+                .guildId(guild.getId())
+                .channelId(textChannel.getId())
+                .build();
+
+        useCaseRunner.run(useCase)
+                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
+                        getCommandPhrase(startCommandPhrasesAfterRunning)))
+                .doOnError(error -> discordListenerHelper.updateNotification(interactionHook,
+                        error.getMessage()))
+                .subscribe();
+    }
+
+    private void processGoCommand(SlashCommandInteractionEvent event, TextChannel textChannel,
+            Guild guild, Member bot) {
+
+        event.getChannel().sendTyping().complete();
+        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
+                getCommandPhrase(goCommandPhrasesBeforeRunning));
+
+        String botUsername = bot.getUser().getName();
+        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
+                : botUsername;
+
+        GoCommand useCase = GoCommand.builder()
+                .botId(bot.getId())
+                .botNickname(botNickname)
+                .botUsername(botUsername)
+                .guildId(guild.getId())
+                .channelId(textChannel.getId())
+                .build();
+
+        useCaseRunner.run(useCase)
+                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
+                        getCommandPhrase(goCommandPhrasesAfterRunning)))
+                .doOnError(error -> errorHandler.handleError(interactionHook, error))
+                .subscribe();
+    }
+
+    private void processRetryCommand(SlashCommandInteractionEvent event, TextChannel textChannel,
+            Guild guild, Member bot) {
+
+        event.getChannel().sendTyping().complete();
+        InteractionHook interactionHook = discordListenerHelper.sendNotification(event,
+                getCommandPhrase(retryCommandPhrasesBeforeRunning));
+
+        String botUsername = bot.getUser().getName();
+        String botNickname = isNotBlank(bot.getNickname()) ? bot.getNickname()
+                : botUsername;
+
+        RetryCommand useCase = RetryCommand.builder()
+                .botId(bot.getId())
+                .botNickname(botNickname)
+                .botUsername(botUsername)
+                .guildId(guild.getId())
+                .channelId(textChannel.getId())
+                .build();
+
+        useCaseRunner.run(useCase)
+                .doOnSuccess(__ -> discordListenerHelper.updateNotification(interactionHook,
+                        getCommandPhrase(retryCommandPhrasesAfterRunning)))
+                .doOnError(error -> errorHandler.handleError(interactionHook, error))
+                .subscribe();
     }
 
     private String mapTokenizationResultToMessage(TokenizeResult tokenizationResult) {
