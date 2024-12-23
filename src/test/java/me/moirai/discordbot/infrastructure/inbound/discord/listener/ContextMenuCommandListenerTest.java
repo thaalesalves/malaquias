@@ -40,6 +40,12 @@ public class ContextMenuCommandListenerTest extends AbstractDiscordTest {
     @Mock
     private DiscordChannelPort discordChannelPort;
 
+    @Mock
+    private DiscordListenerErrorHandler errorHandler;
+
+    @Mock
+    private DiscordListenerHelper discordListenerHelper;
+
     @InjectMocks
     private ContextMenuCommandListener listener;
 
@@ -96,7 +102,6 @@ public class ContextMenuCommandListenerTest extends AbstractDiscordTest {
         String eventName = "(MoirAI) Edit message";
         String messageContent = "It's only possible to edit messages sent by " + NICKNAME;
 
-        ReplyCallbackAction messageReplyAction = mock(ReplyCallbackAction.class);
         InteractionHook interactionHook = mock(InteractionHook.class);
         MessageContextInteractionEvent event = mock(MessageContextInteractionEvent.class);
 
@@ -109,12 +114,10 @@ public class ContextMenuCommandListenerTest extends AbstractDiscordTest {
         when(event.getJDA()).thenReturn(jda);
         when(event.getTarget()).thenReturn(message);
         when(event.getChannel()).thenReturn(channelUnion);
+        when(channelUnion.sendTyping()).thenReturn(restAction);
 
         when(member.getId()).thenReturn(botId);
-        when(event.reply(contentCaptor.capture())).thenReturn(messageReplyAction);
-        when(messageReplyAction.setEphemeral(anyBoolean())).thenReturn(messageReplyAction);
-        when(messageReplyAction.complete()).thenReturn(interactionHook);
-        when(channelUnion.sendTyping()).thenReturn(restAction);
+        when(discordListenerHelper.sendNotification(any(), contentCaptor.capture())).thenReturn(interactionHook);
 
         // When
         listener.onMessageContextInteraction(event);
@@ -134,7 +137,6 @@ public class ContextMenuCommandListenerTest extends AbstractDiscordTest {
         String eventName = "(MoirAI) Edit message";
         String messageContent = "It's only possible to edit messages sent by " + USERNAME;
 
-        ReplyCallbackAction messageReplyAction = mock(ReplyCallbackAction.class);
         InteractionHook interactionHook = mock(InteractionHook.class);
         MessageContextInteractionEvent event = mock(MessageContextInteractionEvent.class);
 
@@ -149,11 +151,10 @@ public class ContextMenuCommandListenerTest extends AbstractDiscordTest {
         when(event.getChannel()).thenReturn(channelUnion);
 
         when(member.getId()).thenReturn(botId);
-        when(event.reply(contentCaptor.capture())).thenReturn(messageReplyAction);
-        when(messageReplyAction.setEphemeral(anyBoolean())).thenReturn(messageReplyAction);
-        when(messageReplyAction.complete()).thenReturn(interactionHook);
         when(member.getNickname()).thenReturn(null);
         when(channelUnion.sendTyping()).thenReturn(restAction);
+
+        when(discordListenerHelper.sendNotification(any(), contentCaptor.capture())).thenReturn(interactionHook);
 
         // When
         listener.onMessageContextInteraction(event);

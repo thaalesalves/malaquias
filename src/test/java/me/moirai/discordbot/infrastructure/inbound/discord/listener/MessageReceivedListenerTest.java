@@ -37,6 +37,12 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
     @Mock
     private AdventureHelper adventureHelper;
 
+    @Mock
+    private DiscordListenerErrorHandler errorHandler;
+
+    @Mock
+    private DiscordListenerHelper discordListenerHelper;
+
     @InjectMocks
     private MessageReceivedListener listener;
 
@@ -311,5 +317,33 @@ public class MessageReceivedListenerTest extends AbstractDiscordTest {
         StepVerifier.create(useCaseResult)
                 .assertNext(result -> assertThat(result).isNotNull())
                 .verifyComplete();
+    }
+
+    @Test
+    public void messageListener_whenExceptionThrown_thenCallErrorHandler() {
+
+        // Given
+        MessageReceivedEvent event = mock(MessageReceivedEvent.class);
+
+        when(event.getMessage()).thenThrow(IllegalStateException.class);
+
+        // When
+        listener.onMessageReceived(event);
+
+        // Then
+        verify(errorHandler, times(1)).handleError(any(), any(), any());
+    }
+
+    @Test
+    public void messageListener_whenNoModeSelected_thenDoNothing() {
+
+        // Given
+        MessageReceivedEvent event = mock(MessageReceivedEvent.class);
+
+        // When
+        listener.onMessageReceived(event);
+
+        // Then
+        verify(useCaseRunner, times(0)).run(any());
     }
 }

@@ -20,7 +20,6 @@ import org.mockito.Mock;
 
 import me.moirai.discordbot.AbstractDiscordTest;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
-import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.adventure.request.GetAdventureByChannelId;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResultFixture;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.GoCommand;
@@ -61,7 +60,10 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
     private UseCaseRunner useCaseRunner;
 
     @Mock
-    private DiscordChannelPort discordChannelPort;
+    private DiscordListenerErrorHandler errorHandler;
+
+    @Mock
+    private DiscordListenerHelper discordListenerHelper;
 
     private SlashCommandListener listener;
 
@@ -70,7 +72,7 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
 
         List<String> commandBefore = singletonList("Running command");
         List<String> commandAfter = singletonList("Command run");
-        listener = new SlashCommandListener(useCaseRunner, discordChannelPort,
+        listener = new SlashCommandListener(useCaseRunner, errorHandler, discordListenerHelper,
                 commandBefore, commandAfter, commandBefore, commandAfter, commandBefore, commandAfter);
 
         InteractionHook interactionHook = mock(InteractionHook.class);
@@ -504,8 +506,6 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
         long[] tokenIds = { 1212, 318, 617, 2420, 13 };
         int tokenCount = 5;
 
-        String expectedNotification = "Could not tokenize content. Too much content. Please use the web UI to tokenize large text";
-
         OptionMapping commandParameterContent = mock(OptionMapping.class);
         InteractionHook interactionHook = mock(InteractionHook.class);
         ReplyCallbackAction eventReplyAction = mock(ReplyCallbackAction.class);
@@ -522,8 +522,6 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
                 .characterCount(textToBeTokenized.length())
                 .build();
 
-        ArgumentCaptor<String> notificationCaptor = ArgumentCaptor.forClass(String.class);
-
         when(event.getFullCommandName()).thenReturn(command);
         when(event.getChannel()).thenReturn(baseChannel);
         when(baseChannel.asTextChannel()).thenReturn(textChannel);
@@ -539,7 +537,6 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
         when(eventReplyAction.setEphemeral(anyBoolean())).thenReturn(eventReplyAction);
         when(eventReplyAction.complete()).thenReturn(interactionHook);
         when(interactionHook.deleteOriginal()).thenReturn(deleteOriginalAction);
-        when(interactionHook.editOriginal(notificationCaptor.capture())).thenReturn(editAction);
         when(editAction.complete()).thenReturn(message);
         when(event.getOption(anyString())).thenReturn(commandParameterContent);
         when(commandParameterContent.getAsString()).thenReturn(textToBeTokenized);
@@ -551,11 +548,6 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
 
         // Then
         verify(useCaseRunner, times(1)).run(any());
-
-        String notificationSent = notificationCaptor.getValue();
-        assertThat(notificationSent).isNotNull()
-                .isNotEmpty()
-                .isEqualTo(expectedNotification);
     }
 
     @Test

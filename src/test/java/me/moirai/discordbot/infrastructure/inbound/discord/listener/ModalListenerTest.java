@@ -36,6 +36,12 @@ public class ModalListenerTest extends AbstractDiscordTest {
     @Mock
     private UseCaseRunner useCaseRunner;
 
+    @Mock
+    private DiscordListenerErrorHandler errorHandler;
+
+    @Mock
+    private DiscordListenerHelper discordListenerHelper;
+
     @InjectMocks
     private ModalListener listener;
 
@@ -193,11 +199,8 @@ public class ModalListenerTest extends AbstractDiscordTest {
         InteractionHook interactionHook = mock(InteractionHook.class);
         ReplyCallbackAction sendMessageCallback = mock(ReplyCallbackAction.class);
         ModalInteractionEvent event = mock(ModalInteractionEvent.class);
-        WebhookMessageEditAction<Message> editNotificationAction = mock(WebhookMessageEditAction.class);
         ModalMapping modalMapping = mock(ModalMapping.class);
         RestAction<Message> getMessageAction = mock(RestAction.class);
-        RestAction<Void> deleteOriginalAction = mock(RestAction.class);
-
         ArgumentCaptor<String> notificationCaptor = ArgumentCaptor.forClass(String.class);
 
         when(event.getModalId()).thenReturn(modalName);
@@ -218,10 +221,7 @@ public class ModalListenerTest extends AbstractDiscordTest {
         when(sendMessageCallback.setEphemeral(anyBoolean())).thenReturn(sendMessageCallback);
         when(sendMessageCallback.complete()).thenReturn(interactionHook);
 
-        when(interactionHook.editOriginal(notificationCaptor.capture())).thenReturn(editNotificationAction);
-        when(editNotificationAction.onSuccess(any())).thenReturn(getMessageAction);
-        when(interactionHook.deleteOriginal()).thenReturn(deleteOriginalAction);
-        when(editNotificationAction.complete()).thenReturn(message);
+        when(discordListenerHelper.updateNotification(any(), notificationCaptor.capture())).thenReturn(message);
 
         // When
         listener.onModalInteraction(event);
@@ -245,10 +245,8 @@ public class ModalListenerTest extends AbstractDiscordTest {
         InteractionHook interactionHook = mock(InteractionHook.class);
         ReplyCallbackAction sendMessageCallback = mock(ReplyCallbackAction.class);
         ModalInteractionEvent event = mock(ModalInteractionEvent.class);
-        WebhookMessageEditAction<Message> editNotificationAction = mock(WebhookMessageEditAction.class);
         ModalMapping modalMapping = mock(ModalMapping.class);
         RestAction<Message> getMessageAction = mock(RestAction.class);
-        RestAction<Void> deleteOriginalAction = mock(RestAction.class);
 
         ArgumentCaptor<String> notificationCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -271,10 +269,7 @@ public class ModalListenerTest extends AbstractDiscordTest {
         when(sendMessageCallback.setEphemeral(anyBoolean())).thenReturn(sendMessageCallback);
         when(sendMessageCallback.complete()).thenReturn(interactionHook);
 
-        when(interactionHook.editOriginal(notificationCaptor.capture())).thenReturn(editNotificationAction);
-        when(editNotificationAction.onSuccess(any())).thenReturn(getMessageAction);
-        when(interactionHook.deleteOriginal()).thenReturn(deleteOriginalAction);
-        when(editNotificationAction.complete()).thenReturn(message);
+        when(discordListenerHelper.updateNotification(any(), notificationCaptor.capture())).thenReturn(message);
 
         // When
         listener.onModalInteraction(event);

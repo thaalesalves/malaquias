@@ -5,64 +5,47 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.helper.AdventureHelper;
-import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.discord.messagereceived.AuthorModeRequest;
 import me.moirai.discordbot.core.application.usecase.discord.messagereceived.ChatModeRequest;
 import me.moirai.discordbot.core.application.usecase.discord.messagereceived.RpgModeRequest;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordEmbeddedMessageRequest.Color;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 @Component
 public class MessageReceivedListener extends ListenerAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageReceivedListener.class);
-
-    private static final String COMMA_DELIMITER = ", ";
-    private static final String CONTENT_FLAGGED_MESSAGE = "Message content was flagged by moderation. The following topics were blocked: %s";
-    private static final String SOMETHING_WENT_WRONG = "Something went wrong. Please try again.";
-    private static final int ERROR_MESSAGE_TTL = 10;
+    private static final String AUTHOR_MODE = "AUTHOR";
+    private static final String RPG_MODE = "RPG";
+    private static final String CHAT_MODE = "CHAT";
 
     private final UseCaseRunner useCaseRunner;
     private final AdventureHelper adventureHelper;
-    private final DiscordChannelPort discordChannelPort;
+    private final DiscordListenerErrorHandler errorHandler;
 
     public MessageReceivedListener(UseCaseRunner useCaseRunner,
             AdventureHelper adventureHelper,
-            DiscordChannelPort discordChannelPort) {
+            DiscordListenerErrorHandler errorHandler) {
 
         this.useCaseRunner = useCaseRunner;
         this.adventureHelper = adventureHelper;
-        this.discordChannelPort = discordChannelPort;
+        this.errorHandler = errorHandler;
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
 
         try {
-            Message message = event.getMessage();
             Member author = event.getMember();
             Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
-            List<String> mentions = message.getMentions()
-                    .getMembers()
-                    .stream()
-                    .map(Member::getId)
-                    .toList();
-
-            String guildId = event.getGuild().getId();
             String channelId = event.getChannel().getId();
-            String messageContent = message.getContentRaw();
+            String messageContent = event.getMessage().getContentRaw();
             String gameMode = adventureHelper.getGameModeByDiscordChannelId(channelId);
 
             if (StringUtils.isNoneBlank(messageContent, gameMode) && !author.getUser().isBot()) {
@@ -72,100 +55,110 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendTyping().complete();
 
                 switch (gameMode) {
-                    case "CHAT" -> {
-                        ChatModeRequest request = ChatModeRequest.builder()
-                                .authordDiscordId(author.getId())
-                                .channelId(channelId)
-                                .messageId(message.getId())
-                                .guildId(guildId)
-                                .isBotMentioned(mentions.contains(bot.getId()))
-                                .mentionedUsersIds(mentions)
-                                .botUsername(botUsername)
-                                .botNickname(botNickname)
-                                .build();
-
-                        useCaseRunner.run(request)
-                                .doOnError(error -> errorNotification(event, error))
-                                .subscribe();
-                    }
-                    case "RPG" -> {
-                        RpgModeRequest request = RpgModeRequest.builder()
-                                .authordDiscordId(author.getId())
-                                .channelId(channelId)
-                                .messageId(message.getId())
-                                .guildId(guildId)
-                                .isBotMentioned(mentions.contains(bot.getId()))
-                                .mentionedUsersIds(mentions)
-                                .botUsername(botUsername)
-                                .botNickname(botNickname)
-                                .build();
-
-                        useCaseRunner.run(request)
-                                .doOnError(error -> errorNotification(event, error))
-                                .subscribe();
-                    }
-                    case "AUTHOR" -> {
-                        AuthorModeRequest request = AuthorModeRequest.builder()
-                                .authordDiscordId(author.getId())
-                                .channelId(channelId)
-                                .messageId(message.getId())
-                                .guildId(guildId)
-                                .isBotMentioned(mentions.contains(bot.getId()))
-                                .mentionedUsersIds(mentions)
-                                .botUsername(botUsername)
-                                .botNickname(botNickname)
-                                .build();
-
-                        useCaseRunner.run(request)
-                                .doOnError(error -> errorNotification(event, error))
-                                .subscribe();
-                    }
+                    case CHAT_MODE -> processChatMode(event, botUsername, botNickname);
+                    case RPG_MODE -> processRpgMode(event, botUsername, botNickname);
+                    case AUTHOR_MODE -> processAuthorMode(event, botUsername, botNickname);
                 }
             }
         } catch (Exception e) {
-            errorNotification(event, e);
+            handleError(event, e);
         }
     }
 
-    private void errorNotification(MessageReceivedEvent event, Throwable error) {
+    private void processAuthorMode(MessageReceivedEvent event, String botUsername, String botNickname) {
 
-        LOG.error("An error occured while processing message received from Discord", error);
-        String authorNickname = isNotBlank(event.getMember().getNickname()) ? event.getMember().getNickname()
-                : event.getMember().getUser().getGlobalName();
+        Message message = event.getMessage();
+        Member author = event.getMember();
+        Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
+        List<String> mentions = message.getMentions()
+                .getMembers()
+                .stream()
+                .map(Member::getId)
+                .toList();
 
-        DiscordEmbeddedMessageRequest.Builder embedBuilder = DiscordEmbeddedMessageRequest.builder()
-                .authorName(authorNickname)
-                .authorIconUrl(event.getAuthor().getAvatarUrl())
-                .embedColor(Color.RED);
+        String guildId = event.getGuild().getId();
+        String channelId = event.getChannel().getId();
 
-        if (error instanceof ModerationException moderationException) {
-            String flaggedTopics = String.join(COMMA_DELIMITER, moderationException.getFlaggedTopics());
-            String message = String.format(CONTENT_FLAGGED_MESSAGE, flaggedTopics);
-
-            DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(message)
-                    .titleText("Inappropriate content detected")
-                    .footerText("MoirAI content moderation")
-                    .build();
-
-            discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
-            return;
-        }
-
-        else if (error instanceof AssetNotFoundException assetNotFoundException) {
-            DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(assetNotFoundException.getMessage())
-                    .titleText("Asset requested was not found")
-                    .footerText("MoirAI asset management")
-                    .build();
-
-            discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
-            return;
-        }
-
-        DiscordEmbeddedMessageRequest embed = embedBuilder.messageContent(SOMETHING_WENT_WRONG)
-                .titleText("An error occurred")
-                .footerText("MoirAI error handling")
+        AuthorModeRequest request = AuthorModeRequest.builder()
+                .authordDiscordId(author.getId())
+                .channelId(channelId)
+                .messageId(message.getId())
+                .guildId(guildId)
+                .isBotMentioned(mentions.contains(bot.getId()))
+                .mentionedUsersIds(mentions)
+                .botUsername(botUsername)
+                .botNickname(botNickname)
                 .build();
 
-        discordChannelPort.sendTemporaryEmbeddedMessageTo(event.getChannel().getId(), embed, ERROR_MESSAGE_TTL);
+        useCaseRunner.run(request)
+                .doOnError(error -> handleError(event, error))
+                .subscribe();
+    }
+
+    private void processRpgMode(MessageReceivedEvent event, String botUsername, String botNickname) {
+
+        Message message = event.getMessage();
+        Member author = event.getMember();
+        Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
+        List<String> mentions = message.getMentions()
+                .getMembers()
+                .stream()
+                .map(Member::getId)
+                .toList();
+
+        String guildId = event.getGuild().getId();
+        String channelId = event.getChannel().getId();
+
+        RpgModeRequest request = RpgModeRequest.builder()
+                .authordDiscordId(author.getId())
+                .channelId(channelId)
+                .messageId(message.getId())
+                .guildId(guildId)
+                .isBotMentioned(mentions.contains(bot.getId()))
+                .mentionedUsersIds(mentions)
+                .botUsername(botUsername)
+                .botNickname(botNickname)
+                .build();
+
+        useCaseRunner.run(request)
+                .doOnError(error -> handleError(event, error))
+                .subscribe();
+    }
+
+    private void processChatMode(MessageReceivedEvent event, String botUsername, String botNickname) {
+
+        Message message = event.getMessage();
+        Member author = event.getMember();
+        Member bot = event.getGuild().getMember(event.getJDA().getSelfUser());
+        List<String> mentions = message.getMentions()
+                .getMembers()
+                .stream()
+                .map(Member::getId)
+                .toList();
+
+        String guildId = event.getGuild().getId();
+        String channelId = event.getChannel().getId();
+
+        ChatModeRequest request = ChatModeRequest.builder()
+                .authordDiscordId(author.getId())
+                .channelId(channelId)
+                .messageId(message.getId())
+                .guildId(guildId)
+                .isBotMentioned(mentions.contains(bot.getId()))
+                .mentionedUsersIds(mentions)
+                .botUsername(botUsername)
+                .botNickname(botNickname)
+                .build();
+
+        useCaseRunner.run(request)
+                .doOnError(error -> handleError(event, error))
+                .subscribe();
+    }
+
+    private void handleError(MessageReceivedEvent event, Throwable error) {
+
+        Member member = event.getMember();
+        MessageChannelUnion channel = event.getChannel();
+        errorHandler.handleError(member, channel, error);
     }
 }
