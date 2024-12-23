@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -55,8 +55,14 @@ public class ContextSummarizationAdapterTest {
     @Mock
     private ChatMessageHelper chatMessageService;
 
-    @InjectMocks
     private StorySummarizationAdapter service;
+
+    @BeforeEach
+    public void before() {
+
+        final String summarizationInstruction = "Generate summary of the story so far";
+        service = new StorySummarizationAdapter(summarizationInstruction, openAiPort, tokenizerPort, chatMessageService);
+    }
 
     @Test
     public void summarizeWith_validInput_thenSummaryGenerated() {
