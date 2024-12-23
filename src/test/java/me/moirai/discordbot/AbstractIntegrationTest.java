@@ -17,7 +17,7 @@ import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.infrastructure.config.JdaConfig;
 import net.dv8tion.jda.api.JDA;
 
-@ActiveProfiles("test")
+@ActiveProfiles({ "test", "prompts" })
 @SpringBootTest(classes = MoiraiApplication.class)
 public abstract class AbstractIntegrationTest {
 

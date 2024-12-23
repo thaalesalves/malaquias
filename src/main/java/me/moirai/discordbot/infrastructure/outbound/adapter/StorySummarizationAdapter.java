@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import me.moirai.discordbot.common.util.StringProcessor;
@@ -38,15 +39,19 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
     private static final Object LOREBOOK = "lorebook";
     private static final String RETRIEVED_MESSAGES = "retrievedMessages";
     private static final String MESSAGE_HISTORY = "messageHistory";
-    private static final String SUMMARIZATION_INSTRUCTION = "Write a detailed summary of this converation. The summary needs to be detailed and explain the conversation so far, as best as possible, so more context on what has happened is available.";
 
+    private final String summarizationInstriction;
     private final TextCompletionPort openAiPort;
     private final TokenizerPort tokenizerPort;
     private final ChatMessageHelper chatMessageService;
 
-    public StorySummarizationAdapter(TextCompletionPort openAiPort, TokenizerPort tokenizerPort,
+    public StorySummarizationAdapter(
+            @Value("${moirai.discord.bot.summarization-instruction}") String summarizationInstriction,
+            TextCompletionPort openAiPort,
+            TokenizerPort tokenizerPort,
             ChatMessageHelper chatMessageService) {
 
+        this.summarizationInstriction = summarizationInstriction;
         this.openAiPort = openAiPort;
         this.tokenizerPort = tokenizerPort;
         this.chatMessageService = chatMessageService;
@@ -141,7 +146,7 @@ public class StorySummarizationAdapter implements StorySummarizationPort {
             chatMessages.addFirst(ChatMessage.build(SYSTEM, lorebook));
         }
 
-        chatMessages.addFirst(ChatMessage.build(SYSTEM, SUMMARIZATION_INSTRUCTION));
+        chatMessages.addFirst(ChatMessage.build(SYSTEM, summarizationInstriction));
 
         return TextGenerationRequest.builder()
                 .presencePenalty(modelConfiguration.getPresencePenalty())

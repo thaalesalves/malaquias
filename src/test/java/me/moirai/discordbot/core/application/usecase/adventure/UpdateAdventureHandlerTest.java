@@ -26,7 +26,6 @@ import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 
-// TODO write tests for all conditions
 @ExtendWith(MockitoExtension.class)
 public class UpdateAdventureHandlerTest {
 
