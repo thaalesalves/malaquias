@@ -1,5 +1,6 @@
 package me.moirai.discordbot.core.domain.adventure;
 
+import static me.moirai.discordbot.core.domain.adventure.Moderation.DISABLED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.util.Lists.list;
@@ -198,6 +199,37 @@ public class AdventureServiceImplTest {
                 .verifyErrorSatisfies(error -> assertThat(error).isNotNull()
                         .isInstanceOf(ModerationException.class)
                         .hasMessage(expectedError));
+    }
+
+    @Test
+    public void createLorebookEntry_whenInappropriateContentFound_andModerationIsDisabled_thenDontFlagTopics() {
+
+        String requesterId = "123123123";
+        TextModerationResult moderationResult = TextModerationResultFixture.withFlags().build();
+        CreateAdventureLorebookEntry command = CreateAdventureLorebookEntryFixture.sampleLorebookEntry()
+                .requesterDiscordId(requesterId)
+                .build();
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
+                .moderation(DISABLED)
+                .build();
+
+        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+        when(lorebookEntryRepository.save(any())).thenReturn(entry);
+        when(moderationPort.moderate(anyString())).thenReturn(Mono.just(moderationResult));
+
+        // Then
+        StepVerifier.create(service.createLorebookEntry(command))
+                .assertNext(entryCreated -> {
+                    assertThat(entryCreated).isNotNull();
+                    assertThat(entryCreated.getId()).isSameAs(entry.getId());
+                })
+                .verifyComplete();
     }
 
     @Test

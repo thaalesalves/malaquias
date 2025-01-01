@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AIModelNotSupportedException;
+import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.helper.LorebookEnrichmentHelper;
 import me.moirai.discordbot.core.application.model.result.TextGenerationResult;
 import me.moirai.discordbot.core.application.model.result.TextGenerationResultFixture;
@@ -76,12 +77,43 @@ public class CompleteTextHandlerTest {
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
+        TextModerationResult textModerationResult = TextModerationResultFixture.withoutFlags().build();
 
         when(personaService.getById(anyString())).thenReturn(persona);
         when(worldService.getWorldById(anyString())).thenReturn(world);
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
         when(tokenizerPort.tokenize(anyString())).thenReturn(tokenizeResult);
+        when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
+
+        // When
+        Mono<CompleteTextResult> result = handler.handle(command);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    public void whenFlaggedContent_andModerationIsDisabled_thenResultIsReturned() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+        Persona persona = PersonaFixture.privatePersona().build();
+        World world = WorldFixture.privateWorld().build();
+        DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
+        TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
+        TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
+        TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
+
+        when(personaService.getById(anyString())).thenReturn(persona);
+        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
+        when(tokenizerPort.tokenize(anyString())).thenReturn(tokenizeResult);
+        when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
 
         // When
         Mono<CompleteTextResult> result = handler.handle(command);
@@ -149,6 +181,80 @@ public class CompleteTextHandlerTest {
                 .expectNextCount(1)
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    public void whenFlaggedContent_andModerationIsStrict_thenExceptionIsThrown() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withStrictModeration().build();
+        Persona persona = PersonaFixture.privatePersona().build();
+        World world = WorldFixture.privateWorld().build();
+        DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
+        TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
+
+        when(personaService.getById(anyString())).thenReturn(persona);
+        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
+        when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
+
+        // When
+        Mono<CompleteTextResult> result = handler.handle(command);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyError(ModerationException.class);
+    }
+
+    @Test
+    public void whenFlaggedContentInInput_andModerationIsPermissive_thenExceptionIsThrown() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withPermissiveModeration().build();
+        Persona persona = PersonaFixture.privatePersona().build();
+        World world = WorldFixture.privateWorld().build();
+        DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
+        TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
+
+        when(personaService.getById(anyString())).thenReturn(persona);
+        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
+        when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
+
+        // When
+        Mono<CompleteTextResult> result = handler.handle(command);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyError(ModerationException.class);
+    }
+
+    @Test
+    public void whenFlaggedContentInOutput_andModerationIsPermissive_thenExceptionIsThrown() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withPermissiveModeration().build();
+        Persona persona = PersonaFixture.privatePersona().build();
+        World world = WorldFixture.privateWorld().build();
+        DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
+        TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
+        TextModerationResult badModerationResult = TextModerationResultFixture.withFlags().build();
+        TextModerationResult goodModerationResult = TextModerationResultFixture.withoutFlags().build();
+
+        when(personaService.getById(anyString())).thenReturn(persona);
+        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
+        when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
+        when(textModerationPort.moderate(anyString()))
+                .thenReturn(Mono.just(goodModerationResult))
+                .thenReturn(Mono.just(badModerationResult));
+
+        // When
+        Mono<CompleteTextResult> result = handler.handle(command);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyError(ModerationException.class);
     }
 
     @Test

@@ -35,6 +35,7 @@ import me.moirai.discordbot.core.application.port.TextCompletionPort;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageData;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
+import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModerationConfigurationRequestFixture;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.StoryGenerationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.StoryGenerationRequestFixture;
 import reactor.core.publisher.Mono;
@@ -124,6 +125,245 @@ public class StoryGenerationHelperImplTest {
 
         List<ChatMessage> messagesSentToAi = textGenerationRequestCaptor.getValue().getMessages();
         assertThat(messagesSentToAi).isNotNull().isNotEmpty().hasSize(13);
+    }
+
+    @Test
+    void givenValidMessage_whenExecute_andGameModeIsRpg_thenShouldProcessAndSendResponse() {
+
+        // Given
+        String personaDescription = "This is a persona";
+        String lorebook = "This is a lorebook";
+        String summary = "This is a story summary";
+        String channelId = "CHNLID";
+
+        StoryGenerationRequest query = StoryGenerationRequestFixture.create()
+                .channelId(channelId)
+                .gameMode("RPG")
+                .build();
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("messageHistory", List.of("TestUser said: history",
+                "AnotherUser said: another message",
+                "TheOtherUser said: another message",
+                "Cherokee said: another message",
+                "YetAnotherUser said: yet another message"));
+
+        context.put("lorebook", lorebook);
+        context.put("persona", personaDescription);
+        context.put("summary", summary);
+
+        TextGenerationResult generationResult = TextGenerationResultFixture.create().build();
+        TextModerationResult moderationResult = TextModerationResultFixture.withoutFlags().build();
+
+        when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(context);
+
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(textCompletionPort.generateTextFrom(any(TextGenerationRequest.class)))
+                .thenReturn(Mono.just(generationResult));
+
+        when(textModerationPort.moderate(anyString()))
+                .thenReturn(Mono.just(moderationResult));
+
+        when(discordChannelOperationsPort.sendTextMessageTo(eq(channelId), anyString()))
+                .thenReturn(mock(DiscordMessageData.class));
+
+        // When
+        Mono<Void> result = adapter.continueStory(query);
+
+        // Then
+        StepVerifier.create(result).verifyComplete();
+        verify(textCompletionPort).generateTextFrom(textGenerationRequestCaptor.capture());
+        verify(discordChannelOperationsPort).sendTextMessageTo(eq(channelId), anyString());
+
+        List<ChatMessage> messagesSentToAi = textGenerationRequestCaptor.getValue().getMessages();
+        assertThat(messagesSentToAi).isNotNull().isNotEmpty().hasSize(13);
+    }
+
+    @Test
+    void givenValidMessage_whenExecute_andModerationIsDisabled_thenShouldProcessAndSendResponse() {
+
+        // Given
+        String personaDescription = "This is a persona";
+        String lorebook = "This is a lorebook";
+        String summary = "This is a story summary";
+        String channelId = "CHNLID";
+
+        StoryGenerationRequest query = StoryGenerationRequestFixture.create()
+                .channelId(channelId)
+                .gameMode("RPG")
+                .moderation(ModerationConfigurationRequestFixture.disabled())
+                .build();
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("messageHistory", List.of("TestUser said: history",
+                "AnotherUser said: another message",
+                "TheOtherUser said: another message",
+                "Cherokee said: another message",
+                "YetAnotherUser said: yet another message"));
+
+        context.put("lorebook", lorebook);
+        context.put("persona", personaDescription);
+        context.put("summary", summary);
+
+        TextGenerationResult generationResult = TextGenerationResultFixture.create().build();
+        TextModerationResult badModerationResult = TextModerationResultFixture.withFlags().build();
+
+        when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(context);
+
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(textCompletionPort.generateTextFrom(any(TextGenerationRequest.class)))
+                .thenReturn(Mono.just(generationResult));
+
+        when(textModerationPort.moderate(anyString()))
+                .thenReturn(Mono.just(badModerationResult));
+
+        when(discordChannelOperationsPort.sendTextMessageTo(eq(channelId), anyString()))
+                .thenReturn(mock(DiscordMessageData.class));
+
+        // When
+        Mono<Void> result = adapter.continueStory(query);
+
+        // Then
+        StepVerifier.create(result).verifyComplete();
+        verify(textCompletionPort).generateTextFrom(textGenerationRequestCaptor.capture());
+        verify(discordChannelOperationsPort).sendTextMessageTo(eq(channelId), anyString());
+
+        List<ChatMessage> messagesSentToAi = textGenerationRequestCaptor.getValue().getMessages();
+        assertThat(messagesSentToAi).isNotNull().isNotEmpty().hasSize(13);
+    }
+
+    @Test
+    void givenInappropriateContentFound_whenExecute_andModerationIsDisabled_thenShouldProcessAndSendResponse() {
+
+        // Given
+        String personaDescription = "This is a persona";
+        String lorebook = "This is a lorebook";
+        String summary = "This is a story summary";
+        String channelId = "CHNLID";
+
+        StoryGenerationRequest query = StoryGenerationRequestFixture.create()
+                .channelId(channelId)
+                .gameMode("RPG")
+                .moderation(ModerationConfigurationRequestFixture.disabled())
+                .build();
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("messageHistory", List.of("TestUser said: history",
+                "AnotherUser said: another message",
+                "TheOtherUser said: another message",
+                "Cherokee said: another message",
+                "YetAnotherUser said: yet another message"));
+
+        context.put("lorebook", lorebook);
+        context.put("persona", personaDescription);
+        context.put("summary", summary);
+
+        TextGenerationResult generationResult = TextGenerationResultFixture.create().build();
+        TextModerationResult badModerationResult = TextModerationResultFixture.withFlags().build();
+
+        when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(anyList(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(context);
+
+        when(textModerationPort.moderate(anyString()))
+                .thenReturn(Mono.just(badModerationResult));
+
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(textCompletionPort.generateTextFrom(any(TextGenerationRequest.class)))
+                .thenReturn(Mono.just(generationResult));
+
+        when(discordChannelOperationsPort.sendTextMessageTo(eq(channelId), anyString()))
+                .thenReturn(mock(DiscordMessageData.class));
+
+        // When
+        Mono<Void> result = adapter.continueStory(query);
+
+        // Then
+        StepVerifier.create(result).verifyComplete();
+        verify(textCompletionPort).generateTextFrom(textGenerationRequestCaptor.capture());
+        verify(discordChannelOperationsPort).sendTextMessageTo(eq(channelId), anyString());
+
+        List<ChatMessage> messagesSentToAi = textGenerationRequestCaptor.getValue().getMessages();
+        assertThat(messagesSentToAi).isNotNull().isNotEmpty().hasSize(13);
+    }
+
+    @Test
+    void givenValidMessage_whenExecute_andNoEntriesFound_thenShouldProcessAndSendResponse() {
+
+        // Given
+        String personaDescription = "This is a persona";
+        String summary = "This is a story summary";
+        String channelId = "CHNLID";
+
+        StoryGenerationRequest query = StoryGenerationRequestFixture.create()
+                .channelId(channelId)
+                .build();
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("messageHistory", List.of("TestUser said: history",
+                "AnotherUser said: another message",
+                "TheOtherUser said: another message",
+                "Cherokee said: another message",
+                "YetAnotherUser said: yet another message"));
+
+        context.put("persona", personaDescription);
+        context.put("summary", summary);
+
+        TextGenerationResult generationResult = TextGenerationResultFixture.create().build();
+        TextModerationResult moderationResult = TextModerationResultFixture.withoutFlags().build();
+
+        when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(context);
+
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(textCompletionPort.generateTextFrom(any(TextGenerationRequest.class)))
+                .thenReturn(Mono.just(generationResult));
+
+        when(textModerationPort.moderate(anyString()))
+                .thenReturn(Mono.just(moderationResult));
+
+        when(discordChannelOperationsPort.sendTextMessageTo(eq(channelId), anyString()))
+                .thenReturn(mock(DiscordMessageData.class));
+
+        // When
+        Mono<Void> result = adapter.continueStory(query);
+
+        // Then
+        StepVerifier.create(result).verifyComplete();
+        verify(textCompletionPort).generateTextFrom(textGenerationRequestCaptor.capture());
+        verify(discordChannelOperationsPort).sendTextMessageTo(eq(channelId), anyString());
+
+        List<ChatMessage> messagesSentToAi = textGenerationRequestCaptor.getValue().getMessages();
+        assertThat(messagesSentToAi).isNotNull().isNotEmpty().hasSize(12);
     }
 
     @Test
@@ -253,7 +493,7 @@ public class StoryGenerationHelperImplTest {
     }
 
     @Test
-    void givenInappropriateInput_whenExecute_thenShouldThrowModerationException() {
+    void givenInappropriateInput_whenExecute_andModerationIsAbsolute_thenShouldThrowModerationException() {
 
         // Given
         String personaDescription = "This is a persona";
@@ -263,6 +503,7 @@ public class StoryGenerationHelperImplTest {
 
         StoryGenerationRequest query = StoryGenerationRequestFixture.create()
                 .channelId(channelId)
+                .moderation(ModerationConfigurationRequestFixture.absoluteWithFlags())
                 .build();
 
         Map<String, Object> context = new HashMap<>();
@@ -304,7 +545,7 @@ public class StoryGenerationHelperImplTest {
     }
 
     @Test
-    void givenInappropriateAiOutput_whenExecute_thenShouldThrowModerationException() {
+    void givenInappropriateAiOutput_whenExecute_andModerationIsAbsolute_thenShouldThrowModerationException() {
 
         // Given
         String personaDescription = "This is a persona";
@@ -314,6 +555,7 @@ public class StoryGenerationHelperImplTest {
 
         StoryGenerationRequest query = StoryGenerationRequestFixture.create()
                 .channelId(channelId)
+                .moderation(ModerationConfigurationRequestFixture.absoluteWithFlags())
                 .build();
 
         Map<String, Object> context = new HashMap<>();
@@ -357,6 +599,64 @@ public class StoryGenerationHelperImplTest {
                 .verifyErrorSatisfies(error -> {
                     assertThat(error).isInstanceOf(ModerationException.class);
                     assertThat(((ModerationException) error).getFlaggedTopics()).hasSize(2);
+                });
+    }
+
+    @Test
+    void givenInappropriateAiOutput_whenExecute_thenShouldThrowModerationException() {
+
+        // Given
+        String personaDescription = "This is a persona";
+        String lorebook = "This is a lorebook";
+        String summary = "This is a story summary";
+        String channelId = "CHNLID";
+
+        StoryGenerationRequest query = StoryGenerationRequestFixture.create()
+                .channelId(channelId)
+                .moderation(ModerationConfigurationRequestFixture.withFlags())
+                .build();
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("messageHistory", List.of("TestUser said: history",
+                "AnotherUser said: another message",
+                "TheOtherUser said: another message",
+                "Cherokee said: another message",
+                "YetAnotherUser said: yet another message"));
+
+        context.put("lorebook", lorebook);
+        context.put("persona", personaDescription);
+        context.put("summary", summary);
+
+        TextGenerationResult generationResult = TextGenerationResultFixture.create().build();
+        TextModerationResult goodModerationResult = TextModerationResultFixture.withoutFlags().build();
+        TextModerationResult badModerationResult = TextModerationResultFixture.withFlags().build();
+
+        when(summarizationPort.summarizeContextWith(anyMap(), any(StoryGenerationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(context);
+
+        when(personaEnrichmentPort.enrichContextWithPersona(anyMap(), anyString(),
+                any(ModelConfigurationRequest.class)))
+                .thenReturn(Mono.just(context));
+
+        when(textModerationPort.moderate(anyString()))
+                .thenReturn(Mono.just(goodModerationResult))
+                .thenReturn(Mono.just(badModerationResult));
+
+        when(textCompletionPort.generateTextFrom(any(TextGenerationRequest.class)))
+                .thenReturn(Mono.just(generationResult));
+
+        // When
+        Mono<Void> result = adapter.continueStory(query);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(ModerationException.class);
+                    assertThat(((ModerationException) error).getFlaggedTopics()).hasSize(1);
                 });
     }
 }

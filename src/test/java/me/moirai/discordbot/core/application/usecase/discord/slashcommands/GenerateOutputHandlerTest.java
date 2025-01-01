@@ -60,8 +60,9 @@ public class GenerateOutputHandlerTest extends AbstractDiscordTest {
                 .forClass(StoryGenerationRequest.class);
 
         when(adventureRepository.findByDiscordChannelId(anyString())).thenReturn(Optional.of(adventure));
-        
-        when(discordChannelPort.getLastMessageIn(anyString())).thenReturn(Optional.of(DiscordMessageDataFixture.messageData().build()));
+
+        when(discordChannelPort.getLastMessageIn(anyString()))
+                .thenReturn(Optional.of(DiscordMessageDataFixture.messageData().build()));
 
         when(discordChannelPort.retrieveEntireHistoryBefore(anyString(), anyString()))
                 .thenReturn(DiscordMessageDataFixture.messageList(5));
@@ -82,7 +83,7 @@ public class GenerateOutputHandlerTest extends AbstractDiscordTest {
         assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
         assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
         assertThat(generationRequest.getPersonaId()).isEqualTo(adventure.getPersonaId());
-        assertThat(generationRequest.getWorldId()).isEqualTo(adventure.getWorldId());
+        assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
     }
 
     @Test

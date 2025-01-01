@@ -5,6 +5,7 @@ import static io.micrometer.common.util.StringUtils.isEmpty;
 import static io.micrometer.common.util.StringUtils.isNotBlank;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.MapUtils.isEmpty;
 
 import java.util.List;
 import java.util.Map;
@@ -199,6 +200,11 @@ public class AdventureServiceImpl implements AdventureService {
     }
 
     private boolean isTopicFlagged(Entry<String, Double> entry, Moderation moderation) {
+
+        if (isEmpty(moderation.getThresholds())) {
+            return false;
+        }
+
         return entry.getValue() > moderation.getThresholds().get(entry.getKey());
     }
 }

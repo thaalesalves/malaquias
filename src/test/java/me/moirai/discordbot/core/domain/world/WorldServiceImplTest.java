@@ -153,7 +153,7 @@ public class WorldServiceImplTest {
     public void deleteWorld_whenWorldNotFound_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
         String requesterId = "RQSTRID";
         DeleteWorld command = DeleteWorld.build(id, requesterId);
 
@@ -167,7 +167,7 @@ public class WorldServiceImplTest {
     public void deleteWorld_whenNotEnoughPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
         String requesterId = "RQSTRID";
         DeleteWorld command = DeleteWorld.build(id, requesterId);
 
@@ -189,7 +189,7 @@ public class WorldServiceImplTest {
     public void deleteWorld_whenProperIdAndPermission_thenWorldIsDeleted() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
         String requesterId = "RQSTRID";
         DeleteWorld command = DeleteWorld.build(id, requesterId);
 

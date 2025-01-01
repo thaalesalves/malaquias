@@ -22,9 +22,9 @@ import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.util.StringProcessor;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageData;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntry;
+import me.moirai.discordbot.core.domain.adventure.AdventureService;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
-import me.moirai.discordbot.core.domain.world.WorldLorebookEntry;
-import me.moirai.discordbot.core.domain.world.WorldService;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 
 @Helper
@@ -35,27 +35,27 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
     private static final String LOREBOOK = "lorebook";
 
     private final TokenizerPort tokenizerPort;
-    private final WorldService worldService;
+    private final AdventureService adventureService;
     private final ChatMessageHelper chatMessageService;
 
     public LorebookEnrichmentHelperImpl(
             TokenizerPort tokenizerPort,
-            WorldService worldService,
+            AdventureService adventureService,
             ChatMessageHelper chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;
-        this.worldService = worldService;
+        this.adventureService = adventureService;
         this.chatMessageService = chatMessageService;
     }
 
     @Override
     public Map<String, Object> enrichContextWithLorebookForRpg(List<DiscordMessageData> rawMessageHistory,
-            String worldId, ModelConfigurationRequest modelConfiguration) {
+            String adventureId, ModelConfigurationRequest modelConfiguration) {
 
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
         int reservedTokensForLorebook = (int) Math.floor(totalTokens * 0.30);
 
-        List<WorldLorebookEntry> entriesFound = findLorebookEntries(worldId, rawMessageHistory);
+        List<AdventureLorebookEntry> entriesFound = findLorebookEntries(adventureId, rawMessageHistory);
         List<DiscordMessageData> formattedHistory = enrichMessagesWithLorebook(rawMessageHistory, entriesFound);
         List<String> formattedEntries = formatEntriesForContext(entriesFound, reservedTokensForLorebook);
 
@@ -71,7 +71,7 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
     }
 
     @Override
-    public Map<String, Object> enrichContextWithLorebook(List<DiscordMessageData> rawMessageHistory, String worldId,
+    public Map<String, Object> enrichContextWithLorebook(List<DiscordMessageData> rawMessageHistory, String adventureId,
             ModelConfigurationRequest modelConfiguration) {
 
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
@@ -86,18 +86,20 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
         Map<String, Object> context = new HashMap<>();
         context.put(RETRIEVED_MESSAGES, new ArrayList<>(rawMessageHistory));
 
-        List<WorldLorebookEntry> entriesFound = worldService.findAllLorebookEntriesByRegex(stringifiedStory, worldId);
+        List<AdventureLorebookEntry> entriesFound = adventureService.findAllLorebookEntriesByRegex(stringifiedStory,
+                adventureId);
         Map<String, Object> enrichedContext = addEntriesFoundToContext(entriesFound, context,
                 reservedTokensForLorebook);
 
         return chatMessageService.addMessagesToContext(enrichedContext, reservedTokensForLorebook);
     }
 
-    private List<WorldLorebookEntry> findLorebookEntries(String worldId, List<DiscordMessageData> rawMessageHistory) {
+    private List<AdventureLorebookEntry> findLorebookEntries(String adventureId,
+            List<DiscordMessageData> rawMessageHistory) {
 
-        List<WorldLorebookEntry> entriesInHistory = findLorebookEntriesInHistory(worldId, rawMessageHistory);
-        List<WorldLorebookEntry> entriesByMention = findLorebookEntriesByMention(worldId, rawMessageHistory);
-        List<WorldLorebookEntry> entriesByAuthor = findLorebookEntriesByAuthor(worldId, rawMessageHistory);
+        List<AdventureLorebookEntry> entriesInHistory = findLorebookEntriesInHistory(adventureId, rawMessageHistory);
+        List<AdventureLorebookEntry> entriesByMention = findLorebookEntriesByMention(adventureId, rawMessageHistory);
+        List<AdventureLorebookEntry> entriesByAuthor = findLorebookEntriesByAuthor(adventureId, rawMessageHistory);
 
         Set<String> entryIdsNotDuplicated = new HashSet<>();
         return Stream.of(entriesInHistory, entriesByMention, entriesByAuthor)
@@ -106,39 +108,40 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
                 .toList();
     }
 
-    private List<WorldLorebookEntry> findLorebookEntriesInHistory(
-            String worldId, List<DiscordMessageData> rawMessageHistory) {
+    private List<AdventureLorebookEntry> findLorebookEntriesInHistory(
+            String adventureId, List<DiscordMessageData> rawMessageHistory) {
 
         List<String> messageHistory = rawMessageHistory.stream()
                 .map(DiscordMessageData::getContent)
                 .toList();
 
-        return worldService.findAllLorebookEntriesByRegex(stringifyList(messageHistory), worldId);
+        return adventureService.findAllLorebookEntriesByRegex(stringifyList(messageHistory), adventureId);
     }
 
-    private List<WorldLorebookEntry> findLorebookEntriesByMention(String worldId,
+    private List<AdventureLorebookEntry> findLorebookEntriesByMention(String adventureId,
             List<DiscordMessageData> rawMessageHistory) {
 
         return rawMessageHistory.stream()
                 .flatMap(message -> message.getMentionedUsers().stream())
-                .map(user -> worldService.findLorebookEntryByPlayerDiscordId(user.getId(), worldId))
+                .map(user -> adventureService.findLorebookEntryByPlayerDiscordId(user.getId(), adventureId))
                 .toList();
     }
 
-    private List<WorldLorebookEntry> findLorebookEntriesByAuthor(String worldId,
+    private List<AdventureLorebookEntry> findLorebookEntriesByAuthor(String adventureId,
             List<DiscordMessageData> rawMessageHistory) {
 
         return rawMessageHistory.stream()
                 .map(message -> {
                     try {
-                        return worldService.findLorebookEntryByPlayerDiscordId(message.getAuthor().getId(), worldId);
+                        return adventureService.findLorebookEntryByPlayerDiscordId(message.getAuthor().getId(),
+                                adventureId);
                     } catch (AssetNotFoundException exception) {
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(
-                        WorldLorebookEntry::getId,
+                        AdventureLorebookEntry::getId,
                         entry -> entry,
                         (existing, replacement) -> existing))
                 .values()
@@ -147,7 +150,7 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
     }
 
     private List<DiscordMessageData> enrichMessagesWithLorebook(List<DiscordMessageData> rawMessageHistory,
-            List<WorldLorebookEntry> lorebook) {
+            List<AdventureLorebookEntry> lorebook) {
 
         List<DiscordMessageData> messagesFormattedForMentions = formatMessagesWithMentions(
                 rawMessageHistory, lorebook);
@@ -156,7 +159,7 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
     }
 
     private List<DiscordMessageData> formatMessagesWithMentions(
-            List<DiscordMessageData> messageHistory, List<WorldLorebookEntry> lorebook) {
+            List<DiscordMessageData> messageHistory, List<AdventureLorebookEntry> lorebook) {
 
         return messageHistory.stream()
                 .flatMap(message -> {
@@ -196,7 +199,7 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
     }
 
     private List<DiscordMessageData> formatMessagesWithAuthor(
-            List<DiscordMessageData> rawMessageHistory, List<WorldLorebookEntry> lorebook) {
+            List<DiscordMessageData> rawMessageHistory, List<AdventureLorebookEntry> lorebook) {
 
         return rawMessageHistory.stream()
                 .map(message -> lorebook.stream()
@@ -232,7 +235,7 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
                 .toList();
     }
 
-    private List<String> formatEntriesForContext(List<WorldLorebookEntry> entries, int reservedTokensForLorebook) {
+    private List<String> formatEntriesForContext(List<AdventureLorebookEntry> entries, int reservedTokensForLorebook) {
 
         List<String> lorebook = new ArrayList<>();
 
@@ -254,7 +257,8 @@ public class LorebookEnrichmentHelperImpl implements LorebookEnrichmentHelper {
         return lorebook;
     }
 
-    private Map<String, Object> addEntriesFoundToContext(List<WorldLorebookEntry> entries, Map<String, Object> context,
+    private Map<String, Object> addEntriesFoundToContext(List<AdventureLorebookEntry> entries,
+            Map<String, Object> context,
             int reservedTokensForLorebook) {
 
         List<String> lorebook = new ArrayList<>();

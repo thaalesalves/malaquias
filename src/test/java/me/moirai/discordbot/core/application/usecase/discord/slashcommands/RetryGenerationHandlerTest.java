@@ -87,7 +87,7 @@ public class RetryGenerationHandlerTest extends AbstractDiscordTest {
         assertThat(generationRequest.getChannelId()).isEqualTo(useCase.getChannelId());
         assertThat(generationRequest.getGuildId()).isEqualTo(useCase.getGuildId());
         assertThat(generationRequest.getPersonaId()).isEqualTo(adventure.getPersonaId());
-        assertThat(generationRequest.getWorldId()).isEqualTo(adventure.getWorldId());
+        assertThat(generationRequest.getAdventureId()).isEqualTo(adventure.getId());
     }
 
     @Test

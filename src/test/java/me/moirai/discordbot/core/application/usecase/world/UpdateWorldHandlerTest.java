@@ -90,7 +90,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenValidData_thenWorldIsUpdated() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
 
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
@@ -130,7 +130,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenEmptyUpdateFields_thenWorldIsNotChanged() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
 
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
@@ -157,7 +157,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenPublicToBeMadePrivate_thenWorldIsMadePrivate() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
 
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
@@ -182,7 +182,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenInvalidVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
 
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
@@ -206,7 +206,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenNotEnoughPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
 
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
@@ -232,7 +232,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenInvalidPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
 
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
@@ -259,7 +259,7 @@ public class UpdateWorldHandlerTest {
     public void updateWorld_whenContentIsFlagged_thenExceptionIsThrown() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
                 .name("MoirAI")

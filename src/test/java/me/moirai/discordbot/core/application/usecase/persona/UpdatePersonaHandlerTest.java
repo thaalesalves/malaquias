@@ -44,7 +44,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenValidData_thenPersonaIsUpdated() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -91,7 +91,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoWriterUsersAreAdded_thenPersonaIsUpdated() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -138,7 +138,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoReaderUsersAreAdded_thenPersonaIsUpdated() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -185,7 +185,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoReaderUsersAreRemoved_thenPersonaIsUpdated() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -232,7 +232,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNoWriterUsersAreRemoved_thenPersonaIsUpdated() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -279,7 +279,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenPublicToMakePrivate_thenPersonaIsMadePrivate() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -312,7 +312,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenInvalidVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -345,7 +345,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenContentIsFlagged_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -368,7 +368,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenUpdateFieldsAreEmpty_thenPersonaIsNotChanged() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
@@ -396,7 +396,7 @@ public class UpdatePersonaHandlerTest {
     public void updatePersona_whenNotEnoughPermissions_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
 
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)

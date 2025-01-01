@@ -47,7 +47,7 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         DeleteAdventure command = DeleteAdventure.build(id, requesterId);
 
@@ -61,7 +61,7 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenInvalidPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         DeleteAdventure command = DeleteAdventure.build(id, requesterId);
 
@@ -83,7 +83,7 @@ public class DeleteAdventureHandlerTest {
     public void deleteAdventure_whenProperPermission_thenAdventureIsDeleted() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         DeleteAdventure command = DeleteAdventure.build(id, requesterId);
 

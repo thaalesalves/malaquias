@@ -102,7 +102,7 @@ public class GetAdventureByIdHandlerTest {
     public void findAdventure_whenInvalidPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         GetAdventureById query = GetAdventureById.build(id, requesterId);
 
@@ -125,7 +125,7 @@ public class GetAdventureByIdHandlerTest {
     public void findAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         GetAdventureById query = GetAdventureById.build(id, requesterId);
 
@@ -139,7 +139,7 @@ public class GetAdventureByIdHandlerTest {
     public void findAdventure_whenValidId_thenAdventureIsReturned() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         GetAdventureById query = GetAdventureById.build(id, requesterId);
 

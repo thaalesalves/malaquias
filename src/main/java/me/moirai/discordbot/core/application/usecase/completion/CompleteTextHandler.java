@@ -6,6 +6,7 @@ import static me.moirai.discordbot.core.application.model.request.ChatMessage.Ro
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.USER;
 import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromInternalName;
 import static me.moirai.discordbot.core.domain.adventure.Moderation.DISABLED;
+import static org.apache.commons.collections4.MapUtils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,10 +206,6 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
 
     private Mono<List<String>> getTopicsFlaggedByModeration(String input, ModerationConfigurationRequest moderation) {
 
-        if (!moderation.isEnabled()) {
-            return Mono.just(emptyList());
-        }
-
         return textModerationPort.moderate(input)
                 .map(result -> {
                     if (moderation.isAbsolute()) {
@@ -230,7 +227,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
 
     private boolean isTopicFlagged(Entry<String, Double> entry, ModerationConfigurationRequest moderation) {
 
-        if (moderation.getThresholds() == null) {
+        if (isEmpty(moderation.getThresholds())) {
             return false;
         }
 

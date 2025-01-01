@@ -14,7 +14,7 @@ public class AdventureFixture {
     public static Adventure.Builder privateSingleplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("CHCONFID");
+        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -45,7 +45,7 @@ public class AdventureFixture {
     public static Adventure.Builder withoutLorebook() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("CHCONFID");
+        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -71,7 +71,7 @@ public class AdventureFixture {
     public static Adventure.Builder privateMultiplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("CHCONFID");
+        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -102,7 +102,7 @@ public class AdventureFixture {
     public static Adventure.Builder publicSingleplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("CHCONFID");
+        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");
@@ -133,7 +133,7 @@ public class AdventureFixture {
     public static Adventure.Builder publicMultiplayerAdventure() {
 
         Adventure.Builder builder = Adventure.builder();
-        builder.id("CHCONFID");
+        builder.id("ADVID");
         builder.name("Name");
         builder.description("This is an RPG world");
         builder.adventureStart("As you enter the city, people around you start looking at you.");

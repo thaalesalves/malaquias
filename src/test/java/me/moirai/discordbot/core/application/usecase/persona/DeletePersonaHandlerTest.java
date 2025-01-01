@@ -47,7 +47,7 @@ public class DeletePersonaHandlerTest {
     public void deletePersona_whenProperIdAndPermission_thenPersonaIsDeleted() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 
@@ -72,7 +72,7 @@ public class DeletePersonaHandlerTest {
     public void deletePersona_whenInvalidPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
         String requesterId = "RQSTRID";
         DeletePersona command = DeletePersona.build(id, requesterId);
 

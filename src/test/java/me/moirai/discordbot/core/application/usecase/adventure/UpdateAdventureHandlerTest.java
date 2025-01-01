@@ -39,7 +39,7 @@ public class UpdateAdventureHandlerTest {
     public void updateAdventure() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "DASDASD";
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .id(id)
@@ -108,7 +108,7 @@ public class UpdateAdventureHandlerTest {
     public void updateAdventure_whenPrivateToBeMadePublic_thenAdventureIsMadePublic() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .requesterDiscordId(requesterId)
@@ -144,7 +144,7 @@ public class UpdateAdventureHandlerTest {
     public void updateAdventure_whenInvalidVisibility_thenNothingIsChanged() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .requesterDiscordId(requesterId)
@@ -180,7 +180,7 @@ public class UpdateAdventureHandlerTest {
     public void updateAdventure_whenEmptyUpdateFields_thenNothingIsChanged() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "ADVID";
         String requesterId = "RQSTRID";
         UpdateAdventure command = UpdateAdventureFixture.sample()
                 .requesterDiscordId(requesterId)

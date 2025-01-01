@@ -16,6 +16,7 @@ import static me.moirai.discordbot.common.util.DefaultStringProcessors.stripTrai
 import static me.moirai.discordbot.common.util.DefaultStringProcessors.trimParagraph;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.ASSISTANT;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.USER;
+import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -96,11 +97,11 @@ public class StoryGenerationHelperImpl implements StoryGenerationHelper {
 
         if (request.getGameMode().equals(RPG)) {
             return lorebookEnrichmentHelper.enrichContextWithLorebookForRpg(messageHistory,
-                    request.getWorldId(), request.getModelConfiguration());
+                    request.getAdventureId(), request.getModelConfiguration());
         }
 
         return lorebookEnrichmentHelper.enrichContextWithLorebook(messageHistory,
-                request.getWorldId(), request.getModelConfiguration());
+                request.getAdventureId(), request.getModelConfiguration());
     }
 
     private Mono<TextGenerationResult> generateAiOutput(StoryGenerationRequest query,
@@ -275,10 +276,6 @@ public class StoryGenerationHelperImpl implements StoryGenerationHelper {
 
     private Mono<List<String>> getTopicsFlaggedByModeration(String input, ModerationConfigurationRequest moderation) {
 
-        if (!moderation.isEnabled()) {
-            return Mono.just(emptyList());
-        }
-
         return textModerationPort.moderate(input)
                 .map(result -> {
                     if (moderation.isAbsolute()) {
@@ -300,7 +297,7 @@ public class StoryGenerationHelperImpl implements StoryGenerationHelper {
 
     private boolean isTopicFlagged(Entry<String, Double> entry, ModerationConfigurationRequest moderation) {
 
-        if (moderation.getThresholds() == null) {
+        if (isEmpty(moderation.getThresholds())) {
             return false;
         }
 

@@ -81,7 +81,7 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
                 .moderation(moderation)
                 .modelConfiguration(modelConfigurationRequest)
                 .personaId(adventure.getPersonaId())
-                .worldId(adventure.getWorldId())
+                .adventureId(adventure.getId())
                 .messageHistory(messageHistory)
                 .gameMode(CHAT.name())
                 .nudge(adventure.getContextAttributes().getNudge())

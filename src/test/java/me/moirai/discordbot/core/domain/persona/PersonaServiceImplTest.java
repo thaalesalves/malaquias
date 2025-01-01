@@ -82,7 +82,7 @@ public class PersonaServiceImplTest {
     public void findPersona_whenValidId_thenReturnPersona() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
 
         Persona persona = PersonaFixture.privatePersona()
                 .id(id)
@@ -103,7 +103,7 @@ public class PersonaServiceImplTest {
     public void findPersona_whenPersonaNotFound_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "PRSNID";
 
         when(repository.findById(anyString())).thenReturn(Optional.empty());
 

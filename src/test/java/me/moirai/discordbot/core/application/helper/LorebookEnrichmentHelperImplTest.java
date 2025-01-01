@@ -19,9 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageData;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntry;
+import me.moirai.discordbot.core.domain.adventure.AdventureService;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
-import me.moirai.discordbot.core.domain.world.WorldLorebookEntry;
-import me.moirai.discordbot.core.domain.world.WorldService;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
 
@@ -35,7 +35,7 @@ public class LorebookEnrichmentHelperImplTest {
     private TokenizerPort tokenizerPort;
 
     @Mock
-    private WorldService worldService;
+    private AdventureService adventureService;
 
     @Mock
     private ChatMessageHelper chatMessageService;
@@ -169,27 +169,27 @@ public class LorebookEnrichmentHelperImplTest {
 
     private void stubLorebookEntriesByAuthor() {
 
-        WorldLorebookEntry marcusCharacter = WorldLorebookEntry.builder()
+        AdventureLorebookEntry marcusCharacter = AdventureLorebookEntry.builder()
                 .id("1")
                 .name("Pyromancer")
                 .regex("[Pp]iro[Mm]ancer")
                 .description("The Pyromancer is a fire battlemage")
                 .playerDiscordId("1")
                 .isPlayerCharacter(true)
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .build();
 
-        WorldLorebookEntry johnCharacter = WorldLorebookEntry.builder()
+        AdventureLorebookEntry johnCharacter = AdventureLorebookEntry.builder()
                 .id("2")
                 .name("Lord of Doom")
                 .regex("[Ll]ord [Oo] [Dd]oom")
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerDiscordId("2")
                 .isPlayerCharacter(true)
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .build();
 
-        when(worldService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
+        when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
                 .thenReturn(marcusCharacter)
                 .thenReturn(johnCharacter)
                 .thenReturn(marcusCharacter);
@@ -197,50 +197,50 @@ public class LorebookEnrichmentHelperImplTest {
 
     private void stubLorebookEntriesByMention() {
 
-        WorldLorebookEntry marcusCharacter = WorldLorebookEntry.builder()
+        AdventureLorebookEntry marcusCharacter = AdventureLorebookEntry.builder()
                 .id("1")
                 .name("Pyromancer")
                 .regex("[Pp]iro[Mm]ancer")
                 .description("The Pyromancer is a fire battlemage")
                 .playerDiscordId("1")
                 .isPlayerCharacter(true)
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .build();
 
-        when(worldService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
+        when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
                 .thenReturn(marcusCharacter);
 
     }
 
     private void stubLorebookEntriesByWords() {
 
-        WorldLorebookEntry swordOfFire = WorldLorebookEntry.builder()
+        AdventureLorebookEntry swordOfFire = AdventureLorebookEntry.builder()
                 .id("3")
                 .name("Sword of Fire")
                 .regex("[Ss]word [Oo]f [Ff]ire")
                 .description("The Sword of Fire is a spectral sword that spits fire")
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .build();
 
-        WorldLorebookEntry gloveOfArmageddon = WorldLorebookEntry.builder()
+        AdventureLorebookEntry gloveOfArmageddon = AdventureLorebookEntry.builder()
                 .id("4")
                 .name("Glove of Armageddon")
                 .regex("[Gg]love [Oo]f [Aa]rmageddon")
                 .description("The Glove of Armageddon is a gauntlet that punches with the strength of three suns")
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .build();
 
-        WorldLorebookEntry lordOfDoom = WorldLorebookEntry.builder()
+        AdventureLorebookEntry lordOfDoom = AdventureLorebookEntry.builder()
                 .id("2")
                 .name("Lord of Doom")
                 .regex("[Ll]ord [Oo] [Dd]oom")
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerDiscordId("2")
                 .isPlayerCharacter(true)
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .build();
 
-        when(worldService.findAllLorebookEntriesByRegex(anyString(), anyString()))
+        when(adventureService.findAllLorebookEntriesByRegex(anyString(), anyString()))
                 .thenReturn(list(swordOfFire, gloveOfArmageddon, lordOfDoom));
     }
 }

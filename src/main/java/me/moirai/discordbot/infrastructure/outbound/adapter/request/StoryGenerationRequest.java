@@ -13,7 +13,7 @@ public class StoryGenerationRequest {
     private final String botNickname;
     private final String channelId;
     private final String guildId;
-    private final String worldId;
+    private final String adventureId;
     private final String personaId;
     private final String gameMode;
     private final String nudge;
@@ -32,7 +32,7 @@ public class StoryGenerationRequest {
         this.botNickname = builder.botNickname;
         this.channelId = builder.channelId;
         this.guildId = builder.guildId;
-        this.worldId = builder.worldId;
+        this.adventureId = builder.adventureId;
         this.personaId = builder.personaId;
         this.gameMode = builder.gameMode;
         this.nudge = builder.nudge;
@@ -69,8 +69,8 @@ public class StoryGenerationRequest {
         return guildId;
     }
 
-    public String getWorldId() {
-        return worldId;
+    public String getAdventureId() {
+        return adventureId;
     }
 
     public String getPersonaId() {
@@ -120,7 +120,7 @@ public class StoryGenerationRequest {
         private String botNickname;
         private String channelId;
         private String guildId;
-        private String worldId;
+        private String adventureId;
         private String personaId;
         private String gameMode;
         private String nudge;
@@ -155,8 +155,8 @@ public class StoryGenerationRequest {
             return this;
         }
 
-        public Builder worldId(String worldId) {
-            this.worldId = worldId;
+        public Builder adventureId(String adventureId) {
+            this.adventureId = adventureId;
             return this;
         }
 

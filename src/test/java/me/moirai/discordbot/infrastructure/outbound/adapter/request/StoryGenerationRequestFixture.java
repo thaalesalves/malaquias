@@ -10,7 +10,7 @@ public class StoryGenerationRequestFixture {
                 .botNickname("BotNickname")
                 .channelId("CHNLID")
                 .guildId("GLDID")
-                .worldId("WRLDID")
+                .adventureId("WRLDID")
                 .personaId("PRSNID")
                 .gameMode("CHAT")
                 .authorsNote("Author's note")
@@ -19,6 +19,6 @@ public class StoryGenerationRequestFixture {
                 .bump("Bump")
                 .bumpFrequency(4)
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini().build())
-                .moderation(ModerationConfigurationRequestFixture.absolute());
+                .moderation(ModerationConfigurationRequestFixture.withFlags());
     }
 }

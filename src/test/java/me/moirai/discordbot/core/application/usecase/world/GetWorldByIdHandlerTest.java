@@ -64,7 +64,7 @@ public class GetWorldByIdHandlerTest {
     public void findWorld_whenNotEnoughPermission_thenThrowException() {
 
         // Given
-        String id = "CHCONFID";
+        String id = "WRLDID";
         String requesterId = "RQSTRID";
         GetWorldById query = GetWorldById.build(id, requesterId);
 
