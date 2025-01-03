@@ -1,7 +1,9 @@
 package me.moirai.discordbot.infrastructure.inbound.discord.listener;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -13,10 +15,12 @@ import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.usecase.adventure.request.GetAdventureByChannelId;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResult;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.GoCommand;
+import me.moirai.discordbot.core.application.usecase.discord.slashcommands.HelpCommand;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.RetryCommand;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.StartCommand;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeInput;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResult;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -42,6 +46,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private static final String NUDGE_COMMAND = "nudge";
     private static final String AUTHORS_NOTE_COMMAND = "authorsnote";
     private static final String BUMP_COMMAND = "bump";
+    private static final String HELP_COMMAND = "help";
 
     private static final String CONTENT = "Content";
     private static final String TOKEN_REPLY_MESSAGE = "**Characters:** %s\n**Tokens:** %s\n**Token IDs:** %s (contains %s total tokens).";
@@ -101,11 +106,33 @@ public class SlashCommandListener extends ListenerAdapter {
                     case NUDGE_COMMAND -> processNudgeCommand(event, textChannel);
                     case AUTHORS_NOTE_COMMAND -> processAuthorsNoteCommand(event, textChannel);
                     case BUMP_COMMAND -> processBumpCommand(event, textChannel);
+                    case HELP_COMMAND -> processHelpCommand(event, textChannel, bot);
                 }
             }
         } catch (Exception e) {
             handleError(event, e);
         }
+    }
+
+    private void processHelpCommand(SlashCommandInteractionEvent event, TextChannel textChannel, Member bot) {
+
+        String commandToDescribe = EMPTY;
+        if (null != event.getOption("command")) {
+            commandToDescribe = event.getOption("command").getAsString();
+        }
+
+        HelpCommand request = HelpCommand.build(commandToDescribe);
+        String helpText = useCaseRunner.run(request);
+
+        event.replyEmbeds(
+                new EmbedBuilder()
+                        .setDescription(helpText)
+                        .setTitle("MoirAI Help")
+                        .setThumbnail(bot.getAvatarUrl())
+                        .setColor(Color.GREEN)
+                        .build())
+                .setEphemeral(true)
+                .complete();
     }
 
     private void processTokenizeCommand(SlashCommandInteractionEvent event) {

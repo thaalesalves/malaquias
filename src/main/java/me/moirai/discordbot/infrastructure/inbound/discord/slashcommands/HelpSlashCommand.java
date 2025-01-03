@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 @Component
-public class TokenizeSlashCommand extends DiscordSlashCommand {
+public class HelpSlashCommand extends DiscordSlashCommand {
 
     @Override
     public String getName() {
-        return "tokenize";
+        return "help";
     }
 
     @Override
     public String getDescription() {
-        return "Converts the input into tokens to show how the AI sees content sent to it";
+        return "Shows details about available commands";
     }
 
     @Override
@@ -26,7 +26,7 @@ public class TokenizeSlashCommand extends DiscordSlashCommand {
         List<DiscordSlashCommandOption> options = new ArrayList<>();
 
         options.add(DiscordSlashCommandOption
-                .build("input", "Input text to be tokenized", OptionType.STRING));
+                .build("command", "Specific command to be described", OptionType.STRING));
 
         return options;
     }

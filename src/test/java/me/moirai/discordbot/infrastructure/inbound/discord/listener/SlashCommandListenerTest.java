@@ -28,6 +28,7 @@ import me.moirai.discordbot.core.application.usecase.discord.slashcommands.Start
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResult;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -736,5 +737,78 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
 
         assertThat(createdModal).isNotNull();
         assertThat(createdModal.getId()).isEqualTo(modalId);
+    }
+
+    @Test
+    public void helpCommand_whenReceived_thenShowHelpPage() {
+
+        // Given
+        String command = "help";
+        String embedContent = "Content";
+
+        ReplyCallbackAction callbackAction = mock(ReplyCallbackAction.class);
+        ArgumentCaptor<MessageEmbed> embedCaptor = ArgumentCaptor.forClass(MessageEmbed.class);
+
+        when(event.getFullCommandName()).thenReturn(command);
+        when(event.getChannel()).thenReturn(channelUnion);
+        when(event.getMember()).thenReturn(member);
+        when(member.getUser()).thenReturn(user);
+        when(user.isBot()).thenReturn(false);
+        when(channelUnion.asTextChannel()).thenReturn(textChannel);
+
+        when(event.getOption(anyString())).thenReturn(null);
+        when(useCaseRunner.run(any())).thenReturn(embedContent);
+        when(event.replyEmbeds(embedCaptor.capture())).thenReturn(callbackAction);
+        when(callbackAction.setEphemeral(anyBoolean())).thenReturn(callbackAction);
+        when(callbackAction.complete()).thenReturn(mock(InteractionHook.class));
+
+        // When
+        listener.onSlashCommandInteraction(event);
+
+        // Then
+        MessageEmbed embedSent = embedCaptor.getValue();
+        assertThat(embedSent).isNotNull();
+        assertThat(embedSent.getDescription()).isEqualTo(embedContent);
+
+        verify(useCaseRunner, times(1)).run(any());
+        verify(event, times(1)).replyEmbeds(any(MessageEmbed.class));
+    }
+
+    @Test
+    public void helpCommand_whenReceived_andSpecificCommandSupplied_thenShowHelpPage() {
+
+        // Given
+        String command = "help";
+        String embedContent = "Content";
+        String commandToBeDescribed = null;
+
+        OptionMapping option = mock(OptionMapping.class);
+        ReplyCallbackAction callbackAction = mock(ReplyCallbackAction.class);
+        ArgumentCaptor<MessageEmbed> embedCaptor = ArgumentCaptor.forClass(MessageEmbed.class);
+
+        when(event.getFullCommandName()).thenReturn(command);
+        when(event.getChannel()).thenReturn(channelUnion);
+        when(event.getMember()).thenReturn(member);
+        when(member.getUser()).thenReturn(user);
+        when(user.isBot()).thenReturn(false);
+        when(channelUnion.asTextChannel()).thenReturn(textChannel);
+
+        when(event.getOption(anyString())).thenReturn(option);
+        when(option.getAsString()).thenReturn(commandToBeDescribed);
+        when(useCaseRunner.run(any())).thenReturn(embedContent);
+        when(event.replyEmbeds(embedCaptor.capture())).thenReturn(callbackAction);
+        when(callbackAction.setEphemeral(anyBoolean())).thenReturn(callbackAction);
+        when(callbackAction.complete()).thenReturn(mock(InteractionHook.class));
+
+        // When
+        listener.onSlashCommandInteraction(event);
+
+        // Then
+        MessageEmbed embedSent = embedCaptor.getValue();
+        assertThat(embedSent).isNotNull();
+        assertThat(embedSent.getDescription()).isEqualTo(embedContent);
+
+        verify(useCaseRunner, times(1)).run(any());
+        verify(event, times(1)).replyEmbeds(any(MessageEmbed.class));
     }
 }
