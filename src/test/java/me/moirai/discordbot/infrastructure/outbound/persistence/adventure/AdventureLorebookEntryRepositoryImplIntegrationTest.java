@@ -48,7 +48,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         Adventure adventure = adventureJpaRepository.save(AdventureFixture.publicMultiplayerAdventure().build());
         AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         // When
@@ -70,7 +70,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         Adventure adventure = adventureJpaRepository.save(AdventureFixture.publicMultiplayerAdventure().build());
         AdventureLorebookEntry entry = repository.save(AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build());
 
         // When
@@ -92,7 +92,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         AdventureLorebookEntry entry = repository.save(AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .playerDiscordId(playerId)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build());
 
         // When
@@ -126,7 +126,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         Adventure adventure = adventureRepository.save(AdventureFixture.publicMultiplayerAdventure().build());
         AdventureLorebookEntry entry = repository.save(AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build());
 
         // When
@@ -143,17 +143,17 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         Adventure adventure = adventureRepository.save(AdventureFixture.publicMultiplayerAdventure().build());
         AdventureLorebookEntry gpt4Omni = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -184,17 +184,17 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         Adventure adventure = adventureRepository.save(AdventureFixture.publicMultiplayerAdventure().build());
         AdventureLorebookEntry gpt4Omni = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -226,17 +226,17 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         Adventure adventure = adventureRepository.save(AdventureFixture.publicMultiplayerAdventure().build());
         AdventureLorebookEntry gpt4Omni = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -269,19 +269,19 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         AdventureLorebookEntry gpt4Omni = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 2")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 1")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 3")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.saveAll(Lists.list(gpt4Omni, gpt4Mini, gpt354k));
@@ -314,19 +314,19 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         AdventureLorebookEntry gpt4Omni = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 2")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 1")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 3")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.saveAll(Lists.list(gpt4Omni, gpt4Mini, gpt354k));
@@ -358,19 +358,19 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         AdventureLorebookEntry gpt4Omni = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 1")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 2")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Number 3")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.saveAll(Lists.list(gpt4Omni, gpt4Mini, gpt354k));
@@ -400,21 +400,21 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
                 .id(null)
                 .name("John")
                 .regex("[Jj]ohn")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt4Mini = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Immune")
                 .regex("[Ii]mmun(e|ity)")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gpt354k = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Archmage")
                 .regex("[Aa]rch(|-|\s)[Mm]age")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         jpaRepository.saveAll(Lists.list(gpt4Omni, gpt4Mini, gpt354k));
@@ -450,14 +450,14 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
         AdventureLorebookEntry originalEntry = repository.save(AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .version(0)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build());
 
         AdventureLorebookEntry entryToBeUpdated = AdventureLorebookEntryFixture.sampleLorebookEntry()
                 .id(originalEntry.getId())
                 .name("new name")
                 .version(originalEntry.getVersion())
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         // When

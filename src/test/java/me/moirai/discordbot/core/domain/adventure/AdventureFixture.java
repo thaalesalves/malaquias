@@ -1,8 +1,6 @@
 package me.moirai.discordbot.core.domain.adventure;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.Visibility;
@@ -33,11 +31,6 @@ public class AdventureFixture {
         builder.isMultiplayer(false);
         builder.contextAttributes(ContextAttributesFixture.sample().build());
         builder.version(1);
-
-        List<AdventureLorebookEntry> lorebook = new ArrayList<>();
-        lorebook.add(AdventureLorebookEntryFixture.sampleLorebookEntry().build());
-        lorebook.add(AdventureLorebookEntryFixture.samplePlayerCharacterLorebookEntry().build());
-        builder.lorebook(lorebook);
 
         return builder;
     }

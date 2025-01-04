@@ -1,21 +1,12 @@
 package me.moirai.discordbot.core.domain.world;
 
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
-import static jakarta.persistence.CascadeType.REMOVE;
-import static jakarta.persistence.FetchType.LAZY;
-
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
@@ -40,9 +31,6 @@ public class World extends ShareableAsset {
     @Column(name = "adventure_start", nullable = false)
     private String adventureStart;
 
-    @OneToMany(mappedBy = "world", cascade = { REMOVE, MERGE, PERSIST }, fetch = LAZY)
-    private List<WorldLorebookEntry> lorebook;
-
     private World(Builder builder) {
 
         super(builder.creatorDiscordId, builder.creationDate,
@@ -52,7 +40,6 @@ public class World extends ShareableAsset {
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
-        this.lorebook = builder.lorebook;
     }
 
     protected World() {
@@ -80,11 +67,6 @@ public class World extends ShareableAsset {
         return adventureStart;
     }
 
-    public List<WorldLorebookEntry> getLorebook() {
-
-        return Collections.unmodifiableList(lorebook);
-    }
-
     public void updateName(String name) {
 
         this.name = name;
@@ -100,23 +82,12 @@ public class World extends ShareableAsset {
         this.adventureStart = adventureStart;
     }
 
-    public void addToLorebook(WorldLorebookEntry lorebookEntry) {
-
-        lorebook.add(lorebookEntry);
-    }
-
-    public void removeFromLorebook(WorldLorebookEntry lorebookEntry) {
-
-        lorebook.remove(lorebookEntry);
-    }
-
     public static final class Builder {
 
         private String id;
         private String name;
         private String description;
         private String adventureStart;
-        private List<WorldLorebookEntry> lorebook = new ArrayList<>();
         private Visibility visibility;
         private Permissions permissions;
         private String creatorDiscordId;
@@ -148,15 +119,6 @@ public class World extends ShareableAsset {
         public Builder adventureStart(String adventureStart) {
 
             this.adventureStart = adventureStart;
-            return this;
-        }
-
-        public Builder lorebook(List<WorldLorebookEntry> lorebook) {
-
-            if (lorebook != null) {
-                this.lorebook = lorebook;
-            }
-
             return this;
         }
 

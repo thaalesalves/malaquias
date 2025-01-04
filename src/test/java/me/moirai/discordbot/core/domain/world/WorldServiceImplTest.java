@@ -67,7 +67,6 @@ public class WorldServiceImplTest {
                 .adventureStart(adventureStart)
                 .visibility(Visibility.fromString(visibility))
                 .permissions(permissions)
-                .lorebook(Collections.singletonList(WorldLorebookEntryFixture.sampleLorebookEntry().build()))
                 .build();
 
         CreateWorld command = CreateWorld.builder()

@@ -603,69 +603,6 @@ public class AdventureTest {
     }
 
     @Test
-    public void errorWhenModifyingLorebookDirectly() {
-
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // Then
-        assertThrows(UnsupportedOperationException.class,
-                () -> adventure.getLorebook().add(entry));
-    }
-
-    @Test
-    public void addLorebookEntry() {
-
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        adventure.addToLorebook(entry);
-
-        // Then
-        assertThat(adventure.getLorebook())
-                .isNotNull()
-                .isNotEmpty()
-                .contains(entry);
-    }
-
-    @Test
-    public void removeLorebookEntry() {
-
-        // Given
-        Adventure adventure = AdventureFixture.privateSingleplayerAdventure().build();
-        AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        adventure.removeFromLorebook(entry);
-
-        // Then
-        assertThat(adventure.getLorebook())
-                .isNotNull()
-                .isNotEmpty()
-                .doesNotContain(entry);
-    }
-
-    @Test
-    public void createAdventure_whenLorebookIsNull_thenLorebookListIsEmpty() {
-
-        // Given
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .lorebook(null)
-                .build();
-
-        // When
-        List<AdventureLorebookEntry> result = adventure.getLorebook();
-
-        // Then
-        assertThat(result)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
     public void adventure_whenUpdateWorldId_thenWorldIdIsUpdated() {
 
         // Given

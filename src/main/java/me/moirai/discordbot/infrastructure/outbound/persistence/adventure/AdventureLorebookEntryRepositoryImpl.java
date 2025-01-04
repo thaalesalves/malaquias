@@ -94,7 +94,7 @@ public class AdventureLorebookEntryRepositoryImpl implements AdventureLorebookEn
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get("adventure").get("id"), query.getAdventureId()));
+            predicates.add(cb.equal(root.get("adventureId"), query.getAdventureId()));
 
             if (StringUtils.isNotBlank(query.getName())) {
                 predicates.add(contains(cb, root, NAME, query.getName()));

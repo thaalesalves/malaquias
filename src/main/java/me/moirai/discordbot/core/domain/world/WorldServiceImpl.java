@@ -95,7 +95,6 @@ public class WorldServiceImpl implements WorldService {
 
                     return repository.save(world);
                 });
-
     }
 
     @Override
@@ -147,7 +146,7 @@ public class WorldServiceImpl implements WorldService {
                 .description(command.getDescription())
                 .playerDiscordId(command.getPlayerDiscordId())
                 .isPlayerCharacter(isEmpty(command.getPlayerDiscordId()))
-                .world(world)
+                .worldId(world.getId())
                 .creatorDiscordId(command.getRequesterDiscordId())
                 .build();
 

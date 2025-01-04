@@ -98,7 +98,7 @@ public class WorldLorebookEntryRepositoryImpl implements WorldLorebookEntryRepos
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get("world").get("id"), query.getWorldId()));
+            predicates.add(cb.equal(root.get("worldId"), query.getWorldId()));
 
             if (StringUtils.isNotBlank(query.getName())) {
                 predicates.add(contains(cb, root, NAME, query.getName()));

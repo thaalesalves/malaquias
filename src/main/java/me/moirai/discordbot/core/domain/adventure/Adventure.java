@@ -1,15 +1,8 @@
 package me.moirai.discordbot.core.domain.adventure;
 
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
-import static jakarta.persistence.CascadeType.REMOVE;
-import static jakarta.persistence.FetchType.LAZY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -17,7 +10,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
@@ -68,9 +60,6 @@ public class Adventure extends ShareableAsset {
     @Embedded
     private ModelConfiguration modelConfiguration;
 
-    @OneToMany(mappedBy = "adventure", cascade = { REMOVE, MERGE, PERSIST }, fetch = LAZY)
-    private List<AdventureLorebookEntry> lorebook;
-
     private Adventure(Builder builder) {
 
         super(builder.creatorDiscordId, builder.creationDate,
@@ -80,7 +69,6 @@ public class Adventure extends ShareableAsset {
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
-        this.lorebook = builder.lorebook;
         this.worldId = builder.worldId;
         this.personaId = builder.personaId;
         this.discordChannelId = builder.discordChannelId;
@@ -109,11 +97,6 @@ public class Adventure extends ShareableAsset {
 
     public String getAdventureStart() {
         return adventureStart;
-    }
-
-    public List<AdventureLorebookEntry> getLorebook() {
-
-        return Collections.unmodifiableList(lorebook);
     }
 
     public String getWorldId() {
@@ -166,16 +149,6 @@ public class Adventure extends ShareableAsset {
     public void updateAdventureStart(String adventureStart) {
 
         this.adventureStart = adventureStart;
-    }
-
-    public void addToLorebook(AdventureLorebookEntry lorebookEntry) {
-
-        lorebook.add(lorebookEntry);
-    }
-
-    public void removeFromLorebook(AdventureLorebookEntry lorebookEntry) {
-
-        lorebook.remove(lorebookEntry);
     }
 
     public void updatePersona(String personaId) {
@@ -301,7 +274,6 @@ public class Adventure extends ShareableAsset {
         private String name;
         private String description;
         private String adventureStart;
-        private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
         private String worldId;
         private String personaId;
         private String discordChannelId;
@@ -341,15 +313,6 @@ public class Adventure extends ShareableAsset {
         public Builder adventureStart(String adventureStart) {
 
             this.adventureStart = adventureStart;
-            return this;
-        }
-
-        public Builder lorebook(List<AdventureLorebookEntry> lorebook) {
-
-            if (lorebook != null) {
-                this.lorebook = lorebook;
-            }
-
             return this;
         }
 

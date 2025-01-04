@@ -48,7 +48,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         // When
@@ -70,7 +70,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry entry = repository.save(WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build());
 
         // When
@@ -103,7 +103,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry entry = repository.save(WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build());
 
         // When
@@ -120,17 +120,17 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry gpt4Omni = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -161,17 +161,17 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry gpt4Omni = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -202,17 +202,17 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry gpt4Omni = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -244,19 +244,19 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry gpt4Omni = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 2")
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 1")
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 3")
                 .build();
 
@@ -289,19 +289,19 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry gpt4Omni = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 2")
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 1")
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 3")
                 .build();
 
@@ -333,19 +333,19 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry gpt4Omni = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 1")
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 2")
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .name("Number 3")
                 .build();
 
@@ -376,21 +376,21 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
                 .id(null)
                 .name("John")
                 .regex("[Jj]ohn")
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt4Mini = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Immune")
                 .regex("[Ii]mmun(e|ity)")
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         WorldLorebookEntry gpt354k = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
                 .name("Archmage")
                 .regex("[Aa]rch(|-|\s)[Mm]age")
-                .world(world)
+                .worldId(world.getId())
                 .build();
 
         jpaRepository.saveAll(Lists.list(gpt4Omni, gpt4Mini, gpt354k));
@@ -423,12 +423,12 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         World world = worldJpaRepository.save(WorldFixture.publicWorld().build());
         WorldLorebookEntry originalEntry = repository.save(WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(null)
-                .world(world)
+                .worldId(world.getId())
                 .build());
 
         WorldLorebookEntry entryToBeUpdated = WorldLorebookEntryFixture.sampleLorebookEntry()
                 .id(originalEntry.getId())
-                .world(world)
+                .worldId(world.getId())
                 .name("new name")
                 .version(originalEntry.getVersion())
                 .build();

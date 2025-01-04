@@ -1,14 +1,10 @@
 package me.moirai.discordbot.core.domain.adventure;
 
-import static jakarta.persistence.FetchType.LAZY;
-
 import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.core.domain.Asset;
@@ -36,9 +32,8 @@ public class AdventureLorebookEntry extends Asset {
     @Column(name = "is_player_character", nullable = false)
     private boolean isPlayerCharacter;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "adventure_id", nullable = false)
-    private Adventure adventure;
+    @Column(name = "adventure_id", nullable = false)
+    private String adventureId;
 
     private AdventureLorebookEntry(Builder builder) {
 
@@ -49,7 +44,7 @@ public class AdventureLorebookEntry extends Asset {
         this.description = builder.description;
         this.playerDiscordId = builder.playerDiscordId;
         this.isPlayerCharacter = builder.isPlayerCharacter;
-        this.adventure = builder.adventure;
+        this.adventureId = builder.adventureId;
     }
 
     protected AdventureLorebookEntry() {
@@ -85,8 +80,8 @@ public class AdventureLorebookEntry extends Asset {
         return isPlayerCharacter;
     }
 
-    public Adventure getAdventure() {
-        return adventure;
+    public String getAdventureId() {
+        return adventureId;
     }
 
     public void updateName(String name) {
@@ -124,8 +119,8 @@ public class AdventureLorebookEntry extends Asset {
         private String description;
         private String playerDiscordId;
         private String creatorDiscordId;
+        private String adventureId;
         private boolean isPlayerCharacter;
-        private Adventure adventure;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
         private int version;
@@ -169,9 +164,9 @@ public class AdventureLorebookEntry extends Asset {
             return this;
         }
 
-        public Builder adventure(Adventure adventure) {
+        public Builder adventureId(String adventureId) {
 
-            this.adventure = adventure;
+            this.adventureId = adventureId;
             return this;
         }
 

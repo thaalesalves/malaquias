@@ -19,7 +19,7 @@ public class AdventureLorebookEntryTest {
                 .description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.")
                 .regex("[Ww]hite [Rr]iver")
                 .creatorDiscordId("CRTID")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .creationDate(OffsetDateTime.now())
                 .lastUpdateDate(OffsetDateTime.now())
                 .isPlayerCharacter(true)
@@ -40,7 +40,7 @@ public class AdventureLorebookEntryTest {
         assertThat(entry.getCreatorDiscordId()).isEqualTo("CRTID");
         assertThat(entry.getRegex()).isEqualTo("[Ww]hite [Rr]iver");
         assertThat(entry.getVersion()).isEqualTo(1);
-        assertThat(entry.getAdventure()).isEqualTo(adventure);
+        assertThat(entry.getAdventureId()).isEqualTo(adventure.getId());
         assertThat(entry.isPlayerCharacter()).isTrue();
     }
 

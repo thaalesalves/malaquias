@@ -2,7 +2,6 @@ package me.moirai.discordbot.core.domain.world;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Lists.list;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -120,61 +119,6 @@ public class WorldTest {
 
         // Then
         assertThrows(BusinessRuleViolationException.class, worldBuilder::build);
-    }
-
-    @Test
-    public void errorWhenModifyingLorebookDirectly() {
-
-        // Given
-        World world = WorldFixture.publicWorld().build();
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // Then
-        assertThrows(UnsupportedOperationException.class,
-                () -> world.getLorebook().add(entry));
-    }
-
-    @Test
-    public void addLorebookEntry() {
-
-        // Given
-        World world = WorldFixture.publicWorld().build();
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        world.addToLorebook(entry);
-
-        // Then
-        assertThat(world.getLorebook())
-                .isNotNull()
-                .isNotEmpty()
-                .contains(entry);
-    }
-
-    @Test
-    public void removeLorebookEntry() {
-
-        // Given
-        WorldLorebookEntry entry1 = WorldLorebookEntryFixture.sampleLorebookEntry()
-                .name("entry1")
-                .build();
-
-        WorldLorebookEntry entry2 = WorldLorebookEntryFixture.sampleLorebookEntry()
-                .name("entry2")
-                .build();
-
-        World world = WorldFixture.publicWorld()
-                .lorebook(list(entry1, entry2))
-                .build();
-
-        // When
-        world.removeFromLorebook(entry1);
-
-        // Then
-        assertThat(world.getLorebook())
-                .isNotNull()
-                .isNotEmpty()
-                .doesNotContain(entry1);
     }
 
     @Test

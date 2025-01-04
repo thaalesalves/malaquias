@@ -179,7 +179,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Pyromancer is a fire battlemage")
                 .playerDiscordId("1")
                 .isPlayerCharacter(true)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry johnCharacter = AdventureLorebookEntry.builder()
@@ -189,7 +189,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerDiscordId("2")
                 .isPlayerCharacter(true)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
@@ -208,7 +208,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Pyromancer is a fire battlemage")
                 .playerDiscordId("1")
                 .isPlayerCharacter(true)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
@@ -224,7 +224,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .name("Sword of Fire")
                 .regex("[Ss]word [Oo]f [Ff]ire")
                 .description("The Sword of Fire is a spectral sword that spits fire")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gloveOfArmageddon = AdventureLorebookEntry.builder()
@@ -232,7 +232,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .name("Glove of Armageddon")
                 .regex("[Gg]love [Oo]f [Aa]rmageddon")
                 .description("The Glove of Armageddon is a gauntlet that punches with the strength of three suns")
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry lordOfDoom = AdventureLorebookEntry.builder()
@@ -242,7 +242,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerDiscordId("2")
                 .isPlayerCharacter(true)
-                .adventure(adventure)
+                .adventureId(adventure.getId())
                 .build();
 
         when(adventureService.findAllLorebookEntriesByRegex(anyString(), anyString()))

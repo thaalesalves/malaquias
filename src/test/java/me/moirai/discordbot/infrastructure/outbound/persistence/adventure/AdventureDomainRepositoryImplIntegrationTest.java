@@ -168,6 +168,6 @@ public class AdventureDomainRepositoryImplIntegrationTest extends AbstractIntegr
         // Then
         assertThat(repository.findById(adventure.getId())).isNotNull().isEmpty();
         assertThat(favoriteRepository.existsById(favorite.getId())).isFalse();
-        assertThat(lorebookEntryJpaRepository.findAllByAdventure(adventure)).isEmpty();
+        assertThat(lorebookEntryJpaRepository.findAllByAdventureId(adventure.getId())).isEmpty();
     }
 }
