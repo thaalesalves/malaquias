@@ -86,7 +86,7 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
                         .description(worldEntry.getDescription())
                         .playerDiscordId(worldEntry.getPlayerDiscordId())
                         .isPlayerCharacter(worldEntry.isPlayerCharacter())
-                        .adventureId(adventure.getId())
+                        .adventure(adventure)
                         .creatorDiscordId(adventure.getCreatorDiscordId())
                         .build())
                 .toList();

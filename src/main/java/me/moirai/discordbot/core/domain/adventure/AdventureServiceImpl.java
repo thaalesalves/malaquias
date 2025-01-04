@@ -99,7 +99,7 @@ public class AdventureServiceImpl implements AdventureService {
                             .description(command.getDescription())
                             .playerDiscordId(command.getPlayerDiscordId())
                             .isPlayerCharacter(isEmpty(command.getPlayerDiscordId()))
-                            .adventureId(command.getAdventureId())
+                            .adventure(adventure)
                             .creatorDiscordId(command.getRequesterDiscordId())
                             .build();
 

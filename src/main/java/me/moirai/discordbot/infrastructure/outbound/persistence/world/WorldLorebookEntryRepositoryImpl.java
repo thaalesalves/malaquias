@@ -43,43 +43,33 @@ public class WorldLorebookEntryRepositoryImpl implements WorldLorebookEntryRepos
     }
 
     @Override
-    public WorldLorebookEntry save(WorldLorebookEntry world) {
+    public WorldLorebookEntry save(WorldLorebookEntry entry) {
 
-        WorldLorebookEntryEntity entity = mapper.mapToEntity(world);
-
-        return mapper.mapFromEntity(jpaRepository.save(entity));
+        return jpaRepository.save(entry);
     }
 
     @Override
     public Optional<WorldLorebookEntry> findById(String lorebookEntryId) {
 
-        return jpaRepository.findById(lorebookEntryId)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findById(lorebookEntryId);
     }
 
     @Override
     public List<WorldLorebookEntry> findAllByRegex(String valueToSearch, String worldId) {
 
-        return jpaRepository.findAllByNameRegex(valueToSearch, worldId)
-                .stream()
-                .map(mapper::mapFromEntity)
-                .toList();
+        return jpaRepository.findAllByNameRegex(valueToSearch, worldId);
     }
 
     @Override
     public List<WorldLorebookEntry> findAllByWorldId(String worldId) {
 
-        return jpaRepository.findAllByWorldId(worldId)
-                .stream()
-                .map(mapper::mapFromEntity)
-                .toList();
+        return jpaRepository.findAllByWorldId(worldId);
     }
 
     @Override
     public Optional<WorldLorebookEntry> findByPlayerDiscordId(String playerDiscordId, String worldId) {
 
-        return jpaRepository.findByPlayerDiscordId(playerDiscordId, worldId)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findByPlayerDiscordId(playerDiscordId, worldId);
     }
 
     @Override
@@ -97,18 +87,18 @@ public class WorldLorebookEntryRepositoryImpl implements WorldLorebookEntryRepos
         Direction direction = extractDirection(request.getDirection());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
-        Specification<WorldLorebookEntryEntity> query = buildSearchQuery(request);
-        Page<WorldLorebookEntryEntity> pagedResult = jpaRepository.findAll(query, pageRequest);
+        Specification<WorldLorebookEntry> query = buildSearchQuery(request);
+        Page<WorldLorebookEntry> pagedResult = jpaRepository.findAll(query, pageRequest);
 
         return mapper.mapToResult(pagedResult);
     }
 
-    private Specification<WorldLorebookEntryEntity> buildSearchQuery(SearchWorldLorebookEntries query) {
+    private Specification<WorldLorebookEntry> buildSearchQuery(SearchWorldLorebookEntries query) {
 
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get("worldId"), query.getWorldId()));
+            predicates.add(cb.equal(root.get("world").get("id"), query.getWorldId()));
 
             if (StringUtils.isNotBlank(query.getName())) {
                 predicates.add(contains(cb, root, NAME, query.getName()));

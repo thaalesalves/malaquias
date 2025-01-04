@@ -2,6 +2,7 @@ package me.moirai.discordbot.core.domain.world;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Lists.list;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -154,17 +155,26 @@ public class WorldTest {
     public void removeLorebookEntry() {
 
         // Given
-        World world = WorldFixture.publicWorld().build();
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
+        WorldLorebookEntry entry1 = WorldLorebookEntryFixture.sampleLorebookEntry()
+                .name("entry1")
+                .build();
+
+        WorldLorebookEntry entry2 = WorldLorebookEntryFixture.sampleLorebookEntry()
+                .name("entry2")
+                .build();
+
+        World world = WorldFixture.publicWorld()
+                .lorebook(list(entry1, entry2))
+                .build();
 
         // When
-        world.removeFromLorebook(entry);
+        world.removeFromLorebook(entry1);
 
         // Then
         assertThat(world.getLorebook())
                 .isNotNull()
                 .isNotEmpty()
-                .doesNotContain(entry);
+                .doesNotContain(entry1);
     }
 
     @Test

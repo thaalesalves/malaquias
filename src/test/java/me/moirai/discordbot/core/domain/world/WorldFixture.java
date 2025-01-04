@@ -1,8 +1,6 @@
 package me.moirai.discordbot.core.domain.world;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import me.moirai.discordbot.core.domain.Permissions;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
@@ -27,11 +25,6 @@ public class WorldFixture {
         Permissions permissions = PermissionsFixture.samplePermissions().build();
         builder.permissions(permissions);
 
-        List<WorldLorebookEntry> lorebook = new ArrayList<>();
-        lorebook.add(WorldLorebookEntryFixture.sampleLorebookEntry().build());
-        lorebook.add(WorldLorebookEntryFixture.samplePlayerCharacterLorebookEntry().build());
-        builder.lorebook(lorebook);
-
         return builder;
     }
 
@@ -49,11 +42,6 @@ public class WorldFixture {
 
         Permissions permissions = PermissionsFixture.samplePermissions().build();
         builder.permissions(permissions);
-
-        List<WorldLorebookEntry> lorebook = new ArrayList<>();
-        lorebook.add(WorldLorebookEntryFixture.sampleLorebookEntry().build());
-        lorebook.add(WorldLorebookEntryFixture.samplePlayerCharacterLorebookEntry().build());
-        builder.lorebook(lorebook);
 
         return builder;
     }

@@ -652,7 +652,7 @@ public class AdventureTest {
     public void createAdventure_whenLorebookIsNull_thenLorebookListIsEmpty() {
 
         // Given
-        Adventure adventure = AdventureFixture.withoutLorebook()
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
                 .lorebook(null)
                 .build();
 

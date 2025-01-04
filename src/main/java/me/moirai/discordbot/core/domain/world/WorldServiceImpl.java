@@ -147,7 +147,7 @@ public class WorldServiceImpl implements WorldService {
                 .description(command.getDescription())
                 .playerDiscordId(command.getPlayerDiscordId())
                 .isPlayerCharacter(isEmpty(command.getPlayerDiscordId()))
-                .worldId(command.getWorldId())
+                .world(world)
                 .creatorDiscordId(command.getRequesterDiscordId())
                 .build();
 

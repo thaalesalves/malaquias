@@ -350,7 +350,7 @@ public class AdventureServiceImplTest {
                 .build();
 
         AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry()
-                .adventureId(adventure.getId())
+                .adventure(adventure)
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
@@ -366,7 +366,7 @@ public class AdventureServiceImplTest {
         assertThat(retrievedEntry.getRegex()).isEqualTo(entry.getRegex());
         assertThat(retrievedEntry.getDescription()).isEqualTo(entry.getDescription());
         assertThat(retrievedEntry.getCreatorDiscordId()).isEqualTo(entry.getCreatorDiscordId());
-        assertThat(retrievedEntry.getAdventureId()).isEqualTo(entry.getAdventureId());
+        assertThat(retrievedEntry.getAdventure()).isEqualTo(entry.getAdventure());
         assertThat(retrievedEntry.getVersion()).isEqualTo(entry.getVersion());
         assertThat(retrievedEntry.getLastUpdateDate()).isEqualTo(entry.getLastUpdateDate());
         assertThat(retrievedEntry.getCreationDate()).isEqualTo(entry.getCreationDate());
@@ -425,7 +425,7 @@ public class AdventureServiceImplTest {
                 .build();
 
         AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry()
-                .adventureId(adventure.getId())
+                .adventure(adventure)
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
@@ -442,7 +442,7 @@ public class AdventureServiceImplTest {
         assertThat(retrievedEntry.getRegex()).isEqualTo(entry.getRegex());
         assertThat(retrievedEntry.getDescription()).isEqualTo(entry.getDescription());
         assertThat(retrievedEntry.getCreatorDiscordId()).isEqualTo(entry.getCreatorDiscordId());
-        assertThat(retrievedEntry.getAdventureId()).isEqualTo(entry.getAdventureId());
+        assertThat(retrievedEntry.getAdventure()).isEqualTo(entry.getAdventure());
         assertThat(retrievedEntry.getVersion()).isEqualTo(entry.getVersion());
         assertThat(retrievedEntry.getLastUpdateDate()).isEqualTo(entry.getLastUpdateDate());
         assertThat(retrievedEntry.getCreationDate()).isEqualTo(entry.getCreationDate());
@@ -478,7 +478,7 @@ public class AdventureServiceImplTest {
                 .build();
 
         AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry()
-                .adventureId(adventure.getId())
+                .adventure(adventure)
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
@@ -494,7 +494,7 @@ public class AdventureServiceImplTest {
         assertThat(result.get(0).getRegex()).isEqualTo(entry.getRegex());
         assertThat(result.get(0).getDescription()).isEqualTo(entry.getDescription());
         assertThat(result.get(0).getCreatorDiscordId()).isEqualTo(entry.getCreatorDiscordId());
-        assertThat(result.get(0).getAdventureId()).isEqualTo(entry.getAdventureId());
+        assertThat(result.get(0).getAdventure()).isEqualTo(entry.getAdventure());
         assertThat(result.get(0).getVersion()).isEqualTo(entry.getVersion());
         assertThat(result.get(0).getLastUpdateDate()).isEqualTo(entry.getLastUpdateDate());
         assertThat(result.get(0).getCreationDate()).isEqualTo(entry.getCreationDate());
@@ -583,7 +583,7 @@ public class AdventureServiceImplTest {
                 .build();
 
         AdventureLorebookEntry entry = AdventureLorebookEntryFixture.sampleLorebookEntry()
-                .adventureId(adventure.getId())
+                .adventure(adventure)
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(adventure));

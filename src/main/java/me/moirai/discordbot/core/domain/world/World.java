@@ -7,17 +7,36 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 import me.moirai.discordbot.core.domain.Permissions;
 import me.moirai.discordbot.core.domain.ShareableAsset;
 import me.moirai.discordbot.core.domain.Visibility;
 
+@Entity(name = "World")
+@Table(name = "world")
 public class World extends ShareableAsset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "adventure_start", nullable = false)
     private String adventureStart;
+
+    @OneToMany(mappedBy = "world", cascade = CascadeType.REMOVE)
     private List<WorldLorebookEntry> lorebook;
 
     private World(Builder builder) {
@@ -30,6 +49,10 @@ public class World extends ShareableAsset {
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
         this.lorebook = builder.lorebook;
+    }
+
+    protected World() {
+        super();
     }
 
     public static Builder builder() {

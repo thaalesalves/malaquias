@@ -2,28 +2,57 @@ package me.moirai.discordbot.core.domain.world;
 
 import java.time.OffsetDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.core.domain.Asset;
 
+@Entity(name = "WorldLorebookEntry")
+@Table(name = "world_lorebook")
 public class WorldLorebookEntry extends Asset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String regex;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "regex", nullable = false)
+    private String regex;
+
+    @Column(name = "player_discord_id")
     private String playerDiscordId;
+
+    @Column(name = "is_player_character", nullable = false)
     private boolean isPlayerCharacter;
-    private String worldId;
+
+    @ManyToOne
+    @JoinColumn(name = "world_id", nullable = false)
+    private World world;
 
     private WorldLorebookEntry(Builder builder) {
 
         super(builder.creatorDiscordId, builder.creationDate, builder.lastUpdateDate, builder.version);
+
         this.id = builder.id;
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
         this.playerDiscordId = builder.playerDiscordId;
         this.isPlayerCharacter = builder.isPlayerCharacter;
-        this.worldId = builder.worldId;
+        this.world = builder.world;
+    }
+
+    protected WorldLorebookEntry() {
+        super();
     }
 
     public static Builder builder() {
@@ -55,8 +84,8 @@ public class WorldLorebookEntry extends Asset {
         return isPlayerCharacter;
     }
 
-    public String getWorldId() {
-        return worldId;
+    public World getWorld() {
+        return world;
     }
 
     public void updateName(String name) {
@@ -95,7 +124,7 @@ public class WorldLorebookEntry extends Asset {
         private String playerDiscordId;
         private String creatorDiscordId;
         private boolean isPlayerCharacter;
-        private String worldId;
+        private World world;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
         private int version;
@@ -139,9 +168,9 @@ public class WorldLorebookEntry extends Asset {
             return this;
         }
 
-        public Builder worldId(String worldId) {
+        public Builder world(World world) {
 
-            this.worldId = worldId;
+            this.world = world;
             return this;
         }
 

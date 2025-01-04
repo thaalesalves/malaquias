@@ -63,15 +63,13 @@ public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
     @Override
     public Optional<Adventure> findById(String id) {
 
-        return jpaRepository.findById(id)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findById(id);
     }
 
     @Override
     public Optional<Adventure> findByDiscordChannelId(String channelId) {
 
-        return jpaRepository.findByDiscordChannelId(channelId)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findByDiscordChannelId(channelId);
     }
 
     @Override
@@ -83,8 +81,8 @@ public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
         Direction direction = extractDirection(request.getDirection());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
-        Specification<AdventureEntity> query = buildSearchQuery(request);
-        Page<AdventureEntity> pagedResult = jpaRepository.findAll(query, pageRequest);
+        Specification<Adventure> query = buildSearchQuery(request);
+        Page<Adventure> pagedResult = jpaRepository.findAll(query, pageRequest);
 
         return mapper.mapToResult(pagedResult);
     }
@@ -95,7 +93,7 @@ public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
         return jpaRepository.getGameModeByDiscordChannelId(discordChannelId);
     }
 
-    private Specification<AdventureEntity> buildSearchQuery(SearchAdventures request) {
+    private Specification<Adventure> buildSearchQuery(SearchAdventures request) {
 
         return (root, cq, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -133,8 +131,8 @@ public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
             }
 
             if (isNotBlank(request.getModel())) {
-                predicates.add(cb.like(cb.upper(root.get(MODEL_CONFIGURATION)
-                        .get(AI_MODEL)), cb.literal(request.getModel().toUpperCase())));
+                predicates.add(cb.like(cb.upper(cb.toString(root.get(MODEL_CONFIGURATION)
+                        .get(AI_MODEL))), cb.literal(request.getModel().toUpperCase())));
             }
 
             if (isNotBlank(request.getGameMode())) {

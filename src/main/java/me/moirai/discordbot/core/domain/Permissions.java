@@ -6,19 +6,43 @@ import static java.util.Collections.unmodifiableList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.Formula;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embeddable;
+import me.moirai.discordbot.common.dbutil.StringListConverter;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 
+@Embeddable
 public final class Permissions {
 
-    private final String ownerDiscordId;
-    private final List<String> usersAllowedToRead;
-    private final List<String> usersAllowedToWrite;
+    @Column(name = "owner_discord_id")
+    private String ownerDiscordId;
+
+    @Column(name = "discord_users_allowed_to_read")
+    @Convert(converter = StringListConverter.class)
+    private List<String> usersAllowedToRead;
+
+    @Formula(value = "discord_users_allowed_to_read")
+    private String usersAllowedToReadString;
+
+    @Column(name = "discord_users_allowed_to_write")
+    @Convert(converter = StringListConverter.class)
+    private List<String> usersAllowedToWrite;
+
+    @Formula(value = "discord_users_allowed_to_write")
+    private String usersAllowedToWriteString;
 
     private Permissions(Builder builder) {
 
         this.ownerDiscordId = builder.ownerDiscordId;
         this.usersAllowedToRead = unmodifiableList(builder.usersAllowedToRead);
         this.usersAllowedToWrite = unmodifiableList(builder.usersAllowedToWrite);
+    }
+
+    protected Permissions() {
+        super();
     }
 
     public static Builder builder() {
@@ -43,6 +67,14 @@ public final class Permissions {
 
     public List<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
+    }
+
+    public String getUsersAllowedToReadString() {
+        return usersAllowedToReadString;
+    }
+
+    public String getUsersAllowedToWriteString() {
+        return usersAllowedToWriteString;
     }
 
     public Permissions updateOwner(String newOwnerDiscordId, String currentOwnerDiscordId) {

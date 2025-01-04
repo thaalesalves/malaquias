@@ -11,20 +11,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import me.moirai.discordbot.common.dbutil.StringListConverter;
+import me.moirai.discordbot.common.dbutil.StringMapDoubleConverter;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 
+@Embeddable
 public final class ModelConfiguration {
 
     private static final double DEFAULT_FREQUENCY_PENALTY = 0.0;
     private static final double DEFAULT_PRESENCE_PENALTY = 0.0;
 
-    private final ArtificialIntelligenceModel aiModel;
-    private final Integer maxTokenLimit;
-    private final Double temperature;
-    private final Double frequencyPenalty;
-    private final Double presencePenalty;
-    private final List<String> stopSequences;
-    private final Map<String, Double> logitBias;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ai_model", nullable = false)
+    private ArtificialIntelligenceModel aiModel;
+
+    @Column(name = "max_token_limit", nullable = false)
+    private int maxTokenLimit;
+
+    @Column(name = "temperature", nullable = false)
+    private Double temperature;
+
+    @Column(name = "frequency_penalty", nullable = false)
+    private Double frequencyPenalty;
+
+    @Column(name = "presence_penalty", nullable = false)
+    private Double presencePenalty;
+
+    @Column(name = "stop_sequences")
+    @Convert(converter = StringListConverter.class)
+    private List<String> stopSequences;
+
+    @Column(name = "logit_bias")
+    @Convert(converter = StringMapDoubleConverter.class)
+    private Map<String, Double> logitBias;
 
     private ModelConfiguration(Builder builder) {
 
@@ -39,6 +63,10 @@ public final class ModelConfiguration {
 
         this.logitBias = unmodifiableMap(
                 builder.logitBias == null ? emptyMap() : new HashMap<>(builder.logitBias));
+    }
+
+    protected ModelConfiguration() {
+        super();
     }
 
     public static Builder builder() {

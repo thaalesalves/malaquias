@@ -2,15 +2,15 @@ package me.moirai.discordbot.common.dbutil;
 
 import java.time.OffsetDateTime;
 
-import me.moirai.discordbot.infrastructure.outbound.persistence.AssetEntity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import me.moirai.discordbot.core.domain.Asset;
 
 public class AssetBaseDataAssigner {
 
     @PreUpdate
     @PrePersist
-    public void setDate(AssetEntity asset) {
+    public void setDate(Asset asset) {
 
         OffsetDateTime now = OffsetDateTime.now();
         if (asset.getCreationDate() == null) {

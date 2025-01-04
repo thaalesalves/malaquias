@@ -4,9 +4,20 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.MappedSuperclass;
+
+@MappedSuperclass
 public abstract class ShareableAsset extends Asset {
 
+    @Embedded
     private Permissions permissions;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility")
     private Visibility visibility;
 
     protected ShareableAsset(String creatorDiscordId, OffsetDateTime creationDate,
@@ -15,6 +26,10 @@ public abstract class ShareableAsset extends Asset {
         super(creatorDiscordId, creationDate, lastUpdateDate, version);
         this.permissions = permissions;
         this.visibility = visibility;
+    }
+
+    protected ShareableAsset() {
+        super();
     }
 
     public boolean isPublic() {

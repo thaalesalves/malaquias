@@ -57,8 +57,7 @@ public class WorldQueryRepositoryImpl implements WorldQueryRepository {
     @Override
     public Optional<World> findById(String id) {
 
-        return jpaRepository.findById(id)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findById(id);
     }
 
     @Override
@@ -70,13 +69,13 @@ public class WorldQueryRepositoryImpl implements WorldQueryRepository {
         Direction direction = extractDirection(request.getDirection());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
-        Specification<WorldEntity> query = buildSearchQuery(request);
-        Page<WorldEntity> pagedResult = jpaRepository.findAll(query, pageRequest);
+        Specification<World> query = buildSearchQuery(request);
+        Page<World> pagedResult = jpaRepository.findAll(query, pageRequest);
 
         return mapper.mapToResult(pagedResult);
     }
 
-    private Specification<WorldEntity> buildSearchQuery(SearchWorlds request) {
+    private Specification<World> buildSearchQuery(SearchWorlds request) {
 
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
