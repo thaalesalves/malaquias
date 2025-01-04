@@ -1,6 +1,5 @@
 package me.moirai.discordbot.infrastructure.outbound.persistence.persona;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.list;
 
@@ -16,7 +15,9 @@ import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.SearchPersonas;
 import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaResult;
 import me.moirai.discordbot.core.application.usecase.persona.result.SearchPersonasResult;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
@@ -40,7 +41,7 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
     public void retrievePersonaById() {
 
         // Given
-        PersonaEntity persona = jpaRepository.save(PersonaEntityFixture.privatePersona()
+        Persona persona = jpaRepository.save(PersonaFixture.privatePersona()
                 .id(null)
                 .build());
 
@@ -73,20 +74,26 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721356875";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId("580485734")
-                .usersAllowedToRead(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .usersAllowedToRead(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId("580485734")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .build())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -115,15 +122,15 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721356875";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
@@ -154,15 +161,15 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721356875";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
@@ -196,17 +203,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721356875";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -237,17 +244,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721356875";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -279,17 +286,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721356875";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -318,20 +325,26 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId("580485734")
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId("580485734")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .build())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -361,17 +374,21 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
@@ -402,17 +419,21 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .build();
 
@@ -446,19 +467,23 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -489,19 +514,23 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -533,18 +562,20 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -574,19 +605,23 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.publicPersona()
+        Persona gpt4Omni = PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToWrite(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -616,19 +651,23 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.publicPersona()
+        Persona gpt4Omni = PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToRead(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToRead(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToRead(singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToRead(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -658,17 +697,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         // Given
         String ownerDiscordId = "586678721358363";
 
-        PersonaEntity gpt4Omni = PersonaEntityFixture.privatePersona()
+        Persona gpt4Omni = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        PersonaEntity gpt4Mini = PersonaEntityFixture.privatePersona()
+        Persona gpt4Mini = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        PersonaEntity gpt354k = PersonaEntityFixture.privatePersona()
+        Persona gpt354k = PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -699,17 +738,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
                 .favorites(true)
                 .build();
 
-        PersonaEntity persona1 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona1 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 1")
                 .build());
 
-        PersonaEntity persona2 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona2 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 2")
                 .build());
 
-        PersonaEntity persona3 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona3 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 3")
                 .build());
@@ -754,17 +793,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
                 .favorites(true)
                 .build();
 
-        PersonaEntity persona1 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona1 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name(nameToSearch)
                 .build());
 
-        PersonaEntity persona2 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona2 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 2")
                 .build());
 
-        PersonaEntity persona3 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona3 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 3")
                 .build());
@@ -808,17 +847,17 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
                 .favorites(true)
                 .build();
 
-        PersonaEntity persona1 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona1 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 1")
                 .build());
 
-        PersonaEntity persona2 = jpaRepository.save(PersonaEntityFixture.publicPersona()
+        Persona persona2 = jpaRepository.save(PersonaFixture.publicPersona()
                 .id(null)
                 .name("Number 2")
                 .build());
 
-        PersonaEntity persona3 = jpaRepository.save(PersonaEntityFixture.privatePersona()
+        Persona persona3 = jpaRepository.save(PersonaFixture.privatePersona()
                 .id(null)
                 .name("Number 3")
                 .build());

@@ -2,21 +2,43 @@ package me.moirai.discordbot.core.domain.world;
 
 import java.time.OffsetDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.core.domain.Asset;
 
+@Entity(name = "WorldLorebookEntry")
+@Table(name = "world_lorebook")
 public class WorldLorebookEntry extends Asset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String regex;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "regex", nullable = false)
+    private String regex;
+
+    @Column(name = "player_discord_id")
     private String playerDiscordId;
+
+    @Column(name = "is_player_character", nullable = false)
     private boolean isPlayerCharacter;
+
+    @Column(name = "world_id", nullable = false)
     private String worldId;
 
     private WorldLorebookEntry(Builder builder) {
 
         super(builder.creatorDiscordId, builder.creationDate, builder.lastUpdateDate, builder.version);
+
         this.id = builder.id;
         this.name = builder.name;
         this.regex = builder.regex;
@@ -24,6 +46,10 @@ public class WorldLorebookEntry extends Asset {
         this.playerDiscordId = builder.playerDiscordId;
         this.isPlayerCharacter = builder.isPlayerCharacter;
         this.worldId = builder.worldId;
+    }
+
+    protected WorldLorebookEntry() {
+        super();
     }
 
     public static Builder builder() {

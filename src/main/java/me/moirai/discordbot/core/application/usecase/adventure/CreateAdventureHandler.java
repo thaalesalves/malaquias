@@ -1,6 +1,6 @@
 package me.moirai.discordbot.core.application.usecase.adventure;
 
-import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromInternalName;
+import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromString;
 
 import java.util.List;
 
@@ -87,7 +87,6 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
                         .playerDiscordId(worldEntry.getPlayerDiscordId())
                         .isPlayerCharacter(worldEntry.isPlayerCharacter())
                         .adventureId(adventure.getId())
-                        .creatorDiscordId(adventure.getCreatorDiscordId())
                         .build())
                 .toList();
     }
@@ -115,7 +114,7 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
     private ModelConfiguration buildModelConfiguration(CreateAdventure command) {
 
         return ModelConfiguration.builder()
-                .aiModel(fromInternalName(command.getAiModel()))
+                .aiModel(fromString(command.getAiModel()))
                 .frequencyPenalty(command.getFrequencyPenalty())
                 .presencePenalty(command.getPresencePenalty())
                 .temperature(command.getTemperature())

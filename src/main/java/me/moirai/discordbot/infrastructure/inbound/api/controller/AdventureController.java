@@ -179,7 +179,7 @@ public class AdventureController extends SecurityContextAware {
     private String getModel(SearchModel searchModel) {
 
         if (searchModel != null) {
-            return toCamelCase(searchModel.name(), false, '_');
+            return searchModel.name();
         }
 
         return EMPTY;
@@ -188,7 +188,7 @@ public class AdventureController extends SecurityContextAware {
     private String getGameMode(SearchGameMode searchGameMode) {
 
         if (searchGameMode != null) {
-            return toCamelCase(searchGameMode.name(), false, '_');
+            return searchGameMode.name();
         }
 
         return EMPTY;
@@ -197,7 +197,7 @@ public class AdventureController extends SecurityContextAware {
     private String getModeration(SearchModeration searchModeration) {
 
         if (searchModeration != null) {
-            return toCamelCase(searchModeration.name(), false, '_');
+            return searchModeration.name();
         }
 
         return EMPTY;

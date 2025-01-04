@@ -1,9 +1,18 @@
 package me.moirai.discordbot.infrastructure.outbound.persistence.adventure;
 
+import static java.util.Collections.singletonList;
+import static me.moirai.discordbot.core.domain.Visibility.PRIVATE;
+import static me.moirai.discordbot.core.domain.Visibility.PUBLIC;
+import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.GPT35_TURBO;
+import static me.moirai.discordbot.core.domain.adventure.GameMode.AUTHOR;
+import static me.moirai.discordbot.core.domain.adventure.GameMode.CHAT;
+import static me.moirai.discordbot.core.domain.adventure.GameMode.RPG;
+import static me.moirai.discordbot.core.domain.adventure.Moderation.DISABLED;
+import static me.moirai.discordbot.core.domain.adventure.Moderation.PERMISSIVE;
+import static me.moirai.discordbot.core.domain.adventure.Moderation.STRICT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.list;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +25,13 @@ import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.SearchAdventures;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResult;
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventuresResult;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
+import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
+import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
+import me.moirai.discordbot.core.domain.adventure.GameMode;
+import me.moirai.discordbot.core.domain.adventure.ModelConfigurationFixture;
+import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
@@ -29,10 +44,14 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
     private AdventureJpaRepository jpaRepository;
 
     @Autowired
+    private AdventureLorebookEntryJpaRepository lorebookEntryJpaRepository;
+
+    @Autowired
     private FavoriteRepository favoriteRepository;
 
     @BeforeEach
     public void before() {
+        lorebookEntryJpaRepository.deleteAllInBatch();
         jpaRepository.deleteAllInBatch();
     }
 
@@ -41,7 +60,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String adventureId = "234234";
-        AdventureEntity adventure = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure adventure = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(adventureId)
                 .discordChannelId(adventureId)
                 .build());
@@ -57,15 +76,15 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         assertThat(retrievedAdventure.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(retrievedAdventure.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(retrievedAdventure.getDiscordChannelId()).isEqualTo(adventure.getDiscordChannelId());
-        assertThat(retrievedAdventure.getGameMode().name()).isEqualTo(adventure.getGameMode());
+        assertThat(retrievedAdventure.getGameMode()).isEqualTo(adventure.getGameMode());
         assertThat(retrievedAdventure.getName()).isEqualTo(adventure.getName());
         assertThat(retrievedAdventure.getOwnerDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
         assertThat(retrievedAdventure.getPersonaId()).isEqualTo(adventure.getPersonaId());
-        assertThat(retrievedAdventure.getVisibility().name()).isEqualTo(adventure.getVisibility());
-        assertThat(retrievedAdventure.getModeration().name()).isEqualTo(adventure.getModeration());
+        assertThat(retrievedAdventure.getVisibility()).isEqualTo(adventure.getVisibility());
+        assertThat(retrievedAdventure.getModeration()).isEqualTo(adventure.getModeration());
         assertThat(retrievedAdventure.getWorldId()).isEqualTo(adventure.getWorldId());
 
-        assertThat(retrievedAdventure.getModelConfiguration().getAiModel().toString())
+        assertThat(retrievedAdventure.getModelConfiguration().getAiModel())
                 .isEqualTo(adventure.getModelConfiguration().getAiModel());
         assertThat(retrievedAdventure.getModelConfiguration().getFrequencyPenalty())
                 .isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
@@ -89,7 +108,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String discordChannelId = "234234";
-        AdventureEntity adventure = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure adventure = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .discordChannelId(discordChannelId)
                 .build());
@@ -105,15 +124,15 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         assertThat(retrievedAdventure.getAdventureStart()).isEqualTo(adventure.getAdventureStart());
         assertThat(retrievedAdventure.getDescription()).isEqualTo(adventure.getDescription());
         assertThat(retrievedAdventure.getDiscordChannelId()).isEqualTo(adventure.getDiscordChannelId());
-        assertThat(retrievedAdventure.getGameMode().name()).isEqualTo(adventure.getGameMode());
+        assertThat(retrievedAdventure.getGameMode()).isEqualTo(adventure.getGameMode());
         assertThat(retrievedAdventure.getName()).isEqualTo(adventure.getName());
         assertThat(retrievedAdventure.getOwnerDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
         assertThat(retrievedAdventure.getPersonaId()).isEqualTo(adventure.getPersonaId());
-        assertThat(retrievedAdventure.getVisibility().name()).isEqualTo(adventure.getVisibility());
-        assertThat(retrievedAdventure.getModeration().name()).isEqualTo(adventure.getModeration());
+        assertThat(retrievedAdventure.getVisibility()).isEqualTo(adventure.getVisibility());
+        assertThat(retrievedAdventure.getModeration()).isEqualTo(adventure.getModeration());
         assertThat(retrievedAdventure.getWorldId()).isEqualTo(adventure.getWorldId());
 
-        assertThat(retrievedAdventure.getModelConfiguration().getAiModel().toString())
+        assertThat(retrievedAdventure.getModelConfiguration().getAiModel())
                 .isEqualTo(adventure.getModelConfiguration().getAiModel());
         assertThat(retrievedAdventure.getModelConfiguration().getFrequencyPenalty())
                 .isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
@@ -151,22 +170,28 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.privateMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId("580485734")
-                .usersAllowedToRead(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .usersAllowedToRead(singletonList(ownerDiscordId))
+                        .build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.privateMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId("580485734")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .build())
                 .discordChannelId("CHNLID3")
                 .build();
 
@@ -196,22 +221,22 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -243,22 +268,22 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -291,25 +316,25 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -340,25 +365,25 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -390,17 +415,17 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
@@ -430,17 +455,17 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
@@ -470,26 +495,26 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .moderation("STRICT")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .moderation("PERMISSIVE")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .moderation("PERMISSIVE")
+                .moderation(PERMISSIVE)
                 .discordChannelId("CHNLID3")
                 .build();
 
@@ -522,17 +547,17 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
@@ -563,25 +588,24 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String ownerDiscordId = "586678721356875";
-
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
         SearchAdventures query = SearchAdventures.builder()
-                .model("gpt4-mini")
+                .model("GPT4_MINI")
                 .requesterDiscordId(ownerDiscordId)
                 .build();
 
@@ -604,26 +628,24 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
-                .visibility("public")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("private")
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
         SearchAdventures query = SearchAdventures.builder()
-                .visibility("private")
+                .visibility("PRIVATE")
                 .requesterDiscordId(ownerDiscordId)
                 .build();
 
@@ -646,27 +668,27 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
-                .visibility("public")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.privateMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("private")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini));
 
         SearchAdventures query = SearchAdventures.builder()
-                .visibility("private")
+                .visibility("PRIVATE")
                 .requesterDiscordId(ownerDiscordId)
                 .operation("WRITE")
                 .build();
@@ -690,25 +712,25 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -739,26 +761,26 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .moderation("STRICT")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .moderation("PERMISSIVE")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .moderation("PERMISSIVE")
+                .moderation(PERMISSIVE)
                 .discordChannelId("CHNLID3")
                 .build();
 
@@ -787,18 +809,18 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String worldId = "WRLD";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .worldId(worldId)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .worldId("AAAA")
                 .build());
@@ -838,18 +860,18 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String personaId = "strict";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .personaId(personaId)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .personaId("AAAA")
                 .build());
@@ -889,22 +911,28 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId("580485734")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId("580485734")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .build())
                 .discordChannelId("CHNLID3")
                 .build();
 
@@ -935,24 +963,28 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -984,24 +1016,28 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -1034,27 +1070,31 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -1085,27 +1125,31 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -1137,18 +1181,20 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
@@ -1180,18 +1226,20 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
@@ -1223,28 +1271,32 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .moderation("STRICT")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .moderation("PERMISSIVE")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .ownerDiscordId(ownerDiscordId)
-                .moderation("PERMISSIVE")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .moderation(PERMISSIVE)
                 .discordChannelId("CHNLID3")
                 .build();
 
@@ -1277,18 +1329,20 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
@@ -1322,26 +1376,28 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -1349,7 +1405,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
 
         SearchAdventures query = SearchAdventures.builder()
-                .model("gpt35-16k")
+                .model("GPT35_TURBO")
                 .requesterDiscordId(ownerDiscordId)
                 .operation("WRITE")
                 .build();
@@ -1373,26 +1429,28 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini()
-                        .aiModel("gpt35-16k")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini()
+                        .aiModel(GPT35_TURBO)
                         .build())
                 .discordChannelId("CHNLID3")
                 .build();
@@ -1424,28 +1482,32 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .moderation("STRICT")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
-                .moderation("PERMISSIVE")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .moderation("PERMISSIVE")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .moderation(PERMISSIVE)
                 .discordChannelId("CHNLID3")
                 .build();
 
@@ -1475,32 +1537,36 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .moderation("STRICT")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
-                .gameMode("CHAT")
+                .gameMode(CHAT)
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
-                .moderation("PERMISSIVE")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .gameMode("RPG")
+                .gameMode(RPG)
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .moderation("PERMISSIVE")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .moderation(PERMISSIVE)
                 .discordChannelId("CHNLID3")
-                .gameMode("AUTHOR")
+                .gameMode(AUTHOR)
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
@@ -1529,33 +1595,37 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721358363";
 
-        AdventureEntity gpt4Omni = AdventureEntityFixture.sample()
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .moderation("STRICT")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
-                .gameMode("AUTHOR")
+                .gameMode(AUTHOR)
                 .build();
 
-        AdventureEntity gpt4Mini = AdventureEntityFixture.sample()
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
-                .moderation("PERMISSIVE")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .gameMode("CHAT")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .gameMode(CHAT)
                 .build();
 
-        AdventureEntity gpt354k = AdventureEntityFixture.sample()
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 3")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
-                .moderation("PERMISSIVE")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(singletonList(ownerDiscordId))
+                        .build())
+                .moderation(PERMISSIVE)
                 .discordChannelId("CHNLID3")
-                .gameMode("RPG")
+                .gameMode(RPG)
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
@@ -1585,18 +1655,18 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String worldId = "WRLD";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .worldId(worldId)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .worldId("AAAA")
                 .build());
@@ -1637,18 +1707,18 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String personaId = "strict";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .personaId(personaId)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .personaId("AAAA")
                 .build());
@@ -1689,20 +1759,20 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
 
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
-                .visibility("public")
+                .visibility(PUBLIC)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("public")
+                .visibility(PUBLIC)
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -1738,20 +1808,20 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String nameToSearch = "nameToBeSearched";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
-                .visibility("public")
+                .visibility(PUBLIC)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name(nameToSearch)
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("public")
+                .visibility(PUBLIC)
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -1789,21 +1859,21 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String ownerDiscordId = "586678721356875";
-        String visibility = "public";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Visibility visibility = PUBLIC;
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .visibility(visibility)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("private")
+                .visibility(PRIVATE)
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -1822,7 +1892,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterDiscordId(ownerDiscordId)
-                .visibility(visibility)
+                .visibility(visibility.name())
                 .favorites(true)
                 .build();
 
@@ -1841,21 +1911,21 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String ownerDiscordId = "586678721356875";
-        String gameMode = "chat";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        GameMode gameMode = CHAT;
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .gameMode(gameMode)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("private")
+                .visibility(PRIVATE)
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -1874,7 +1944,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterDiscordId(ownerDiscordId)
-                .gameMode(gameMode)
+                .gameMode(gameMode.name())
                 .favorites(true)
                 .build();
 
@@ -1893,20 +1963,20 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String ownerDiscordId = "586678721356875";
-        String model = "gpt4-omni";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        String model = "GPT4_OMNI";
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .visibility("private")
+                .visibility(PRIVATE)
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -1944,21 +2014,21 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String ownerDiscordId = "586678721356875";
-        String moderation = "strict";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Moderation moderation = STRICT;
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .moderation(moderation)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
-                .moderation("disabled")
+                .moderation(DISABLED)
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -1977,7 +2047,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         SearchAdventures query = SearchAdventures.builder()
                 .requesterDiscordId(ownerDiscordId)
-                .moderation(moderation)
+                .moderation(moderation.name())
                 .favorites(true)
                 .build();
 
@@ -1997,18 +2067,18 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String worldId = "WRLD";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .worldId(worldId)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .worldId("AAAA")
                 .build());
@@ -2049,18 +2119,18 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Given
         String ownerDiscordId = "586678721356875";
         String personaId = "strict";
-        AdventureEntity gpt4Omni = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 1")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Omni().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
                 .discordChannelId("CHNLID1")
                 .personaId(personaId)
                 .build());
 
-        AdventureEntity gpt4Mini = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .id(null)
                 .name("Number 2")
-                .modelConfiguration(ModelConfigurationEntityFixture.gpt4Mini().build())
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
                 .discordChannelId("CHNLID2")
                 .personaId("AAAA")
                 .build());
@@ -2100,7 +2170,7 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
 
         // Given
         String discordChannelId = "1234";
-        AdventureEntity adventure = jpaRepository.save(AdventureEntityFixture.sample()
+        Adventure adventure = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
                 .discordChannelId(discordChannelId)
                 .build());
 
@@ -2110,6 +2180,6 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         // Then
         assertThat(gameMode).isNotNull()
                 .isNotEmpty()
-                .isEqualTo(adventure.getGameMode());
+                .isEqualTo(adventure.getGameMode().name());
     }
 }

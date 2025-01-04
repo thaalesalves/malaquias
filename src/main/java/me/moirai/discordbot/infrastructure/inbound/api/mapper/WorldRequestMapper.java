@@ -1,8 +1,11 @@
 package me.moirai.discordbot.infrastructure.inbound.api.mapper;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+
 import org.springframework.stereotype.Component;
 
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
+import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntry;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreateWorldRequest;
@@ -21,6 +24,14 @@ public class WorldRequestMapper {
                 .usersAllowedToWrite(request.getUsersAllowedToWrite())
                 .usersAllowedToRead(request.getUsersAllowedToRead())
                 .requesterDiscordId(requesterDiscordId)
+                .lorebookEntries(emptyIfNull(request.getLorebook()).stream()
+                        .map(entry -> CreateWorldLorebookEntry.builder()
+                                .name(entry.getName())
+                                .description(entry.getDescription())
+                                .regex(entry.getRegex())
+                                .playerDiscordId(entry.getPlayerDiscordId())
+                                .build())
+                        .toList())
                 .build();
     }
 

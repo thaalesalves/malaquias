@@ -12,7 +12,6 @@ public class WorldLorebookEntryFixture {
         builder.description("The White River goes through Falkreath, Whiterun and ends in Eastmarch.");
         builder.regex("[Ww]hite [Rr]iver");
         builder.creatorDiscordId("CRTID");
-        builder.worldId("WRLDID");
         builder.creationDate(OffsetDateTime.now());
         builder.lastUpdateDate(OffsetDateTime.now());
 
@@ -28,7 +27,6 @@ public class WorldLorebookEntryFixture {
         builder.regex("[Vv]olin [Hh]abar|[Vv]oha");
         builder.playerDiscordId("2423423423423");
         builder.creatorDiscordId("CRTID");
-        builder.worldId("WRLDID");
         builder.creationDate(OffsetDateTime.now());
         builder.lastUpdateDate(OffsetDateTime.now());
 

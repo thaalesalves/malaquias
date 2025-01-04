@@ -1,24 +1,35 @@
 package me.moirai.discordbot.core.domain.world;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 import me.moirai.discordbot.core.domain.Permissions;
 import me.moirai.discordbot.core.domain.ShareableAsset;
 import me.moirai.discordbot.core.domain.Visibility;
 
+@Entity(name = "World")
+@Table(name = "world")
 public class World extends ShareableAsset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "adventure_start", nullable = false)
     private String adventureStart;
-    private List<WorldLorebookEntry> lorebook;
 
     private World(Builder builder) {
 
@@ -29,7 +40,10 @@ public class World extends ShareableAsset {
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
-        this.lorebook = builder.lorebook;
+    }
+
+    protected World() {
+        super();
     }
 
     public static Builder builder() {
@@ -53,11 +67,6 @@ public class World extends ShareableAsset {
         return adventureStart;
     }
 
-    public List<WorldLorebookEntry> getLorebook() {
-
-        return Collections.unmodifiableList(lorebook);
-    }
-
     public void updateName(String name) {
 
         this.name = name;
@@ -73,23 +82,12 @@ public class World extends ShareableAsset {
         this.adventureStart = adventureStart;
     }
 
-    public void addToLorebook(WorldLorebookEntry lorebookEntry) {
-
-        lorebook.add(lorebookEntry);
-    }
-
-    public void removeFromLorebook(WorldLorebookEntry lorebookEntry) {
-
-        lorebook.remove(lorebookEntry);
-    }
-
     public static final class Builder {
 
         private String id;
         private String name;
         private String description;
         private String adventureStart;
-        private List<WorldLorebookEntry> lorebook = new ArrayList<>();
         private Visibility visibility;
         private Permissions permissions;
         private String creatorDiscordId;
@@ -121,15 +119,6 @@ public class World extends ShareableAsset {
         public Builder adventureStart(String adventureStart) {
 
             this.adventureStart = adventureStart;
-            return this;
-        }
-
-        public Builder lorebook(List<WorldLorebookEntry> lorebook) {
-
-            if (lorebook != null) {
-                this.lorebook = lorebook;
-            }
-
             return this;
         }
 

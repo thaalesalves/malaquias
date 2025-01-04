@@ -17,8 +17,6 @@ import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventu
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventuresResult;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
-import me.moirai.discordbot.infrastructure.outbound.persistence.adventure.AdventureEntity;
-import me.moirai.discordbot.infrastructure.outbound.persistence.adventure.AdventureEntityFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class AdventurePersistenceMapperTest {
@@ -27,87 +25,10 @@ public class AdventurePersistenceMapperTest {
     private AdventurePersistenceMapper mapper;
 
     @Test
-    public void mapAdventureDomainToPersistence_whenCreatorIdProvided_thenAdventureIsCreatedWithCreatorId() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        AdventureEntity entity = mapper.mapToEntity(adventure);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(adventure.getName());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(adventure.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(adventure.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
-        assertThat(entity.getVisibility()).isEqualTo(adventure.getVisibility().name());
-        assertThat(entity.getDiscordChannelId()).isEqualTo(adventure.getDiscordChannelId());
-        assertThat(entity.getWorldId()).isEqualTo(adventure.getWorldId());
-        assertThat(entity.getPersonaId()).isEqualTo(adventure.getPersonaId());
-        assertThat(entity.getGameMode().toLowerCase()).isEqualTo(adventure.getGameMode().toString().toLowerCase());
-    }
-
-    @Test
-    public void mapAdventureDomainToPersistence_whenCreatorIdNull_thenAdventureIsCreatedWithOwnerId() {
-
-        // Given
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .creatorDiscordId(null)
-                .build();
-
-        // When
-        AdventureEntity entity = mapper.mapToEntity(adventure);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(adventure.getName());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(adventure.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
-        assertThat(entity.getVisibility()).isEqualTo(adventure.getVisibility().name());
-        assertThat(entity.getDiscordChannelId()).isEqualTo(adventure.getDiscordChannelId());
-        assertThat(entity.getWorldId()).isEqualTo(adventure.getWorldId());
-        assertThat(entity.getPersonaId()).isEqualTo(adventure.getPersonaId());
-        assertThat(entity.getGameMode().toLowerCase()).isEqualTo(adventure.getGameMode().toString().toLowerCase());
-    }
-
-    @Test
-    public void mapAdventurePersistenceToDomain_whenPersistenceEntityProvided_thenAdventureIsCreated() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        AdventureEntity adventure = AdventureEntityFixture.sample()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        Adventure entity = mapper.mapFromEntity(adventure);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(adventure.getName());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(adventure.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(adventure.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
-        assertThat(entity.getGameMode().toString().toLowerCase()).isEqualTo(adventure.getGameMode().toLowerCase());
-    }
-
-    @Test
     public void mapAdventureDomain_whenGetOperation_thenMapToGetResult() {
 
         // Given
-        AdventureEntity adventure = AdventureEntityFixture.sample().build();
+        Adventure adventure = AdventureFixture.publicSingleplayerAdventure().build();
 
         // When
         GetAdventureResult result = mapper.mapToResult(adventure);
@@ -116,27 +37,27 @@ public class AdventurePersistenceMapperTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(adventure.getId());
         assertThat(result.getName()).isEqualTo(adventure.getName());
-        assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility());
+        assertThat(result.getVisibility()).isEqualTo(adventure.getVisibility().name());
         assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(adventure.getUsersAllowedToRead());
         assertThat(result.getUsersAllowedToWrite()).hasSameElementsAs(adventure.getUsersAllowedToWrite());
         assertThat(result.getCreationDate()).isEqualTo(adventure.getCreationDate());
         assertThat(result.getLastUpdateDate()).isEqualTo(adventure.getLastUpdateDate());
         assertThat(result.getOwnerDiscordId()).isEqualTo(adventure.getOwnerDiscordId());
-        assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode());
+        assertThat(result.getGameMode()).isEqualTo(adventure.getGameMode().name());
     }
 
     @Test
     public void mapAdventureDomain_whenSearchAdventure_thenMapToServer() {
 
         // Given
-        List<AdventureEntity> adventures = IntStream.range(0, 20)
-                .mapToObj(op -> AdventureEntityFixture.sample()
+        List<Adventure> adventures = IntStream.range(0, 20)
+                .mapToObj(op -> AdventureFixture.publicSingleplayerAdventure()
                         .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 
         Pageable pageable = Pageable.ofSize(10);
-        Page<AdventureEntity> page = new PageImpl<>(adventures, pageable, 20);
+        Page<Adventure> page = new PageImpl<>(adventures, pageable, 20);
 
         // When
         SearchAdventuresResult result = mapper.mapToResult(page);

@@ -57,7 +57,7 @@ public class RpgModeHandler extends AbstractUseCaseHandler<RpgModeRequest, Mono<
     private StoryGenerationRequest buildGenerationRequest(RpgModeRequest useCase, Adventure adventure) {
 
         AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().getAiModel().getInternalModelName(),
+                .build(adventure.getModelConfiguration().getAiModel().toString(),
                         adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
                         adventure.getModelConfiguration().getAiModel().getHardTokenLimit());
 

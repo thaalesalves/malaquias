@@ -1,12 +1,25 @@
 package me.moirai.discordbot.core.domain.adventure;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public final class ContextAttributes {
 
-    private final String nudge;
-    private final String authorsNote;
-    private final String remember;
-    private final String bump;
-    private final Integer bumpFrequency;
+    @Column(name = "nudge")
+    private String nudge;
+
+    @Column(name = "authors_note")
+    private String authorsNote;
+
+    @Column(name = "remember")
+    private String remember;
+
+    @Column(name = "bump")
+    private String bump;
+
+    @Column(name = "bump_frequency")
+    private Integer bumpFrequency;
 
     public ContextAttributes(Builder builder) {
         this.nudge = builder.nudge;
@@ -14,6 +27,10 @@ public final class ContextAttributes {
         this.remember = builder.remember;
         this.bump = builder.bump;
         this.bumpFrequency = builder.bumpFrequency;
+    }
+
+    protected ContextAttributes() {
+        super();
     }
 
     public static Builder builder() {

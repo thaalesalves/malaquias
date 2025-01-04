@@ -74,7 +74,7 @@ public class RetryCommandHandler extends AbstractUseCaseHandler<RetryCommand, Mo
                 .stopSequences(adventure.getModelConfiguration().getStopSequences())
                 .temperature(adventure.getModelConfiguration().getTemperature())
                 .aiModel(AiModelRequest
-                        .build(adventure.getModelConfiguration().getAiModel().getInternalModelName(),
+                        .build(adventure.getModelConfiguration().getAiModel().toString(),
                                 adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
                                 adventure.getModelConfiguration().getAiModel().getHardTokenLimit()))
                 .build();

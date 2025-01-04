@@ -6,46 +6,11 @@ import org.springframework.stereotype.Component;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureLorebookEntryResult;
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventureLorebookEntriesResult;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntry;
-import me.moirai.discordbot.infrastructure.outbound.persistence.adventure.AdventureLorebookEntryEntity;
 
 @Component
 public class AdventureLorebookPersistenceMapper {
 
-    public AdventureLorebookEntryEntity mapToEntity(AdventureLorebookEntry entry) {
-
-        return AdventureLorebookEntryEntity.builder()
-                .id(entry.getId())
-                .name(entry.getName())
-                .description(entry.getDescription())
-                .regex(entry.getRegex())
-                .playerDiscordId(entry.getPlayerDiscordId())
-                .isPlayerCharacter(entry.isPlayerCharacter())
-                .adventureId(entry.getAdventureId())
-                .creatorDiscordId(entry.getCreatorDiscordId())
-                .creationDate(entry.getCreationDate())
-                .lastUpdateDate(entry.getLastUpdateDate())
-                .version(entry.getVersion())
-                .build();
-    }
-
-    public AdventureLorebookEntry mapFromEntity(AdventureLorebookEntryEntity entry) {
-
-        return AdventureLorebookEntry.builder()
-                .id(entry.getId())
-                .name(entry.getName())
-                .description(entry.getDescription())
-                .regex(entry.getRegex())
-                .playerDiscordId(entry.getPlayerDiscordId())
-                .isPlayerCharacter(entry.isPlayerCharacter())
-                .adventureId(entry.getAdventureId())
-                .creatorDiscordId(entry.getCreatorDiscordId())
-                .creationDate(entry.getCreationDate())
-                .lastUpdateDate(entry.getLastUpdateDate())
-                .version(entry.getVersion())
-                .build();
-    }
-
-    public GetAdventureLorebookEntryResult mapToResult(AdventureLorebookEntryEntity entry) {
+    public GetAdventureLorebookEntryResult mapToResult(AdventureLorebookEntry entry) {
 
         return GetAdventureLorebookEntryResult.builder()
                 .id(entry.getId())
@@ -59,7 +24,7 @@ public class AdventureLorebookPersistenceMapper {
                 .build();
     }
 
-    public SearchAdventureLorebookEntriesResult mapToResult(Page<AdventureLorebookEntryEntity> pagedResult) {
+    public SearchAdventureLorebookEntriesResult mapToResult(Page<AdventureLorebookEntry> pagedResult) {
         return SearchAdventureLorebookEntriesResult.builder()
                 .results(pagedResult.getContent()
                         .stream()

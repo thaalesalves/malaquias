@@ -3,15 +3,28 @@ package me.moirai.discordbot.core.domain.persona;
 import java.time.OffsetDateTime;
 
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 import me.moirai.discordbot.core.domain.Permissions;
 import me.moirai.discordbot.core.domain.ShareableAsset;
 import me.moirai.discordbot.core.domain.Visibility;
 
+@Entity(name = "Persona")
+@Table(name = "persona")
 public class Persona extends ShareableAsset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "personality", nullable = false)
     private String personality;
 
     private Persona(Builder builder) {
@@ -22,6 +35,10 @@ public class Persona extends ShareableAsset {
         this.id = builder.id;
         this.name = builder.name;
         this.personality = builder.personality;
+    }
+
+    protected Persona() {
+        super();
     }
 
     public static Builder builder() {

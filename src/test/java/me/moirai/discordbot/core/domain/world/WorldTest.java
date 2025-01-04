@@ -122,52 +122,6 @@ public class WorldTest {
     }
 
     @Test
-    public void errorWhenModifyingLorebookDirectly() {
-
-        // Given
-        World world = WorldFixture.publicWorld().build();
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // Then
-        assertThrows(UnsupportedOperationException.class,
-                () -> world.getLorebook().add(entry));
-    }
-
-    @Test
-    public void addLorebookEntry() {
-
-        // Given
-        World world = WorldFixture.publicWorld().build();
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        world.addToLorebook(entry);
-
-        // Then
-        assertThat(world.getLorebook())
-                .isNotNull()
-                .isNotEmpty()
-                .contains(entry);
-    }
-
-    @Test
-    public void removeLorebookEntry() {
-
-        // Given
-        World world = WorldFixture.publicWorld().build();
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        world.removeFromLorebook(entry);
-
-        // Then
-        assertThat(world.getLorebook())
-                .isNotNull()
-                .isNotEmpty()
-                .doesNotContain(entry);
-    }
-
-    @Test
     public void addWriterToList() {
 
         // Given

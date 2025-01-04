@@ -17,8 +17,6 @@ import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldsResult;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
-import me.moirai.discordbot.infrastructure.outbound.persistence.world.WorldEntity;
-import me.moirai.discordbot.infrastructure.outbound.persistence.world.WorldEntityFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class WorldPersistenceMapperTest {
@@ -27,84 +25,10 @@ public class WorldPersistenceMapperTest {
     private WorldPersistenceMapper mapper;
 
     @Test
-    public void mapWorldDomainToPersistence_whenCreatorIdProvided_thenWorldIsCreatedWithCreatorId() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        World world = WorldFixture.privateWorld()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        WorldEntity entity = mapper.mapToEntity(world);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(world.getName());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(world.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(world.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(world.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(world.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(world.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(world.getUsersAllowedToWrite());
-        assertThat(entity.getDescription()).isEqualTo(world.getDescription());
-        assertThat(entity.getAdventureStart()).isEqualTo(world.getAdventureStart());
-    }
-
-    @Test
-    public void mapWorldDomainToPersistence_whenCreatorIdNull_thenWorldIsCreatedWithOwnerId() {
-
-        // Given
-        World world = WorldFixture.privateWorld()
-                .creatorDiscordId(null)
-                .build();
-
-        // When
-        WorldEntity entity = mapper.mapToEntity(world);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(world.getName());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(world.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(world.getOwnerDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(world.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(world.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(world.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(world.getUsersAllowedToWrite());
-        assertThat(entity.getDescription()).isEqualTo(world.getDescription());
-        assertThat(entity.getAdventureStart()).isEqualTo(world.getAdventureStart());
-    }
-
-    @Test
-    public void mapWorldPersistenceToDomain_whenPersistenceEntityProvided_thenWorldIsCreated() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        WorldEntity world = WorldEntityFixture.privateWorld()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        World entity = mapper.mapFromEntity(world);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(world.getName());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(world.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(world.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(world.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(world.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(world.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(world.getUsersAllowedToWrite());
-        assertThat(entity.getDescription()).isEqualTo(world.getDescription());
-        assertThat(entity.getAdventureStart()).isEqualTo(world.getAdventureStart());
-    }
-
-    @Test
     public void mapWorldDomain_whenGetOperation_thenMapToGetResult() {
 
         // Given
-        WorldEntity world = WorldEntityFixture.privateWorld().build();
+        World world = WorldFixture.privateWorld().build();
 
         // When
         GetWorldResult result = mapper.mapToResult(world);
@@ -125,14 +49,14 @@ public class WorldPersistenceMapperTest {
     public void mapWorldDomain_whenSearchWorld_thenMapToServer() {
 
         // Given
-        List<WorldEntity> worlds = IntStream.range(0, 20)
-                .mapToObj(op -> WorldEntityFixture.privateWorld()
+        List<World> worlds = IntStream.range(0, 20)
+                .mapToObj(op -> WorldFixture.privateWorld()
                         .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 
         Pageable pageable = Pageable.ofSize(10);
-        Page<WorldEntity> page = new PageImpl<>(worlds, pageable, 20);
+        Page<World> page = new PageImpl<>(worlds, pageable, 20);
 
         // When
         SearchWorldsResult result = mapper.mapToResult(page);

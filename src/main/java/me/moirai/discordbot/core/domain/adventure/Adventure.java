@@ -3,30 +3,62 @@ package me.moirai.discordbot.core.domain.adventure;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 import me.moirai.discordbot.core.domain.Permissions;
 import me.moirai.discordbot.core.domain.ShareableAsset;
 import me.moirai.discordbot.core.domain.Visibility;
 
+@Entity(name = "Adventure")
+@Table(name = "adventure")
 public class Adventure extends ShareableAsset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String description;
-    private String adventureStart;
-    private List<AdventureLorebookEntry> lorebook;
+
+    @Column(name = "world_id", nullable = false)
     private String worldId;
+
+    @Column(name = "persona_id", nullable = false)
     private String personaId;
+
+    @Column(name = "discord_channel_id", nullable = false)
     private String discordChannelId;
-    private ModelConfiguration modelConfiguration;
-    private ContextAttributes contextAttributes;
-    private Moderation moderation;
-    private GameMode gameMode;
+
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "adventure_start", nullable = false)
+    private String adventureStart;
+
+    @Column(name = "is_multiplayer", nullable = false)
     private boolean isMultiplayer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "game_mode", nullable = false)
+    private GameMode gameMode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "moderation", nullable = false)
+    private Moderation moderation;
+
+    @Embedded
+    private ContextAttributes contextAttributes;
+
+    @Embedded
+    private ModelConfiguration modelConfiguration;
 
     private Adventure(Builder builder) {
 
@@ -37,7 +69,6 @@ public class Adventure extends ShareableAsset {
         this.name = builder.name;
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
-        this.lorebook = builder.lorebook;
         this.worldId = builder.worldId;
         this.personaId = builder.personaId;
         this.discordChannelId = builder.discordChannelId;
@@ -46,6 +77,10 @@ public class Adventure extends ShareableAsset {
         this.moderation = builder.moderation;
         this.gameMode = builder.gameMode;
         this.isMultiplayer = builder.isMultiplayer;
+    }
+
+    protected Adventure() {
+        super();
     }
 
     public String getId() {
@@ -62,11 +97,6 @@ public class Adventure extends ShareableAsset {
 
     public String getAdventureStart() {
         return adventureStart;
-    }
-
-    public List<AdventureLorebookEntry> getLorebook() {
-
-        return Collections.unmodifiableList(lorebook);
     }
 
     public String getWorldId() {
@@ -119,16 +149,6 @@ public class Adventure extends ShareableAsset {
     public void updateAdventureStart(String adventureStart) {
 
         this.adventureStart = adventureStart;
-    }
-
-    public void addToLorebook(AdventureLorebookEntry lorebookEntry) {
-
-        lorebook.add(lorebookEntry);
-    }
-
-    public void removeFromLorebook(AdventureLorebookEntry lorebookEntry) {
-
-        lorebook.remove(lorebookEntry);
     }
 
     public void updatePersona(String personaId) {
@@ -254,7 +274,6 @@ public class Adventure extends ShareableAsset {
         private String name;
         private String description;
         private String adventureStart;
-        private List<AdventureLorebookEntry> lorebook = new ArrayList<>();
         private String worldId;
         private String personaId;
         private String discordChannelId;
@@ -294,15 +313,6 @@ public class Adventure extends ShareableAsset {
         public Builder adventureStart(String adventureStart) {
 
             this.adventureStart = adventureStart;
-            return this;
-        }
-
-        public Builder lorebook(List<AdventureLorebookEntry> lorebook) {
-
-            if (lorebook != null) {
-                this.lorebook = lorebook;
-            }
-
             return this;
         }
 

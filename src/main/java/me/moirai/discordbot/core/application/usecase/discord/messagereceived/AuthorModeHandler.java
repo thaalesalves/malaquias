@@ -55,7 +55,7 @@ public class AuthorModeHandler extends AbstractUseCaseHandler<AuthorModeRequest,
     private StoryGenerationRequest buildGenerationRequest(AuthorModeRequest useCase, Adventure adventure) {
 
         AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().getAiModel().getInternalModelName(),
+                .build(adventure.getModelConfiguration().getAiModel().toString(),
                         adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
                         adventure.getModelConfiguration().getAiModel().getHardTokenLimit());
 

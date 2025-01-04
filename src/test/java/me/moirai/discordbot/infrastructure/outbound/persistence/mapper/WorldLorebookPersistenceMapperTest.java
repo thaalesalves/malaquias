@@ -17,8 +17,6 @@ import me.moirai.discordbot.core.application.usecase.world.result.GetWorldLorebo
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldLorebookEntriesResult;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntry;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntryFixture;
-import me.moirai.discordbot.infrastructure.outbound.persistence.world.WorldLorebookEntryEntity;
-import me.moirai.discordbot.infrastructure.outbound.persistence.world.WorldLorebookEntryEntityFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class WorldLorebookPersistenceMapperTest {
@@ -27,75 +25,10 @@ public class WorldLorebookPersistenceMapperTest {
     private WorldLorebookPersistenceMapper mapper;
 
     @Test
-    public void mapWorldLorebookEntryDomainToPersistence_whenCreatorIdProvided_thenWorldLorebookEntryIsCreatedWithCreatorId() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        WorldLorebookEntry worldLorebookEntry = WorldLorebookEntryFixture.sampleLorebookEntry()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        WorldLorebookEntryEntity entity = mapper.mapToEntity(worldLorebookEntry);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(worldLorebookEntry.getName());
-        assertThat(entity.getRegex()).isEqualTo(worldLorebookEntry.getRegex());
-        assertThat(entity.getDescription()).isEqualTo(worldLorebookEntry.getDescription());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(worldLorebookEntry.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(worldLorebookEntry.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(worldLorebookEntry.getLastUpdateDate());
-    }
-
-    @Test
-    public void mapWorldLorebookEntryDomainToPersistence_whenCreatorIdNull_thenWorldLorebookEntryIsCreatedWithOwnerId() {
-
-        // Given
-        WorldLorebookEntry worldLorebookEntry = WorldLorebookEntryFixture.sampleLorebookEntry()
-                .creatorDiscordId(null)
-                .build();
-
-        // When
-        WorldLorebookEntryEntity entity = mapper.mapToEntity(worldLorebookEntry);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(worldLorebookEntry.getName());
-        assertThat(entity.getRegex()).isEqualTo(worldLorebookEntry.getRegex());
-        assertThat(entity.getDescription()).isEqualTo(worldLorebookEntry.getDescription());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(worldLorebookEntry.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(worldLorebookEntry.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(worldLorebookEntry.getLastUpdateDate());
-    }
-
-    @Test
-    public void mapWorldLorebookEntryPersistenceToDomain_whenPersistenceEntityProvided_thenWorldLorebookEntryIsCreated() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        WorldLorebookEntryEntity worldLorebookEntry = WorldLorebookEntryEntityFixture.sampleLorebookEntry()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        WorldLorebookEntry entity = mapper.mapFromEntity(worldLorebookEntry);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(worldLorebookEntry.getName());
-        assertThat(entity.getRegex()).isEqualTo(worldLorebookEntry.getRegex());
-        assertThat(entity.getDescription()).isEqualTo(worldLorebookEntry.getDescription());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(worldLorebookEntry.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(worldLorebookEntry.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(worldLorebookEntry.getLastUpdateDate());
-    }
-
-    @Test
     public void mapWorldLorebookEntryDomain_whenGetOperation_thenMapToGetResult() {
 
         // Given
-        WorldLorebookEntryEntity worldLorebookEntry = WorldLorebookEntryEntityFixture.sampleLorebookEntry().build();
+        WorldLorebookEntry worldLorebookEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
 
         // When
         GetWorldLorebookEntryResult result = mapper.mapToResult(worldLorebookEntry);
@@ -111,14 +44,14 @@ public class WorldLorebookPersistenceMapperTest {
     public void mapWorldLorebookEntryDomain_whenSearchWorldLorebookEntry_thenMapToServer() {
 
         // Given
-        List<WorldLorebookEntryEntity> worldLorebookEntries = IntStream.range(0, 20)
-                .mapToObj(op -> WorldLorebookEntryEntityFixture.sampleLorebookEntry()
+        List<WorldLorebookEntry> worldLorebookEntries = IntStream.range(0, 20)
+                .mapToObj(op -> WorldLorebookEntryFixture.sampleLorebookEntry()
                         .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 
         Pageable pageable = Pageable.ofSize(10);
-        Page<WorldLorebookEntryEntity> page = new PageImpl<>(worldLorebookEntries, pageable, 20);
+        Page<WorldLorebookEntry> page = new PageImpl<>(worldLorebookEntries, pageable, 20);
 
         // When
         SearchWorldLorebookEntriesResult result = mapper.mapToResult(page);

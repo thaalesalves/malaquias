@@ -18,6 +18,7 @@ import org.springframework.web.server.WebFilterChain;
 
 import me.moirai.discordbot.infrastructure.security.authentication.DiscordPrincipal;
 import me.moirai.discordbot.infrastructure.security.authentication.DiscordUserDetailsService;
+import me.moirai.discordbot.infrastructure.security.authentication.SecuritySessionContext;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -63,6 +64,8 @@ public class DiscordAuthenticationFilter implements WebFilter {
             DiscordPrincipal user = (DiscordPrincipal) userDetails;
             UsernamePasswordAuthenticationToken authenticatedPrincipal = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities());
+
+            SecuritySessionContext.setCurrentUser(user);
 
             return chain.filter(exchange)
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authenticatedPrincipal));

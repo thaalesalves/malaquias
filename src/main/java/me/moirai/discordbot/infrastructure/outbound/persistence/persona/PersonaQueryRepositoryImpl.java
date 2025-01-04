@@ -58,8 +58,7 @@ public class PersonaQueryRepositoryImpl implements PersonaQueryRepository {
     @Override
     public Optional<Persona> findById(String id) {
 
-        return jpaRepository.findById(id)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findById(id);
     }
 
     @Override
@@ -77,13 +76,13 @@ public class PersonaQueryRepositoryImpl implements PersonaQueryRepository {
         Direction direction = extractDirection(request.getDirection());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
-        Specification<PersonaEntity> query = buildSearchQuery(request);
-        Page<PersonaEntity> pagedResult = jpaRepository.findAll(query, pageRequest);
+        Specification<Persona> query = buildSearchQuery(request);
+        Page<Persona> pagedResult = jpaRepository.findAll(query, pageRequest);
 
         return mapper.mapToResult(pagedResult);
     }
 
-    private Specification<PersonaEntity> buildSearchQuery(SearchPersonas request) {
+    private Specification<Persona> buildSearchQuery(SearchPersonas request) {
 
         return (root, cq, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();

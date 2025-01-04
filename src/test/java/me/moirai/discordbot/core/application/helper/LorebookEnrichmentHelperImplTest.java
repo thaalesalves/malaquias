@@ -19,6 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageData;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetails;
+import me.moirai.discordbot.core.domain.adventure.Adventure;
+import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.discordbot.core.domain.adventure.AdventureService;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
@@ -169,6 +171,7 @@ public class LorebookEnrichmentHelperImplTest {
 
     private void stubLorebookEntriesByAuthor() {
 
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
         AdventureLorebookEntry marcusCharacter = AdventureLorebookEntry.builder()
                 .id("1")
                 .name("Pyromancer")
@@ -176,7 +179,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Pyromancer is a fire battlemage")
                 .playerDiscordId("1")
                 .isPlayerCharacter(true)
-                .adventureId("WRLDID")
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry johnCharacter = AdventureLorebookEntry.builder()
@@ -186,7 +189,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerDiscordId("2")
                 .isPlayerCharacter(true)
-                .adventureId("WRLDID")
+                .adventureId(adventure.getId())
                 .build();
 
         when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
@@ -197,6 +200,7 @@ public class LorebookEnrichmentHelperImplTest {
 
     private void stubLorebookEntriesByMention() {
 
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
         AdventureLorebookEntry marcusCharacter = AdventureLorebookEntry.builder()
                 .id("1")
                 .name("Pyromancer")
@@ -204,7 +208,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Pyromancer is a fire battlemage")
                 .playerDiscordId("1")
                 .isPlayerCharacter(true)
-                .adventureId("WRLDID")
+                .adventureId(adventure.getId())
                 .build();
 
         when(adventureService.findLorebookEntryByPlayerDiscordId(anyString(), anyString()))
@@ -214,12 +218,13 @@ public class LorebookEnrichmentHelperImplTest {
 
     private void stubLorebookEntriesByWords() {
 
+        Adventure adventure = AdventureFixture.publicMultiplayerAdventure().build();
         AdventureLorebookEntry swordOfFire = AdventureLorebookEntry.builder()
                 .id("3")
                 .name("Sword of Fire")
                 .regex("[Ss]word [Oo]f [Ff]ire")
                 .description("The Sword of Fire is a spectral sword that spits fire")
-                .adventureId("WRLDID")
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry gloveOfArmageddon = AdventureLorebookEntry.builder()
@@ -227,7 +232,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .name("Glove of Armageddon")
                 .regex("[Gg]love [Oo]f [Aa]rmageddon")
                 .description("The Glove of Armageddon is a gauntlet that punches with the strength of three suns")
-                .adventureId("WRLDID")
+                .adventureId(adventure.getId())
                 .build();
 
         AdventureLorebookEntry lordOfDoom = AdventureLorebookEntry.builder()
@@ -237,7 +242,7 @@ public class LorebookEnrichmentHelperImplTest {
                 .description("The Lord of Doom is a very powerful ogre")
                 .playerDiscordId("2")
                 .isPlayerCharacter(true)
-                .adventureId("WRLDID")
+                .adventureId(adventure.getId())
                 .build();
 
         when(adventureService.findAllLorebookEntriesByRegex(anyString(), anyString()))

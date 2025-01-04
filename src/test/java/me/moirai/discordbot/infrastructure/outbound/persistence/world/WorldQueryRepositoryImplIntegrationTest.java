@@ -3,7 +3,6 @@ package me.moirai.discordbot.infrastructure.outbound.persistence.world;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.list;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +13,9 @@ import me.moirai.discordbot.AbstractIntegrationTest;
 import me.moirai.discordbot.core.application.usecase.world.request.SearchWorlds;
 import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult;
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
+import me.moirai.discordbot.core.domain.world.World;
+import me.moirai.discordbot.core.domain.world.WorldFixture;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
@@ -28,8 +30,12 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
     @Autowired
     private FavoriteRepository favoriteRepository;
 
+    @Autowired
+    private WorldLorebookEntryJpaRepository lorebookEntryJpaRepository;
+
     @BeforeEach
     public void before() {
+        lorebookEntryJpaRepository.deleteAllInBatch();
         jpaRepository.deleteAllInBatch();
     }
 
@@ -39,20 +45,26 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId("580485734")
-                .usersAllowedToRead(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .usersAllowedToRead(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId("580485734")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .build())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -81,15 +93,15 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
@@ -120,15 +132,15 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
@@ -160,17 +172,17 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -203,17 +215,17 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -245,17 +257,17 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -284,22 +296,19 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
         String visibilityToSearch = "public";
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .visibility("private")
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 2")
-                .visibility(visibilityToSearch)
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 3")
-                .visibility(visibilityToSearch)
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
@@ -326,24 +335,25 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721356875";
         String visibilityToSearch = "public";
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .visibility("private")
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 2")
-                .visibility(visibilityToSearch)
-                .usersAllowedToWrite(list(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 3")
-                .visibility(visibilityToSearch)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
         jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
@@ -371,20 +381,26 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId("580485734")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId("580485734")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("580485734")
+                        .build())
                 .build();
 
         jpaRepository.save(gpt4Omni);
@@ -414,17 +430,21 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
@@ -455,17 +475,21 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .build();
 
@@ -497,19 +521,23 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -542,19 +570,23 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -586,18 +618,20 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -627,18 +661,20 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
         // Given
         String ownerDiscordId = "586678721358363";
 
-        WorldEntity gpt4Omni = WorldEntityFixture.privateWorld()
+        World gpt4Omni = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .usersAllowedToWrite(Collections.singletonList(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build();
 
-        WorldEntity gpt4Mini = WorldEntityFixture.privateWorld()
+        World gpt4Mini = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 2")
                 .build();
 
-        WorldEntity gpt354k = WorldEntityFixture.privateWorld()
+        World gpt354k = WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 3")
                 .build();
@@ -664,24 +700,25 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
 
         // Given
         String ownerDiscordId = "586678721356875";
-        WorldEntity gpt4Omni = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt4Omni = jpaRepository.save(WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .visibility("private")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build());
 
-        WorldEntity gpt4Mini = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt4Mini = jpaRepository.save(WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 2")
-                .visibility("public")
-                .usersAllowedToWrite(list(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build());
 
-        WorldEntity gpt354k = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt354k = jpaRepository.save(WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 3")
-                .visibility("public")
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -722,24 +759,25 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
 
         // Given
         String ownerDiscordId = "586678721356875";
-        WorldEntity gpt4Omni = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt4Omni = jpaRepository.save(WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .visibility("private")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build());
 
-        WorldEntity gpt4Mini = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt4Mini = jpaRepository.save(WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 2")
-                .visibility("public")
-                .usersAllowedToWrite(list(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build());
 
-        WorldEntity gpt354k = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt354k = jpaRepository.save(WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 3")
-                .visibility("public")
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()
@@ -781,24 +819,25 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
 
         // Given
         String ownerDiscordId = "586678721356875";
-        WorldEntity gpt4Omni = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt4Omni = jpaRepository.save(WorldFixture.privateWorld()
                 .id(null)
                 .name("Number 1")
-                .visibility("private")
-                .ownerDiscordId(ownerDiscordId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
                 .build());
 
-        WorldEntity gpt4Mini = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt4Mini = jpaRepository.save(WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 2")
-                .visibility("public")
-                .usersAllowedToWrite(list(ownerDiscordId))
+                .permissions(PermissionsFixture.samplePermissions()
+                        .usersAllowedToWrite(list(ownerDiscordId))
+                        .build())
                 .build());
 
-        WorldEntity gpt354k = jpaRepository.save(WorldEntityFixture.privateWorld()
+        World gpt354k = jpaRepository.save(WorldFixture.publicWorld()
                 .id(null)
                 .name("Number 3")
-                .visibility("public")
                 .build());
 
         FavoriteEntity favorite1 = FavoriteEntity.builder()

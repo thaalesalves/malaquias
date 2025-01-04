@@ -24,6 +24,7 @@ public class CreateWorldRequest {
     private String visibility;
     private List<String> usersAllowedToWrite;
     private List<String> usersAllowedToRead;
+    private List<CreateLorebookEntryRequest> lorebook;
 
     public CreateWorldRequest() {
     }
@@ -52,6 +53,10 @@ public class CreateWorldRequest {
         return usersAllowedToRead;
     }
 
+    public List<CreateLorebookEntryRequest> getLorebook() {
+        return lorebook;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -74,5 +79,9 @@ public class CreateWorldRequest {
 
     public void setUsersAllowedToRead(List<String> usersAllowedToRead) {
         this.usersAllowedToRead = usersAllowedToRead;
+    }
+
+    public void setLorebook(List<CreateLorebookEntryRequest> lorebook) {
+        this.lorebook = lorebook;
     }
 }

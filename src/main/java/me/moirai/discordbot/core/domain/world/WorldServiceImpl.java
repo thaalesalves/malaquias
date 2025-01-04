@@ -1,6 +1,7 @@
 package me.moirai.discordbot.core.domain.world;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.Collections;
 import java.util.List;
@@ -84,18 +85,28 @@ public class WorldServiceImpl implements WorldService {
                             .usersAllowedToWrite(command.getUsersAllowedToWrite())
                             .build();
 
-                    World world = World.builder()
+                    World world = repository.save(World.builder()
                             .name(command.getName())
                             .description(command.getDescription())
                             .adventureStart(command.getAdventureStart())
                             .visibility(Visibility.fromString(command.getVisibility()))
                             .permissions(permissions)
                             .creatorDiscordId(command.getRequesterDiscordId())
-                            .build();
+                            .build());
 
-                    return repository.save(world);
+                    command.getLorebookEntries().stream()
+                            .map(entry -> WorldLorebookEntry.builder()
+                                    .name(entry.getName())
+                                    .description(entry.getDescription())
+                                    .regex(entry.getRegex())
+                                    .playerDiscordId(entry.getPlayerDiscordId())
+                                    .isPlayerCharacter(isNotEmpty(entry.getPlayerDiscordId()))
+                                    .worldId(world.getId())
+                                    .build())
+                            .forEach(lorebookEntryRepository::save);
+
+                    return world;
                 });
-
     }
 
     @Override
@@ -104,8 +115,8 @@ public class WorldServiceImpl implements WorldService {
         repository.findById(worldId)
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
 
-                return lorebookEntryRepository.findByPlayerDiscordId(playerDiscordId, worldId)
-                        .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
+        return lorebookEntryRepository.findByPlayerDiscordId(playerDiscordId, worldId)
+                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
     }
 
     @Override
@@ -147,7 +158,7 @@ public class WorldServiceImpl implements WorldService {
                 .description(command.getDescription())
                 .playerDiscordId(command.getPlayerDiscordId())
                 .isPlayerCharacter(isEmpty(command.getPlayerDiscordId()))
-                .worldId(command.getWorldId())
+                .worldId(world.getId())
                 .creatorDiscordId(command.getRequesterDiscordId())
                 .build();
 

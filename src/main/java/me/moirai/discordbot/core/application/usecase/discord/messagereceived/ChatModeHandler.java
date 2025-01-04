@@ -52,7 +52,7 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
     private StoryGenerationRequest buildGenerationRequest(ChatModeRequest useCase, Adventure adventure) {
 
         AiModelRequest aiModel = AiModelRequest
-                .build(adventure.getModelConfiguration().getAiModel().getInternalModelName(),
+                .build(adventure.getModelConfiguration().getAiModel().toString(),
                         adventure.getModelConfiguration().getAiModel().getOfficialModelName(),
                         adventure.getModelConfiguration().getAiModel().getHardTokenLimit());
 

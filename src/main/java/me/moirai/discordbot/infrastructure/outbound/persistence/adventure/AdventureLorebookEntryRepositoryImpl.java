@@ -43,18 +43,15 @@ public class AdventureLorebookEntryRepositoryImpl implements AdventureLorebookEn
     }
 
     @Override
-    public AdventureLorebookEntry save(AdventureLorebookEntry adventure) {
+    public AdventureLorebookEntry save(AdventureLorebookEntry entry) {
 
-        AdventureLorebookEntryEntity entity = mapper.mapToEntity(adventure);
-
-        return mapper.mapFromEntity(jpaRepository.save(entity));
+        return jpaRepository.save(entry);
     }
 
     @Override
     public Optional<AdventureLorebookEntry> findById(String lorebookEntryId) {
 
-        return jpaRepository.findById(lorebookEntryId)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findById(lorebookEntryId);
     }
 
     @Override
@@ -62,15 +59,13 @@ public class AdventureLorebookEntryRepositoryImpl implements AdventureLorebookEn
 
         return jpaRepository.findAllByNameRegex(valueToSearch, adventureId)
                 .stream()
-                .map(mapper::mapFromEntity)
                 .toList();
     }
 
     @Override
     public Optional<AdventureLorebookEntry> findByPlayerDiscordId(String playerDiscordId, String adventureId) {
 
-        return jpaRepository.findByPlayerDiscordId(playerDiscordId, adventureId)
-                .map(mapper::mapFromEntity);
+        return jpaRepository.findByPlayerDiscordId(playerDiscordId, adventureId);
     }
 
     @Override
@@ -88,13 +83,13 @@ public class AdventureLorebookEntryRepositoryImpl implements AdventureLorebookEn
         Direction direction = extractDirection(request.getDirection());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
-        Specification<AdventureLorebookEntryEntity> query = buildSearchQuery(request);
-        Page<AdventureLorebookEntryEntity> pagedResult = jpaRepository.findAll(query, pageRequest);
+        Specification<AdventureLorebookEntry> query = buildSearchQuery(request);
+        Page<AdventureLorebookEntry> pagedResult = jpaRepository.findAll(query, pageRequest);
 
         return mapper.mapToResult(pagedResult);
     }
 
-    private Specification<AdventureLorebookEntryEntity> buildSearchQuery(SearchAdventureLorebookEntries query) {
+    private Specification<AdventureLorebookEntry> buildSearchQuery(SearchAdventureLorebookEntries query) {
 
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

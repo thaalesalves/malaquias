@@ -17,8 +17,6 @@ import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaRe
 import me.moirai.discordbot.core.application.usecase.persona.result.SearchPersonasResult;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
-import me.moirai.discordbot.infrastructure.outbound.persistence.persona.PersonaEntity;
-import me.moirai.discordbot.infrastructure.outbound.persistence.persona.PersonaEntityFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonaPersistenceMapperTest {
@@ -27,81 +25,10 @@ public class PersonaPersistenceMapperTest {
     private PersonaPersistenceMapper mapper;
 
     @Test
-    public void mapPersonaDomainToPersistence_whenCreatorIdProvided_thenPersonaIsCreatedWithCreatorId() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        Persona persona = PersonaFixture.privatePersona()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        PersonaEntity entity = mapper.mapToEntity(persona);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(persona.getName());
-        assertThat(entity.getPersonality()).isEqualTo(persona.getPersonality());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(persona.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(persona.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(persona.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(persona.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
-    }
-
-    @Test
-    public void mapPersonaDomainToPersistence_whenCreatorIdNull_thenPersonaIsCreatedWithOwnerId() {
-
-        // Given
-        Persona persona = PersonaFixture.privatePersona()
-                .creatorDiscordId(null)
-                .build();
-
-        // When
-        PersonaEntity entity = mapper.mapToEntity(persona);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(persona.getName());
-        assertThat(entity.getPersonality()).isEqualTo(persona.getPersonality());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(persona.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(persona.getOwnerDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(persona.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(persona.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
-    }
-
-    @Test
-    public void mapPersonaPersistenceToDomain_whenPersistenceEntityProvided_thenPersonaIsCreated() {
-
-        // Given
-        String creatorDiscordId = "CRTRID";
-        PersonaEntity persona = PersonaEntityFixture.privatePersona()
-                .creatorDiscordId(creatorDiscordId)
-                .build();
-
-        // When
-        Persona entity = mapper.mapFromEntity(persona);
-
-        // Then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getName()).isEqualTo(persona.getName());
-        assertThat(entity.getPersonality()).isEqualTo(persona.getPersonality());
-        assertThat(entity.getOwnerDiscordId()).isEqualTo(persona.getOwnerDiscordId());
-        assertThat(entity.getCreatorDiscordId()).isEqualTo(persona.getCreatorDiscordId());
-        assertThat(entity.getCreationDate()).isEqualTo(persona.getCreationDate());
-        assertThat(entity.getLastUpdateDate()).isEqualTo(persona.getLastUpdateDate());
-        assertThat(entity.getUsersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
-        assertThat(entity.getUsersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
-    }
-
-    @Test
     public void mapPersonaDomain_whenGetOperation_thenMapToGetResult() {
 
         // Given
-        PersonaEntity persona = PersonaEntityFixture.privatePersona().build();
+        Persona persona = PersonaFixture.privatePersona().build();
 
         // When
         GetPersonaResult result = mapper.mapToResult(persona);
@@ -111,7 +38,7 @@ public class PersonaPersistenceMapperTest {
         assertThat(result.getId()).isEqualTo(persona.getId());
         assertThat(result.getName()).isEqualTo(persona.getName());
         assertThat(result.getPersonality()).isEqualTo(persona.getPersonality());
-        assertThat(result.getVisibility()).isEqualTo(persona.getVisibility());
+        assertThat(result.getVisibility()).isEqualTo(persona.getVisibility().name());
         assertThat(result.getUsersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
         assertThat(result.getUsersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
         assertThat(result.getCreationDate()).isEqualTo(persona.getCreationDate());
@@ -123,14 +50,14 @@ public class PersonaPersistenceMapperTest {
     public void mapPersonaDomain_whenSearchPersona_thenMapToServer() {
 
         // Given
-        List<PersonaEntity> personas = IntStream.range(0, 20)
-                .mapToObj(op -> PersonaEntityFixture.privatePersona()
+        List<Persona> personas = IntStream.range(0, 20)
+                .mapToObj(op -> PersonaFixture.privatePersona()
                         .id(String.valueOf(op + 1))
                         .build())
                 .toList();
 
         Pageable pageable = Pageable.ofSize(10);
-        Page<PersonaEntity> page = new PageImpl<>(personas, pageable, 20);
+        Page<Persona> page = new PageImpl<>(personas, pageable, 20);
 
         // When
         SearchPersonasResult result = mapper.mapToResult(page);

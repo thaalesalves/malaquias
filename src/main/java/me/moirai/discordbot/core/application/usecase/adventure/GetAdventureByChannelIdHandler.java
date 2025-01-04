@@ -34,7 +34,7 @@ public class GetAdventureByChannelIdHandler
                 .worldId(adventure.getWorldId())
                 .personaId(adventure.getPersonaId())
                 .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().getInternalModelName())
+                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .moderation(adventure.getModeration().name())
                 .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
                 .temperature(adventure.getModelConfiguration().getTemperature())

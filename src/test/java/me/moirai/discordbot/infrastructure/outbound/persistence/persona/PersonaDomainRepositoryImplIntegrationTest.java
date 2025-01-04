@@ -37,7 +37,7 @@ public class PersonaDomainRepositoryImplIntegrationTest extends AbstractIntegrat
     public void retrievePersonaById() {
 
         // Given
-        PersonaEntity persona = jpaRepository.save(PersonaEntityFixture.privatePersona()
+        Persona persona = jpaRepository.save(PersonaFixture.privatePersona()
                 .id(null)
                 .build());
 

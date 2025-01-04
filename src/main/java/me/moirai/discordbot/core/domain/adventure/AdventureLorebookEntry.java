@@ -2,16 +2,37 @@ package me.moirai.discordbot.core.domain.adventure;
 
 import java.time.OffsetDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.core.domain.Asset;
 
+@Entity(name = "AdventureLorebookEntry")
+@Table(name = "adventure_lorebook")
 public class AdventureLorebookEntry extends Asset {
 
+    @Id
+    @NanoId
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String regex;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "regex", nullable = false)
+    private String regex;
+
+    @Column(name = "player_discord_id")
     private String playerDiscordId;
+
+    @Column(name = "is_player_character", nullable = false)
     private boolean isPlayerCharacter;
+
+    @Column(name = "adventure_id", nullable = false)
     private String adventureId;
 
     private AdventureLorebookEntry(Builder builder) {
@@ -24,6 +45,10 @@ public class AdventureLorebookEntry extends Asset {
         this.playerDiscordId = builder.playerDiscordId;
         this.isPlayerCharacter = builder.isPlayerCharacter;
         this.adventureId = builder.adventureId;
+    }
+
+    protected AdventureLorebookEntry() {
+        super();
     }
 
     public static Builder builder() {
@@ -94,8 +119,8 @@ public class AdventureLorebookEntry extends Asset {
         private String description;
         private String playerDiscordId;
         private String creatorDiscordId;
-        private boolean isPlayerCharacter;
         private String adventureId;
+        private boolean isPlayerCharacter;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
         private int version;
