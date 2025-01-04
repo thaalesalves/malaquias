@@ -1,5 +1,10 @@
 package me.moirai.discordbot.core.domain.world;
 
+import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.FetchType.LAZY;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,10 +12,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -37,7 +40,7 @@ public class World extends ShareableAsset {
     @Column(name = "adventure_start", nullable = false)
     private String adventureStart;
 
-    @OneToMany(mappedBy = "world", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "world", cascade = { REMOVE, MERGE, PERSIST }, fetch = LAZY)
     private List<WorldLorebookEntry> lorebook;
 
     private World(Builder builder) {

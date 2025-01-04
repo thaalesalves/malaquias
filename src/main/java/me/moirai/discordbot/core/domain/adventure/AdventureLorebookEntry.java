@@ -1,5 +1,7 @@
 package me.moirai.discordbot.core.domain.adventure;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
@@ -34,7 +36,7 @@ public class AdventureLorebookEntry extends Asset {
     @Column(name = "is_player_character", nullable = false)
     private boolean isPlayerCharacter;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "adventure_id", nullable = false)
     private Adventure adventure;
 

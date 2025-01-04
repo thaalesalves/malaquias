@@ -1,5 +1,9 @@
 package me.moirai.discordbot.core.domain.adventure;
 
+import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.FetchType.LAZY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.OffsetDateTime;
@@ -7,13 +11,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -66,7 +68,7 @@ public class Adventure extends ShareableAsset {
     @Embedded
     private ModelConfiguration modelConfiguration;
 
-    @OneToMany(mappedBy = "adventure", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "adventure", cascade = { REMOVE, MERGE, PERSIST }, fetch = LAZY)
     private List<AdventureLorebookEntry> lorebook;
 
     private Adventure(Builder builder) {
