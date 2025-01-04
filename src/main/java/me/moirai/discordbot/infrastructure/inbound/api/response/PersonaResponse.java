@@ -1,10 +1,11 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -115,12 +116,12 @@ public class PersonaResponse {
         }
 
         public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
-            this.usersAllowedToWrite = usersAllowedToWrite;
+            this.usersAllowedToWrite = emptyIfNull(usersAllowedToWrite);
             return this;
         }
 
         public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
-            this.usersAllowedToRead = usersAllowedToRead;
+            this.usersAllowedToRead = emptyIfNull(usersAllowedToRead);
             return this;
         }
 

@@ -1,5 +1,8 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.apache.commons.collections4.MapUtils.emptyIfNull;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -304,12 +307,12 @@ public class AdventureResponse {
         }
 
         public Builder stopSequences(List<String> stopSequences) {
-            this.stopSequences = stopSequences;
+            this.stopSequences = emptyIfNull(stopSequences);
             return this;
         }
 
         public Builder logitBias(Map<String, Double> logitBias) {
-            this.logitBias = logitBias;
+            this.logitBias = emptyIfNull(logitBias);
             return this;
         }
 
@@ -319,12 +322,12 @@ public class AdventureResponse {
         }
 
         public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
-            this.usersAllowedToRead = usersAllowedToRead;
+            this.usersAllowedToRead = emptyIfNull(usersAllowedToRead);
             return this;
         }
 
         public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
-            this.usersAllowedToWrite = usersAllowedToWrite;
+            this.usersAllowedToWrite = emptyIfNull(usersAllowedToWrite);
             return this;
         }
 

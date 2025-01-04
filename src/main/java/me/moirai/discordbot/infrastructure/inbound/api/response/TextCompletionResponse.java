@@ -1,5 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
+import static org.apache.commons.lang3.ArrayUtils.nullToEmpty;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -110,12 +112,12 @@ public class TextCompletionResponse {
         }
 
         public Builder tokenIds(long[] tokenIds) {
-            this.tokenIds = tokenIds;
+            this.tokenIds = nullToEmpty(tokenIds);
             return this;
         }
 
         public Builder tokens(String[] tokens) {
-            this.tokens = tokens;
+            this.tokens = nullToEmpty(tokens);
             return this;
         }
 

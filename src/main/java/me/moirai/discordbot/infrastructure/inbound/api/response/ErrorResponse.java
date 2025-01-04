@@ -1,5 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -66,7 +68,7 @@ public class ErrorResponse {
         }
 
         public Builder details(List<String> details) {
-            this.details = details;
+            this.details = emptyIfNull(details);
             return this;
         }
 

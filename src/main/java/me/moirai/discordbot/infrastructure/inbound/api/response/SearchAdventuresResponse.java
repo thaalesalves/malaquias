@@ -1,5 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -79,7 +81,8 @@ public class SearchAdventuresResponse {
         }
 
         public Builder results(List<AdventureResponse> results) {
-            this.results = results;
+
+            this.results = emptyIfNull(results);
             return this;
         }
 
