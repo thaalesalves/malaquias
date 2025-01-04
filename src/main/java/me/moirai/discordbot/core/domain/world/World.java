@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -36,7 +37,7 @@ public class World extends ShareableAsset {
     @Column(name = "adventure_start", nullable = false)
     private String adventureStart;
 
-    @OneToMany(mappedBy = "world", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "world", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<WorldLorebookEntry> lorebook;
 
     private World(Builder builder) {

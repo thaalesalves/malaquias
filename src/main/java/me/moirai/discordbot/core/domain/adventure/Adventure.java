@@ -13,6 +13,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -65,7 +66,7 @@ public class Adventure extends ShareableAsset {
     @Embedded
     private ModelConfiguration modelConfiguration;
 
-    @OneToMany(mappedBy = "adventure", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "adventure", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<AdventureLorebookEntry> lorebook;
 
     private Adventure(Builder builder) {
