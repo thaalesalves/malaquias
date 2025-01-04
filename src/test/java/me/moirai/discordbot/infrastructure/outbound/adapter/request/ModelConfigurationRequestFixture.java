@@ -18,7 +18,7 @@ public class ModelConfigurationRequestFixture {
         modelConfigurationBuilder.temperature(1.0);
 
         ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_MINI;
-        modelConfigurationBuilder.aiModel(AiModelRequest.build(aiModel.getInternalModelName(),
+        modelConfigurationBuilder.aiModel(AiModelRequest.build(aiModel.toString(),
                 aiModel.getOfficialModelName(),
                 aiModel.getHardTokenLimit()));
 
@@ -44,7 +44,7 @@ public class ModelConfigurationRequestFixture {
         modelConfigurationBuilder.temperature(1.0);
 
         ArtificialIntelligenceModel aiModel = ArtificialIntelligenceModel.GPT4_OMNI;
-        modelConfigurationBuilder.aiModel(AiModelRequest.build(aiModel.getInternalModelName(),
+        modelConfigurationBuilder.aiModel(AiModelRequest.build(aiModel.toString(),
                 aiModel.getOfficialModelName(),
                 aiModel.getHardTokenLimit()));
 

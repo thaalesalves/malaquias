@@ -20,7 +20,7 @@ public class UpdateAdventureFixture {
                 .personaId(adventure.getPersonaId())
                 .discordChannelId(adventure.getDiscordChannelId())
                 .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().getInternalModelName())
+                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .moderation(adventure.getModeration().name())
                 .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
                 .temperature(adventure.getModelConfiguration().getTemperature())

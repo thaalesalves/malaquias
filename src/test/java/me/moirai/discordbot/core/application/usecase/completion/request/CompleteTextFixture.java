@@ -21,7 +21,7 @@ public class CompleteTextFixture {
         messages.add(userMessage().build());
 
         return CompleteText.builder()
-                .aiModel("gpt4-omni")
+                .aiModel("GPT4_OMNI")
                 .authorDiscordId("123456")
                 .frequencyPenalty(0D)
                 .logitBias(emptyMap())
@@ -41,7 +41,7 @@ public class CompleteTextFixture {
         messages.add(userMessage().build());
 
         return CompleteText.builder()
-                .aiModel("gpt4-omni")
+                .aiModel("GPT4_OMNI")
                 .authorDiscordId("123456")
                 .frequencyPenalty(0D)
                 .logitBias(emptyMap())
@@ -61,7 +61,7 @@ public class CompleteTextFixture {
         messages.add(userMessage().build());
 
         return CompleteText.builder()
-                .aiModel("gpt4-omni")
+                .aiModel("GPT4_OMNI")
                 .authorDiscordId("123456")
                 .frequencyPenalty(0D)
                 .logitBias(emptyMap())

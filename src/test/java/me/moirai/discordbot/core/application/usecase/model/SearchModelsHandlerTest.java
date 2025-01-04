@@ -55,7 +55,7 @@ public class SearchModelsHandlerTest {
 
         AiModelResult modelFound = result.get(0);
         assertThat(modelFound.getFullModelName()).isEqualTo(expectedModel.getFullModelName());
-        assertThat(modelFound.getInternalModelName()).isEqualTo(expectedModel.getInternalModelName());
+        assertThat(modelFound.getInternalModelName()).isEqualTo(expectedModel.toString());
         assertThat(modelFound.getOfficialModelName()).isEqualTo(expectedModel.getOfficialModelName());
         assertThat(modelFound.getHardTokenLimit()).isEqualTo(expectedModel.getHardTokenLimit());
     }
@@ -77,7 +77,7 @@ public class SearchModelsHandlerTest {
 
         AiModelResult modelFound = result.get(0);
         assertThat(modelFound.getFullModelName()).isEqualTo(expectedModel.getFullModelName());
-        assertThat(modelFound.getInternalModelName()).isEqualTo(expectedModel.getInternalModelName());
+        assertThat(modelFound.getInternalModelName()).isEqualTo(expectedModel.toString());
         assertThat(modelFound.getOfficialModelName()).isEqualTo(expectedModel.getOfficialModelName());
         assertThat(modelFound.getHardTokenLimit()).isEqualTo(expectedModel.getHardTokenLimit());
     }
@@ -100,13 +100,13 @@ public class SearchModelsHandlerTest {
 
         AiModelResult miniFound = result.get(0);
         assertThat(miniFound.getFullModelName()).isEqualTo(mini.getFullModelName());
-        assertThat(miniFound.getInternalModelName()).isEqualTo(mini.getInternalModelName());
+        assertThat(miniFound.getInternalModelName()).isEqualTo(mini.toString());
         assertThat(miniFound.getOfficialModelName()).isEqualTo(mini.getOfficialModelName());
         assertThat(miniFound.getHardTokenLimit()).isEqualTo(mini.getHardTokenLimit());
 
         AiModelResult omniFound = result.get(1);
         assertThat(omniFound.getFullModelName()).isEqualTo(omni.getFullModelName());
-        assertThat(omniFound.getInternalModelName()).isEqualTo(omni.getInternalModelName());
+        assertThat(omniFound.getInternalModelName()).isEqualTo(omni.toString());
         assertThat(omniFound.getOfficialModelName()).isEqualTo(omni.getOfficialModelName());
         assertThat(omniFound.getHardTokenLimit()).isEqualTo(omni.getHardTokenLimit());
     }

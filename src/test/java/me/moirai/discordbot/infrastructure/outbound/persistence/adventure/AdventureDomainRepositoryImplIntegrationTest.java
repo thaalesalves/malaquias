@@ -33,6 +33,7 @@ public class AdventureDomainRepositoryImplIntegrationTest extends AbstractIntegr
 
     @BeforeEach
     public void before() {
+        lorebookEntryJpaRepository.deleteAllInBatch();
         jpaRepository.deleteAllInBatch();
     }
 
@@ -53,8 +54,8 @@ public class AdventureDomainRepositoryImplIntegrationTest extends AbstractIntegr
         assertThat(createdAdventure.getCreationDate()).isNotNull();
         assertThat(createdAdventure.getLastUpdateDate()).isNotNull();
 
-        assertThat(createdAdventure.getModelConfiguration().getAiModel().getInternalModelName())
-                .isEqualTo((adventure.getModelConfiguration().getAiModel().getInternalModelName()));
+        assertThat(createdAdventure.getModelConfiguration().getAiModel().toString())
+                .isEqualTo((adventure.getModelConfiguration().getAiModel().toString()));
 
         assertThat(createdAdventure.getModelConfiguration().getFrequencyPenalty())
                 .isEqualTo((adventure.getModelConfiguration().getFrequencyPenalty()));

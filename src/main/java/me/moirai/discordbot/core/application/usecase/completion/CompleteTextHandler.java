@@ -4,7 +4,7 @@ import static java.util.Collections.emptyList;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.ASSISTANT;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.SYSTEM;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.USER;
-import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromInternalName;
+import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromString;
 import static me.moirai.discordbot.core.domain.adventure.Moderation.DISABLED;
 import static org.apache.commons.collections4.MapUtils.isEmpty;
 
@@ -76,7 +76,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     @Override
     public Mono<CompleteTextResult> execute(CompleteText useCase) {
 
-        ArtificialIntelligenceModel model = fromInternalName(useCase.getAiModel());
+        ArtificialIntelligenceModel model = fromString(useCase.getAiModel());
         Persona persona = personaService.getById(useCase.getPersonaId());
         World world = worldService.getWorldById(useCase.getWorldId());
         DiscordUserDetails author = discordUserDetailsPort.getUserById(useCase.getAuthorDiscordId())
@@ -124,7 +124,7 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
                 .maxTokenLimit(useCase.getMaxTokenLimit())
                 .stopSequences(useCase.getStopSequences())
                 .temperature(useCase.getTemperature())
-                .aiModel(AiModelRequest.build(model.getInternalModelName(),
+                .aiModel(AiModelRequest.build(model.toString(),
                         model.getOfficialModelName(), model.getHardTokenLimit()))
                 .build();
 

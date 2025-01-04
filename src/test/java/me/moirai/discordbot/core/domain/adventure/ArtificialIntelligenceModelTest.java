@@ -13,20 +13,20 @@ public class ArtificialIntelligenceModelTest {
     public void retrieveModelFromName() {
 
         // Given
-        String internalModelName = "gpt4-omni";
+        String internalModelName = "GPT4_OMNI";
         String fullModelName = "GPT-4 Omni";
         String officialModelName = "gpt-4o";
         int hardTokenLimit = 128000;
 
         // When
-        ArtificialIntelligenceModel model = ArtificialIntelligenceModel.fromInternalName(internalModelName);
+        ArtificialIntelligenceModel model = ArtificialIntelligenceModel.fromString(internalModelName);
 
         // Then
         assertThat(model).isNotNull()
                 .hasToString(internalModelName);
 
         assertThat(model.getFullModelName()).isEqualTo(fullModelName);
-        assertThat(model.getInternalModelName()).isEqualTo(internalModelName);
+        assertThat(model.toString()).isEqualTo(internalModelName);
         assertThat(model.getOfficialModelName()).isEqualTo(officialModelName);
         assertThat(model.getHardTokenLimit()).isEqualTo(hardTokenLimit);
     }
@@ -39,6 +39,6 @@ public class ArtificialIntelligenceModelTest {
 
         // Then
         assertThrows(AIModelNotSupportedException.class,
-                () -> ArtificialIntelligenceModel.fromInternalName(modelName));
+                () -> ArtificialIntelligenceModel.fromString(modelName));
     }
 }

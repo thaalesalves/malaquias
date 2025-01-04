@@ -129,7 +129,7 @@ public class ContextSummarizationAdapterTest {
         StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
                         .aiModel(AiModelRequest.build(
-                                GPT4_MINI.getInternalModelName(),
+                                GPT4_MINI.toString(),
                                 GPT4_MINI.getOfficialModelName(),
                                 GPT4_MINI.getHardTokenLimit()))
                         .build())
@@ -187,7 +187,7 @@ public class ContextSummarizationAdapterTest {
         StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
                         .aiModel(AiModelRequest.build(
-                                GPT4_MINI.getInternalModelName(),
+                                GPT4_MINI.toString(),
                                 GPT4_MINI.getOfficialModelName(),
                                 GPT4_MINI.getHardTokenLimit()))
                         .build())
@@ -245,7 +245,7 @@ public class ContextSummarizationAdapterTest {
         StoryGenerationRequest storyGenerationRequest = StoryGenerationRequestFixture.create()
                 .modelConfiguration(ModelConfigurationRequestFixture.gpt4Mini()
                         .aiModel(AiModelRequest.build(
-                                GPT4_MINI.getInternalModelName(),
+                                GPT4_MINI.toString(),
                                 GPT4_MINI.getOfficialModelName(),
                                 GPT4_MINI.getHardTokenLimit()))
                         .build())

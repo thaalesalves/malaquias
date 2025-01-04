@@ -30,8 +30,12 @@ public class WorldQueryRepositoryImplIntegrationTest extends AbstractIntegration
     @Autowired
     private FavoriteRepository favoriteRepository;
 
+    @Autowired
+    private WorldLorebookEntryJpaRepository lorebookEntryJpaRepository;
+
     @BeforeEach
     public void before() {
+        lorebookEntryJpaRepository.deleteAllInBatch();
         jpaRepository.deleteAllInBatch();
     }
 

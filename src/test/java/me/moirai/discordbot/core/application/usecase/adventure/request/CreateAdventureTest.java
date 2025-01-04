@@ -24,7 +24,7 @@ public class CreateAdventureTest {
                 .personaId(adventure.getPersonaId())
                 .discordChannelId(adventure.getDiscordChannelId())
                 .visibility(adventure.getVisibility().name())
-                .aiModel(adventure.getModelConfiguration().getAiModel().getInternalModelName())
+                .aiModel(adventure.getModelConfiguration().getAiModel().toString())
                 .moderation(adventure.getModeration().name())
                 .maxTokenLimit(adventure.getModelConfiguration().getMaxTokenLimit())
                 .temperature(adventure.getModelConfiguration().getTemperature())
@@ -68,7 +68,7 @@ public class CreateAdventureTest {
         assertThat(updateAdventure.getBumpFrequency()).isEqualTo(adventure.getContextAttributes().getBumpFrequency());
 
         assertThat(updateAdventure.getAiModel())
-                .isEqualToIgnoringCase(adventure.getModelConfiguration().getAiModel().getInternalModelName());
+                .isEqualToIgnoringCase(adventure.getModelConfiguration().getAiModel().toString());
     }
 
     @Test

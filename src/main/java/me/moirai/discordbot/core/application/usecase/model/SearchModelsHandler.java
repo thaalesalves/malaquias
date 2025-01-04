@@ -53,7 +53,7 @@ public class SearchModelsHandler extends AbstractUseCaseHandler<SearchModels, Li
         return AiModelResult.builder()
                 .fullModelName(model.getFullModelName())
                 .hardTokenLimit(model.getHardTokenLimit())
-                .internalModelName(model.getInternalModelName())
+                .internalModelName(model.toString())
                 .officialModelName(model.getOfficialModelName())
                 .build();
     }

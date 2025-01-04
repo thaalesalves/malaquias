@@ -2,7 +2,7 @@ package me.moirai.discordbot.core.application.usecase.adventure;
 
 import static me.moirai.discordbot.core.domain.Visibility.PRIVATE;
 import static me.moirai.discordbot.core.domain.Visibility.PUBLIC;
-import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromInternalName;
+import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -54,7 +54,7 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         }
 
         if (isNotBlank(command.getAiModel())) {
-            adventure.updateAiModel(fromInternalName(command.getAiModel()));
+            adventure.updateAiModel(fromString(command.getAiModel()));
         }
 
         if (isNotBlank(command.getModeration())) {

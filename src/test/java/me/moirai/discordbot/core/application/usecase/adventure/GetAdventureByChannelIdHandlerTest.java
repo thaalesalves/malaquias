@@ -84,7 +84,7 @@ public class GetAdventureByChannelIdHandlerTest {
         assertThat(result.getBumpFrequency()).isEqualTo(adventure.getContextAttributes().getBumpFrequency());
 
         assertThat(result.getAiModel())
-                .isEqualToIgnoringCase(adventure.getModelConfiguration().getAiModel().getInternalModelName());
+                .isEqualToIgnoringCase(adventure.getModelConfiguration().getAiModel().toString());
         assertThat(result.getFrequencyPenalty()).isEqualTo(adventure.getModelConfiguration().getFrequencyPenalty());
         assertThat(result.getLogitBias()).isEqualTo(adventure.getModelConfiguration().getLogitBias());
         assertThat(result.getMaxTokenLimit()).isEqualTo(adventure.getModelConfiguration().getMaxTokenLimit());
