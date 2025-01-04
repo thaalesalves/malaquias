@@ -81,7 +81,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
 
         // Then
         webTestClient.get()
-                .uri(String.format(ADVENTURE_ID_BASE_URL, "search"))
+                .uri(String.format(ADVENTURE_BASE_URL))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(SearchAdventuresResponse.class)
@@ -117,7 +117,7 @@ public class AdventureControllerTest extends AbstractRestWebTest {
 
         // Then
         webTestClient.get()
-                .uri(uri -> uri.path(String.format(ADVENTURE_ID_BASE_URL, "search"))
+                .uri(uri -> uri.path(String.format(ADVENTURE_BASE_URL))
                         .queryParam("name", "someName")
                         .queryParam("world", "someName")
                         .queryParam("persona", "someName")

@@ -59,7 +59,7 @@ public class WorldController extends SecurityContextAware {
         this.requestMapper = requestMapper;
     }
 
-    @GetMapping("/search")
+    @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchWorldsResponse> search(WorldSearchParameters searchParameters) {
 

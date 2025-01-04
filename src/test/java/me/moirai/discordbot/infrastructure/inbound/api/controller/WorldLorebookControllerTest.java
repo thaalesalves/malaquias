@@ -81,7 +81,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
 
         // Then
         webTestClient.get()
-                .uri("/world/1234/lorebook/search")
+                .uri("/world/1234/lorebook")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(SearchWorldsResponse.class)
@@ -123,7 +123,7 @@ public class WorldLorebookControllerTest extends AbstractRestWebTest {
 
         // Then
         webTestClient.get()
-                .uri(uri -> uri.path("/world/1234/lorebook/search")
+                .uri(uri -> uri.path("/world/1234/lorebook")
                         .queryParam("name", "someName")
                         .queryParam("page", 1)
                         .queryParam("size", 10)

@@ -79,7 +79,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
 
         // Then
         webTestClient.get()
-                .uri(String.format(PERSONA_ID_BASE_URL, "search"))
+                .uri(String.format(PERSONA_BASE_URL))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(SearchPersonasResponse.class)
@@ -112,7 +112,7 @@ public class PersonaControllerTest extends AbstractRestWebTest {
 
         // Then
         webTestClient.get()
-                .uri(uri -> uri.path(String.format(PERSONA_ID_BASE_URL, "search"))
+                .uri(uri -> uri.path(String.format(PERSONA_BASE_URL))
                         .queryParam("name", "someName")
                         .queryParam("ownerDiscordId", "someName")
                         .queryParam("favorites", true)

@@ -54,7 +54,7 @@ public class AdventureLorebookController extends SecurityContextAware {
         this.responseMapper = responseMapper;
     }
 
-    @GetMapping("/search")
+    @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchLorebookEntriesResponse> search(
             @PathVariable(required = true) String adventureId,

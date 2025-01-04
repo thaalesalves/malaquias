@@ -30,7 +30,7 @@ public class UserDetailsController extends SecurityContextAware {
 
     @GetMapping("/{discordUserId}")
     public Mono<UserDataResponse> getMethodName(
-            @PathVariable(name = "discordUserId", required = true) String discordUserId) {
+            @PathVariable(required = true) String discordUserId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 

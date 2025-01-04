@@ -62,7 +62,7 @@ public class AdventureController extends SecurityContextAware {
         this.requestMapper = requestMapper;
     }
 
-    @GetMapping("/search")
+    @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<SearchAdventuresResponse> search(AdventureSearchParameters searchParameters) {
 
