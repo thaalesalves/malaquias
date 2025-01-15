@@ -2,7 +2,7 @@ package me.moirai.discordbot.core.application.usecase.discord.userdetails;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 
-public final class GetUserDetailsById extends UseCase<DiscordUserDetailsResult> {
+public final class GetUserDetailsById extends UseCase<DiscordUserResult> {
 
     private final String discordUserId;
 

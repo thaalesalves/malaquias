@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserDetailsResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,10 +20,10 @@ public class UserDataResponseMapperTest {
     public void mapUserDataResponse_whenValidData_thenObjectIsMapped() {
 
         // Given
-        DiscordUserDetailsResult input = DiscordUserDetailsResult.builder()
-                .id("1234")
-                .avatar("https://img;com/avatar.jpg")
-                .globalNickname("nickname")
+        DiscordUserResult input = DiscordUserResult.builder()
+                .discordId("1234")
+                .avatarUrl("https://img;com/avatar.jpg")
+                .nickname("nickname")
                 .username("username")
                 .build();
 
@@ -32,9 +32,9 @@ public class UserDataResponseMapperTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(input.getId());
-        assertThat(result.getAvatar()).isEqualTo(input.getAvatar());
-        assertThat(result.getGlobalNickname()).isEqualTo(input.getGlobalNickname());
+        assertThat(result.getDiscordId()).isEqualTo(input.getDiscordId());
+        assertThat(result.getAvatar()).isEqualTo(input.getAvatarUrl());
+        assertThat(result.getNickname()).isEqualTo(input.getNickname());
         assertThat(result.getUsername()).isEqualTo(input.getUsername());
     }
 }

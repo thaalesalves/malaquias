@@ -1,30 +1,25 @@
-package me.moirai.discordbot.infrastructure.inbound.api.response;
+package me.moirai.discordbot.core.application.usecase.discord.userdetails;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+public final class DiscordUserResult {
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UserDataResponse {
+    private final String discordId;
+    private final String username;
+    private final String nickname;
+    private final String avatarUrl;
+    private final OffsetDateTime joinDate;
 
-    private String discordId;
-    private String username;
-    private String nickname;
-    private String avatar;
-    private OffsetDateTime joinDate;
-
-    public UserDataResponse() {
-    }
-
-    private UserDataResponse(Builder builder) {
+    private DiscordUserResult(Builder builder) {
         this.discordId = builder.discordId;
         this.username = builder.username;
         this.nickname = builder.nickname;
-        this.avatar = builder.avatar;
+        this.avatarUrl = builder.avatarUrl;
         this.joinDate = builder.joinDate;
     }
 
     public static Builder builder() {
+
         return new Builder();
     }
 
@@ -40,8 +35,8 @@ public class UserDataResponse {
         return nickname;
     }
 
-    public String getAvatar() {
-        return avatar;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
     public OffsetDateTime getJoinDate() {
@@ -49,14 +44,12 @@ public class UserDataResponse {
     }
 
     public static final class Builder {
+
         private String discordId;
         private String username;
         private String nickname;
-        private String avatar;
+        private String avatarUrl;
         private OffsetDateTime joinDate;
-
-        private Builder() {
-        }
 
         public Builder discordId(String discordId) {
             this.discordId = discordId;
@@ -73,8 +66,8 @@ public class UserDataResponse {
             return this;
         }
 
-        public Builder avatar(String avatar) {
-            this.avatar = avatar;
+        public Builder avatarUrl(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
             return this;
         }
 
@@ -83,8 +76,8 @@ public class UserDataResponse {
             return this;
         }
 
-        public UserDataResponse build() {
-            return new UserDataResponse(this);
+        public DiscordUserResult build() {
+            return new DiscordUserResult(this);
         }
     }
 }

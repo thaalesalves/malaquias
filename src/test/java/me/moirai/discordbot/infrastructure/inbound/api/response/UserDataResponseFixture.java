@@ -5,9 +5,8 @@ public class UserDataResponseFixture {
     public static UserDataResponse.Builder create() {
 
         return UserDataResponse.builder()
-                .id("1234")
-                .email("user@email.com")
-                .globalNickname("nickname")
+                .discordId("1234")
+                .nickname("nickname")
                 .username("username")
                 .avatar("https://img.com/avatar.jpg");
     }

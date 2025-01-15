@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.discordbot.AbstractRestWebTest;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserDetailsResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
 import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
@@ -88,9 +88,9 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
         UserDataResponse result = UserDataResponseFixture.create().build();
 
         when(useCaseRunner.run(any(GetUserDetailsById.class)))
-                .thenReturn(mock(DiscordUserDetailsResult.class));
+                .thenReturn(mock(DiscordUserResult.class));
 
-        when(responseMapper.toResponse(any(DiscordUserDetailsResult.class))).thenReturn(result);
+        when(responseMapper.toResponse(any(DiscordUserResult.class))).thenReturn(result);
 
         // Then
         webTestClient.get()
@@ -100,9 +100,8 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                 .expectBody(UserDataResponse.class)
                 .value(response -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getId()).isEqualTo(result.getId());
-                    assertThat(response.getEmail()).isEqualTo(result.getEmail());
-                    assertThat(response.getGlobalNickname()).isEqualTo(result.getGlobalNickname());
+                    assertThat(response.getDiscordId()).isEqualTo(result.getDiscordId());
+                    assertThat(response.getNickname()).isEqualTo(result.getNickname());
                     assertThat(response.getUsername()).isEqualTo(result.getUsername());
                     assertThat(response.getAvatar()).isEqualTo(result.getAvatar());
                 });

@@ -147,8 +147,7 @@ public class AuthenticationController extends SecurityContextAware {
         return exchange.getResponse();
     }
 
-    private ServerHttpResponse handleSessionTermination(
-            ServerWebExchange exchange) {
+    private ServerHttpResponse handleSessionTermination(ServerWebExchange exchange) {
 
         ResponseCookie sessionCookie = expireCookie(SESSION_COOKIE);
         ResponseCookie refreshCookie = expireCookie(REFRESH_COOKIE);
