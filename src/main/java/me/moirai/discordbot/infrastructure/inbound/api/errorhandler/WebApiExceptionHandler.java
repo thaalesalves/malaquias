@@ -165,14 +165,7 @@ public class WebApiExceptionHandler extends AbstractErrorWebExceptionHandler {
     public ResponseEntity<ErrorResponse> authenticationError(AuthenticationFailedException exception) {
 
         LOG.error("Error during authentication", exception);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(HttpStatus.UNAUTHORIZED)
-                .message(exception.getMessage())
-                .details(Collections.singletonList(exception.getResponseMessage()))
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)

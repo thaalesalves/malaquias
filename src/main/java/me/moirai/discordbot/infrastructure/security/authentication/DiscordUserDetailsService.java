@@ -7,10 +7,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
+import me.moirai.discordbot.common.exception.AuthenticationFailedException;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.CreateDiscordUser;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.CreateDiscordUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
@@ -52,15 +51,7 @@ public class DiscordUserDetailsService implements ReactiveUserDetailsService {
                     .authorizationToken(token.replace(BEARER, EMPTY))
                     .build();
         } catch (AssetNotFoundException e) {
-            CreateDiscordUser command = CreateDiscordUser.build(userDetails.getId());
-            CreateDiscordUserResult discordUserResult = useCaseRunner.run(command);
-
-            return DiscordPrincipal.builder()
-                    .id(discordUserResult.getId())
-                    .username(userDetails.getUsername())
-                    .email(userDetails.getEmail())
-                    .authorizationToken(token.replace(BEARER, EMPTY))
-                    .build();
+            throw new AuthenticationFailedException("Invalid user requested authentication");
         }
     }
 }
