@@ -18,7 +18,7 @@ import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.CreateDiscordUser;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.CreateDiscordUserResult;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
@@ -50,7 +50,7 @@ public class DiscordUserDetailsServiceTest {
                 .email("email@email.com")
                 .build();
 
-        when(useCaseRunner.run(any(GetUserDetailsById.class))).thenReturn(DiscordUserResult.builder()
+        when(useCaseRunner.run(any(GetUserDetailsById.class))).thenReturn(UserDetailsResult.builder()
                 .avatarUrl("http://someurl.com/somepic.jpg")
                 .discordId("12345")
                 .nickname(nickname)

@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.discordbot.AbstractRestWebTest;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
@@ -39,7 +39,7 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
                 .discordId(userId)
                 .build();
 
-        DiscordUserResult result = DiscordUserResult.builder()
+        UserDetailsResult result = UserDetailsResult.builder()
                 .avatarUrl(response.getAvatar())
                 .discordId(response.getDiscordId())
                 .nickname(response.getNickname())
@@ -48,7 +48,7 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
                 .build();
 
         when(useCaseRunner.run(any(GetUserDetailsById.class))).thenReturn(result);
-        when(responseMapper.toResponse(any(DiscordUserResult.class))).thenReturn(response);
+        when(responseMapper.toResponse(any(UserDetailsResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()

@@ -49,7 +49,7 @@ public class GetUserDetailsByIdHandlerTest extends AbstractDiscordTest {
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
 
         // When
-        DiscordUserResult result = handler.handle(query);
+        UserDetailsResult result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();
@@ -76,7 +76,7 @@ public class GetUserDetailsByIdHandlerTest extends AbstractDiscordTest {
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
 
         // When
-        DiscordUserResult result = handler.execute(query);
+        UserDetailsResult result = handler.execute(query);
 
         // Then
         assertThat(result).isNotNull();

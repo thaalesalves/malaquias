@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.common.web.SecurityContextAware;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 import reactor.core.publisher.Mono;
@@ -36,7 +36,7 @@ public class UserDetailsController extends SecurityContextAware {
                 .map(this::toResponse);
     }
 
-    private UserDataResponse toResponse(DiscordUserResult discordUser) {
+    private UserDataResponse toResponse(UserDetailsResult discordUser) {
 
         return UserDataResponse.builder()
                 .discordId(discordUser.getDiscordId())

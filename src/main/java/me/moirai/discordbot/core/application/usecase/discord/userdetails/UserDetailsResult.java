@@ -2,7 +2,7 @@ package me.moirai.discordbot.core.application.usecase.discord.userdetails;
 
 import java.time.OffsetDateTime;
 
-public final class DiscordUserResult {
+public final class UserDetailsResult {
 
     private final String discordId;
     private final String username;
@@ -10,7 +10,7 @@ public final class DiscordUserResult {
     private final String avatarUrl;
     private final OffsetDateTime joinDate;
 
-    private DiscordUserResult(Builder builder) {
+    private UserDetailsResult(Builder builder) {
         this.discordId = builder.discordId;
         this.username = builder.username;
         this.nickname = builder.nickname;
@@ -76,8 +76,8 @@ public final class DiscordUserResult {
             return this;
         }
 
-        public DiscordUserResult build() {
-            return new DiscordUserResult(this);
+        public UserDetailsResult build() {
+            return new UserDetailsResult(this);
         }
     }
 }

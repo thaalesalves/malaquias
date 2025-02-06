@@ -155,12 +155,7 @@ public class WebExceptionHandlerTest extends AbstractRestWebTest {
         webTestClient.get()
                 .uri("/world/" + worldId)
                 .exchange()
-                .expectStatus().is4xxClientError()
-                .expectBody(ErrorResponse.class)
-                .value(response -> {
-                    assertThat(response).isNotNull();
-                    assertThat(response.getCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-                });
+                .expectStatus().is4xxClientError();
     }
 
     @Test

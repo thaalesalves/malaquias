@@ -13,7 +13,7 @@ import me.moirai.discordbot.core.domain.userdetails.User;
 import me.moirai.discordbot.core.domain.userdetails.UserDomainRepository;
 
 @UseCaseHandler
-public class GetUserDetailsByIdHandler extends AbstractUseCaseHandler<GetUserDetailsById, DiscordUserResult> {
+public class GetUserDetailsByIdHandler extends AbstractUseCaseHandler<GetUserDetailsById, UserDetailsResult> {
 
     private static final String USER_NOT_REGISTERED_IN_MOIRAI = "The User with the requested ID is not registered in MoirAI";
     private static final String DISCORD_USER_DOES_NOT_EXIST = "The Discord User with the requested ID does not exist";
@@ -38,7 +38,7 @@ public class GetUserDetailsByIdHandler extends AbstractUseCaseHandler<GetUserDet
     }
 
     @Override
-    public DiscordUserResult execute(GetUserDetailsById useCase) {
+    public UserDetailsResult execute(GetUserDetailsById useCase) {
 
         DiscordUserDetails discordUserDetails = discordUserDetailsPort.getUserById(useCase.getDiscordUserId())
                 .orElseThrow(() -> new DiscordApiException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
@@ -49,7 +49,7 @@ public class GetUserDetailsByIdHandler extends AbstractUseCaseHandler<GetUserDet
         String nickname = isBlank(discordUserDetails.getNickname()) ? discordUserDetails.getUsername()
                 : discordUserDetails.getNickname();
 
-        return DiscordUserResult.builder()
+        return UserDetailsResult.builder()
                 .discordId(discordUser.getDiscordId())
                 .nickname(nickname)
                 .username(discordUserDetails.getUsername())

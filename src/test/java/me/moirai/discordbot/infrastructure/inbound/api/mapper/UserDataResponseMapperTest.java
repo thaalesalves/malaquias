@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +20,7 @@ public class UserDataResponseMapperTest {
     public void mapUserDataResponse_whenValidData_thenObjectIsMapped() {
 
         // Given
-        DiscordUserResult input = DiscordUserResult.builder()
+        UserDetailsResult input = UserDetailsResult.builder()
                 .discordId("1234")
                 .avatarUrl("https://img;com/avatar.jpg")
                 .nickname("nickname")
