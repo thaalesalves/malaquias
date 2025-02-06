@@ -10,19 +10,18 @@ import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
-import me.moirai.discordbot.infrastructure.security.authentication.DiscordPrincipal;
-import me.moirai.discordbot.infrastructure.security.authentication.DiscordUserDetailsService;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiUserDetailsService;
 import me.moirai.discordbot.infrastructure.security.authentication.SecuritySessionContext;
 import reactor.core.publisher.Mono;
 
 @Component
-public class DiscordAuthenticationFilter implements WebFilter {
+public class AuthenticationFilter implements WebFilter {
 
     private static final String BEARER = "Bearer %s";
     private static final HttpStatusCode HTTP_UNAUTHORIZED = HttpStatusCode.valueOf(401);
@@ -30,13 +29,13 @@ public class DiscordAuthenticationFilter implements WebFilter {
     private final List<String> ignoredPaths;
     private final String authenticationFailedPath;
     private final String authenticationTerminatedPath;
-    private final DiscordUserDetailsService userDetailsService;
+    private final MoiraiUserDetailsService userDetailsService;
 
-    public DiscordAuthenticationFilter(
+    public AuthenticationFilter(
             @Value("#{'${moirai.security.ignored-paths}'.split(',')}") List<String> ignoredPaths,
             @Value("${moirai.security.redirect-path.fail}") String authenticationFailedPath,
             @Value("${moirai.security.redirect-path.logout}") String authenticationTerminatedPath,
-            DiscordUserDetailsService userDetailsService) {
+            MoiraiUserDetailsService userDetailsService) {
 
         this.ignoredPaths = ignoredPaths;
         this.authenticationFailedPath = authenticationFailedPath;
@@ -60,16 +59,15 @@ public class DiscordAuthenticationFilter implements WebFilter {
         }
 
         String bearerToken = String.format(BEARER, sessionCookie.getValue());
-        return userDetailsService.findByUsername(bearerToken).flatMap(userDetails -> {
-            DiscordPrincipal user = (DiscordPrincipal) userDetails;
-            UsernamePasswordAuthenticationToken authenticatedPrincipal = new UsernamePasswordAuthenticationToken(
-                    user, null, user.getAuthorities());
+        return userDetailsService.findByUsername(bearerToken)
+                .flatMap(userDetails -> {
+                    MoiraiPrincipal user = (MoiraiPrincipal) userDetails;
+                    UsernamePasswordAuthenticationToken authenticatedPrincipal = new UsernamePasswordAuthenticationToken(
+                            user, null, user.getAuthorities());
 
-            SecuritySessionContext.setCurrentUser(user);
-
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authenticatedPrincipal));
-        });
+                    return chain.filter(exchange)
+                            .contextWrite(SecuritySessionContext.createContext(authenticatedPrincipal));
+                });
 
     }
 

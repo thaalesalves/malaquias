@@ -28,7 +28,7 @@ import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthRespo
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
-import me.moirai.discordbot.infrastructure.security.authentication.DiscordPrincipal;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.discordbot.infrastructure.security.authentication.MoiraiCookie;
 import reactor.core.publisher.Mono;
 
@@ -97,7 +97,7 @@ public class AuthenticationController extends SecurityContextAware {
     @GetMapping("/logout")
     public Mono<ServerHttpResponse> logout(ServerWebExchange exchange, Authentication authentication) {
 
-        DiscordPrincipal authenticatedUser = (DiscordPrincipal) authentication.getPrincipal();
+        MoiraiPrincipal authenticatedUser = (MoiraiPrincipal) authentication.getPrincipal();
         DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
                 .clientId(clientId)
                 .clientSecret(clientSecret)

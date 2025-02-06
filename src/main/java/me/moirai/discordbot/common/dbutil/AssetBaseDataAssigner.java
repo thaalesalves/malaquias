@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import me.moirai.discordbot.core.domain.Asset;
-import me.moirai.discordbot.infrastructure.security.authentication.DiscordPrincipal;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.discordbot.infrastructure.security.authentication.SecuritySessionContext;
 
 public class AssetBaseDataAssigner {
@@ -14,7 +14,7 @@ public class AssetBaseDataAssigner {
     @PrePersist
     public void setBaseData(Asset asset) {
 
-        DiscordPrincipal authenticatedUser = SecuritySessionContext.getCurrentUser();
+        MoiraiPrincipal authenticatedUser = SecuritySessionContext.getCurrentUser();
         if (asset.getCreatorDiscordId() == null) {
             asset.setCreatorDiscordId(authenticatedUser.getId());
         }

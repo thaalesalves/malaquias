@@ -6,7 +6,7 @@ import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public final class DiscordPrincipal implements UserDetails {
+public final class MoiraiPrincipal implements UserDetails {
 
     private final String id;
     private final String username;
@@ -15,7 +15,7 @@ public final class DiscordPrincipal implements UserDetails {
     private final String refreshToken;
     private final Long expiresAt;
 
-    private DiscordPrincipal(Builder builder) {
+    private MoiraiPrincipal(Builder builder) {
         this.id = builder.id;
         this.username = builder.username;
         this.email = builder.email;
@@ -125,8 +125,8 @@ public final class DiscordPrincipal implements UserDetails {
             return this;
         }
 
-        public DiscordPrincipal build() {
-            return new DiscordPrincipal(this);
+        public MoiraiPrincipal build() {
+            return new MoiraiPrincipal(this);
         }
     }
 }

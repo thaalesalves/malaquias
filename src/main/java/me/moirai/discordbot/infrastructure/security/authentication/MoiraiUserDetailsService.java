@@ -7,24 +7,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
+import me.moirai.discordbot.common.exception.AuthenticationFailedException;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.CreateDiscordUser;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.CreateDiscordUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 
 @Service
-public class DiscordUserDetailsService implements ReactiveUserDetailsService {
+public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
 
     private static final String BEARER = "Bearer ";
 
     private final DiscordAuthenticationPort discordAuthenticationPort;
     private final UseCaseRunner useCaseRunner;
 
-    public DiscordUserDetailsService(
+    public MoiraiUserDetailsService(
             DiscordAuthenticationPort discordAuthenticationPort,
             UseCaseRunner useCaseRunner) {
 
@@ -39,28 +38,20 @@ public class DiscordUserDetailsService implements ReactiveUserDetailsService {
                 .map(userDetails -> getUserDetails(userDetails, token));
     }
 
-    private DiscordPrincipal getUserDetails(DiscordUserDataResponse userDetails, String token) {
+    private MoiraiPrincipal getUserDetails(DiscordUserDataResponse userDetails, String token) {
 
         try {
             GetUserDetailsById query = GetUserDetailsById.build(userDetails.getId());
             UserDetailsResult discordUserResult = useCaseRunner.run(query);
 
-            return DiscordPrincipal.builder()
+            return MoiraiPrincipal.builder()
                     .id(discordUserResult.getDiscordId())
                     .username(discordUserResult.getUsername())
                     .email(userDetails.getEmail())
                     .authorizationToken(token.replace(BEARER, EMPTY))
                     .build();
         } catch (AssetNotFoundException e) {
-            CreateDiscordUser command = CreateDiscordUser.build(userDetails.getId());
-            CreateDiscordUserResult discordUserResult = useCaseRunner.run(command);
-
-            return DiscordPrincipal.builder()
-                    .id(discordUserResult.getId())
-                    .username(userDetails.getUsername())
-                    .email(userDetails.getEmail())
-                    .authorizationToken(token.replace(BEARER, EMPTY))
-                    .build();
+            throw new AuthenticationFailedException("Invalid user requested authentication", e);
         }
     }
 }

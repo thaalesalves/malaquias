@@ -16,8 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
-import me.moirai.discordbot.infrastructure.security.authentication.DiscordPrincipal;
-import me.moirai.discordbot.infrastructure.security.authentication.DiscordUserDetailsService;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiUserDetailsService;
 import me.moirai.discordbot.infrastructure.security.authentication.MoiraiCookie;
 import net.dv8tion.jda.api.JDA;
 import reactor.core.publisher.Mono;
@@ -36,7 +36,7 @@ public abstract class AbstractRestWebTest {
     protected ServerHttpSecurity serverHttpSecurity;
 
     @MockBean
-    protected DiscordUserDetailsService discordUserDetailsService;
+    protected MoiraiUserDetailsService discordUserDetailsService;
 
     @Autowired
     protected WebTestClient webTestClient;
@@ -44,7 +44,7 @@ public abstract class AbstractRestWebTest {
     @BeforeEach
     public void before() {
 
-        UserDetails userDetails = DiscordPrincipal.builder()
+        UserDetails userDetails = MoiraiPrincipal.builder()
                 .id("USRID")
                 .email("user@email.com")
                 .username("username")

@@ -30,6 +30,6 @@ public class CreateDiscordUserHandler extends AbstractUseCaseHandler<CreateDisco
                 .discordId(useCase.getDiscordId())
                 .build());
 
-        return CreateDiscordUserResult.build(discordUser.getId());
+        return CreateDiscordUserResult.build(discordUser.getId(), discordUser.getDiscordId());
     }
 }
