@@ -15,8 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -47,7 +47,7 @@ public class MoiraiUserDetailsServiceTest {
                 .email("email@email.com")
                 .build();
 
-        when(useCaseRunner.run(any(GetUserDetailsById.class))).thenReturn(UserDetailsResult.builder()
+        when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(UserDetailsResult.builder()
                 .avatarUrl("http://someurl.com/somepic.jpg")
                 .discordId("12345")
                 .nickname(nickname)

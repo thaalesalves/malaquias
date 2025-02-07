@@ -12,5 +12,5 @@
     <include file="db/changelog/migrations/1734218870_migrate_channel_configs_to_adventures.sql" />
     <include file="db/changelog/migrations/1734220446_drop_table_channel_config.sql" />
     <include file="db/changelog/migrations/1734220624_alter_table_persona_remove_nudge_bump.sql" />
-    <include file="db/changelog/migrations/1736283065_create_table_discord_user.sql" />
+    <include file="db/changelog/migrations/1736283065_create_table_moirai_user.sql" />
 </databaseChangeLog>

@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public interface UserDomainRepository {
 
-    Optional<User> findByDiscordId(String discordId);
+    Optional<User> findByDiscordId(String discordUserId);
 
-    User save(User discordUser);
+    User save(User user);
 
-    void deleteByDiscordId(String discordId);
+    void delete(User user);
 }

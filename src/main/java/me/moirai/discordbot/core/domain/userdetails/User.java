@@ -9,15 +9,15 @@ import jakarta.persistence.Table;
 import me.moirai.discordbot.common.annotation.NanoId;
 import me.moirai.discordbot.core.domain.Asset;
 
-@Entity(name = "DiscordUser")
-@Table(name = "discord_user")
+@Entity(name = "User")
+@Table(name = "moirai_user")
 public class User extends Asset {
 
     @Id
     @NanoId
     private String id;
 
-    @Column(name = "discord_id", nullable = false)
+    @Column(name = "discord_id", unique = true, nullable = false)
     private String discordId;
 
     public User(Builder builder) {

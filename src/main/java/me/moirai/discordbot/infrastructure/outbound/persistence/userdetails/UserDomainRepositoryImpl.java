@@ -17,17 +17,17 @@ public class UserDomainRepositoryImpl implements UserDomainRepository {
     }
 
     @Override
-    public Optional<User> findByDiscordId(String discordId) {
-        return jpaRepository.findByDiscordId(discordId);
+    public Optional<User> findByDiscordId(String discordUserId) {
+        return jpaRepository.findByDiscordId(discordUserId);
     }
 
     @Override
-    public User save(User discordUser) {
-        return jpaRepository.save(discordUser);
+    public User save(User user) {
+        return jpaRepository.save(user);
     }
 
     @Override
-    public void deleteByDiscordId(String discordId) {
-        jpaRepository.deleteByDiscordId(discordId);
+    public void delete(User user) {
+        jpaRepository.delete(user);
     }
 }

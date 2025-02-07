@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 
 @ExtendWith(MockitoExtension.class)

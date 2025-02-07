@@ -12,8 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.discordbot.AbstractRestWebTest;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
 import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
@@ -87,7 +87,7 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
         // Given
         UserDataResponse result = UserDataResponseFixture.create().build();
 
-        when(useCaseRunner.run(any(GetUserDetailsById.class)))
+        when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class)))
                 .thenReturn(mock(UserDetailsResult.class));
 
         when(responseMapper.toResponse(any(UserDetailsResult.class))).thenReturn(result);

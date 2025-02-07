@@ -2,7 +2,7 @@ package me.moirai.discordbot.infrastructure.inbound.api.mapper;
 
 import org.springframework.stereotype.Component;
 
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 
 @Component

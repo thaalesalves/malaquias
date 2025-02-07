@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.CreateDiscordUser;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateDiscordUserResult;
 import me.moirai.discordbot.core.domain.userdetails.User;
 import me.moirai.discordbot.core.domain.userdetails.UserDomainRepository;
 

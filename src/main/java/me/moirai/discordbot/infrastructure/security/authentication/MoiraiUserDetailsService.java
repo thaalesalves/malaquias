@@ -10,8 +10,8 @@ import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.AuthenticationFailedException;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.UserDetailsResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.outbound.adapter.response.DiscordUserDataResponse;
 import reactor.core.publisher.Mono;
 
@@ -41,7 +41,7 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
     private MoiraiPrincipal getUserDetails(DiscordUserDataResponse userDetails, String token) {
 
         try {
-            GetUserDetailsById query = GetUserDetailsById.build(userDetails.getId());
+            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(userDetails.getId());
             UserDetailsResult discordUserResult = useCaseRunner.run(query);
 
             return MoiraiPrincipal.builder()

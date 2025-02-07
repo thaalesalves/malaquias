@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.common.web.SecurityContextAware;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
 import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
@@ -114,7 +114,7 @@ public class AuthenticationController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetUserDetailsById query = GetUserDetailsById.build(authenticatedUser.getId());
+            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(authenticatedUser.getId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
