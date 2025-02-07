@@ -1,11 +1,12 @@
 package me.moirai.discordbot.infrastructure.inbound.api.controller;
 
+import static me.moirai.discordbot.infrastructure.security.authentication.MoiraiCookie.SESSION_COOKIE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
+import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
@@ -15,19 +16,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import me.moirai.discordbot.AbstractRestWebTest;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.SignupUser;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
-import me.moirai.discordbot.infrastructure.inbound.api.request.CreateUserRequest;
-import me.moirai.discordbot.infrastructure.inbound.api.response.CreateUserResponse;
-import me.moirai.discordbot.infrastructure.inbound.api.response.CreateUserResponseFixture;
-import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponseFixture;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
-import me.moirai.discordbot.infrastructure.security.authentication.MoiraiCookie;
 import me.moirai.discordbot.infrastructure.security.authentication.config.AuthenticationSecurityConfig;
 import reactor.core.publisher.Mono;
 
@@ -54,15 +48,14 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
 
         // Given
         String code = "CODE";
-        DiscordAuthResponse expectedResponse = DiscordAuthResponse.builder()
+        AuthenticateUserResult expectedResponse = AuthenticateUserResult.builder()
                 .accessToken("TOKEN")
                 .expiresIn(4324324L)
                 .refreshToken("RFRSHTK")
                 .scope("SCOPE")
                 .build();
 
-        when(discordAuthenticationPort.authenticate(any(DiscordAuthRequest.class)))
-                .thenReturn(Mono.just(expectedResponse));
+        when(useCaseRunner.run(any())).thenReturn(Mono.just(expectedResponse));
 
         // Then
         webTestClient.get()
@@ -71,13 +64,26 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                         .queryParam("code", code)
                         .build())
                 .exchange()
-                .expectCookie().valueEquals(MoiraiCookie.SESSION_COOKIE.getName(), "TOKEN");
+                .expectCookie().valueEquals(SESSION_COOKIE.getName(), "TOKEN");
+    }
+
+    @Test
+    public void noTokenWhenExchangeCodeIsNull() {
+
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/auth/code")
+                        .build())
+                .exchange()
+                .expectCookie().doesNotExist(SESSION_COOKIE.getName());
     }
 
     @Test
     public void logout() {
 
         // Given
+        Duration expiredCookie = Duration.ofSeconds(0);
         when(discordAuthenticationPort.logout(any(DiscordTokenRevocationRequest.class)))
                 .thenReturn(Mono.empty());
 
@@ -85,11 +91,11 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
         webTestClient.get()
                 .uri("/auth/logout")
                 .exchange()
-                .expectCookie().doesNotExist(MoiraiCookie.SESSION_COOKIE.getName());
+                .expectCookie().maxAge(SESSION_COOKIE.getName(), expiredCookie);
     }
 
     @Test
-    public void http200WhenUserIsFound() {
+    public void getAuthenticatedUser() {
 
         // Given
         UserDataResponse result = UserDataResponseFixture.create().build();
@@ -111,39 +117,6 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                     assertThat(response.getNickname()).isEqualTo(result.getNickname());
                     assertThat(response.getUsername()).isEqualTo(result.getUsername());
                     assertThat(response.getAvatar()).isEqualTo(result.getAvatar());
-                });
-
-    }
-
-    @Test
-    public void http200WhenUserIsCreated() {
-
-        // Given
-        String userId = "12345";
-        CreateUserRequest request = new CreateUserRequest();
-        request.setDiscordId(userId);
-
-        CreateUserResponse expectedResult = CreateUserResponseFixture.create()
-                .discordId(userId)
-                .creationDate(OffsetDateTime.parse("2024-12-01T12:12:12Z"))
-                .build();
-
-        when(useCaseRunner.run(any(SignupUser.class)))
-                .thenReturn(mock(CreateUserResult.class));
-
-        when(responseMapper.toResponse(any(CreateUserResult.class))).thenReturn(expectedResult);
-
-        // Then
-        webTestClient.post()
-                .uri("/auth/signup")
-                .bodyValue(request)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(CreateUserResponse.class)
-                .value(response -> {
-                    assertThat(response).isNotNull();
-                    assertThat(response.getDiscordId()).isEqualTo(expectedResult.getDiscordId());
-                    assertThat(response.getCreationDate()).isEqualTo(expectedResult.getCreationDate());
                 });
 
     }

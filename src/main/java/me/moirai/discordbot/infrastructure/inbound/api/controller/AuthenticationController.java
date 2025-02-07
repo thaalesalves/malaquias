@@ -14,8 +14,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,21 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.validation.Valid;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.common.web.SecurityContextAware;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.AuthenticateUser;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.SignupUser;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.AuthenticateUserResult;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
-import me.moirai.discordbot.infrastructure.inbound.api.request.CreateUserRequest;
-import me.moirai.discordbot.infrastructure.inbound.api.response.CreateUserResponse;
-import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
-import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
 import me.moirai.discordbot.infrastructure.security.authentication.MoiraiCookie;
-import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
 import reactor.core.publisher.Mono;
 
 @Hidden
@@ -48,15 +41,12 @@ public class AuthenticationController extends SecurityContextAware {
     private static final String NONE = "None";
     private static final String ROOT = "/";
     private static final String TOKEN_TYPE_HINT = "access_token";
-    private static final String DISCORD_SCOPE = "identify";
-    private static final String DISCORD_GRANT_TYPE = "authorization_code";
     private static final int EXPIRE_IMMEDIATELY = 0;
     private static final boolean SECURE = true;
     private static final HttpStatusCode REDIRECT = HttpStatusCode.valueOf(302);
 
     private final String clientId;
     private final String clientSecret;
-    private final String redirectUrl;
     private final String successPath;
     private final String failPath;
     private final String logoutPath;
@@ -77,7 +67,6 @@ public class AuthenticationController extends SecurityContextAware {
 
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.redirectUrl = redirectUrl;
         this.successPath = successPath;
         this.logoutPath = logoutPath;
         this.failPath = failPath;
@@ -98,8 +87,8 @@ public class AuthenticationController extends SecurityContextAware {
             return Mono.just(exchange.getResponse());
         }
 
-        DiscordAuthRequest request = createDiscordAuthRequest(code);
-        return discordAuthenticationPort.authenticate(request)
+        AuthenticateUser command = AuthenticateUser.build(code);
+        return useCaseRunner.run(command)
                 .map(authResponse -> handleSessionAuthentication(exchange, authResponse));
     }
 
@@ -107,16 +96,17 @@ public class AuthenticationController extends SecurityContextAware {
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<ServerHttpResponse> logout(ServerWebExchange exchange, Authentication authentication) {
 
-        MoiraiPrincipal authenticatedUser = (MoiraiPrincipal) authentication.getPrincipal();
-        DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .token(authenticatedUser.getAuthorizationToken())
-                .tokenTypeHint(TOKEN_TYPE_HINT)
-                .build();
+        return flatMapWithAuthenticatedUser(authenticatedUser -> {
+            DiscordTokenRevocationRequest request = DiscordTokenRevocationRequest.builder()
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .token(authenticatedUser.getAuthorizationToken())
+                    .tokenTypeHint(TOKEN_TYPE_HINT)
+                    .build();
 
-        return discordAuthenticationPort.logout(request)
-                .thenReturn(handleSessionTermination(exchange));
+            return discordAuthenticationPort.logout(request)
+                    .thenReturn(handleSessionTermination(exchange));
+        });
     }
 
     @GetMapping("/user")
@@ -130,33 +120,12 @@ public class AuthenticationController extends SecurityContextAware {
         });
     }
 
-    @PostMapping("/signup")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public Mono<CreateUserResponse> signup(@RequestBody @Valid CreateUserRequest request) {
-
-        return Mono.just(SignupUser.build(request.getDiscordId()))
-                .map(useCaseRunner::run)
-                .map(responseMapper::toResponse);
-    }
-
-    private DiscordAuthRequest createDiscordAuthRequest(String code) {
-
-        return DiscordAuthRequest.builder()
-                .code(code)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .redirectUri(redirectUrl)
-                .scope(DISCORD_SCOPE)
-                .grantType(DISCORD_GRANT_TYPE)
-                .build();
-    }
-
     private ServerHttpResponse handleSessionAuthentication(
-            ServerWebExchange exchange, DiscordAuthResponse authResponse) {
+            ServerWebExchange exchange, AuthenticateUserResult authResult) {
 
-        ResponseCookie sessionCookie = createCookie(SESSION_COOKIE, authResponse.getAccessToken());
-        ResponseCookie refreshCookie = createCookie(REFRESH_COOKIE, authResponse.getRefreshToken());
-        ResponseCookie expiryCookie = createCookie(EXPIRY_COOKIE, String.valueOf(authResponse.getExpiresIn()));
+        ResponseCookie sessionCookie = createCookie(SESSION_COOKIE, authResult.getAccessToken());
+        ResponseCookie refreshCookie = createCookie(REFRESH_COOKIE, authResult.getRefreshToken());
+        ResponseCookie expiryCookie = createCookie(EXPIRY_COOKIE, String.valueOf(authResult.getExpiresIn()));
 
         exchange.getResponse().setStatusCode(REDIRECT);
         exchange.getResponse().getHeaders().setLocation(URI.create(successPath));
@@ -194,7 +163,7 @@ public class AuthenticationController extends SecurityContextAware {
 
     private ResponseCookie expireCookie(MoiraiCookie cookie) {
 
-        return ResponseCookie.from(cookie.getName())
+        return ResponseCookie.from(cookie.getName(), null)
                 .httpOnly(cookie.isHttpOnly())
                 .path(ROOT)
                 .sameSite(NONE)
