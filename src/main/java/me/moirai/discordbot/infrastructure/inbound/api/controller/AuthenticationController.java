@@ -8,28 +8,36 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.validation.Valid;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.common.web.SecurityContextAware;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.SignupUser;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
+import me.moirai.discordbot.infrastructure.inbound.api.request.CreateUserRequest;
+import me.moirai.discordbot.infrastructure.inbound.api.response.CreateUserResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordAuthRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.DiscordTokenRevocationRequest;
-import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
 import me.moirai.discordbot.infrastructure.security.authentication.MoiraiCookie;
+import me.moirai.discordbot.infrastructure.security.authentication.MoiraiPrincipal;
 import reactor.core.publisher.Mono;
 
 @Hidden
@@ -79,6 +87,7 @@ public class AuthenticationController extends SecurityContextAware {
     }
 
     @GetMapping("/code")
+    @ResponseStatus(code = HttpStatus.OK)
     public Mono<ServerHttpResponse> codeExchange(
             @RequestParam(required = false) String code, ServerWebExchange exchange) {
 
@@ -95,6 +104,7 @@ public class AuthenticationController extends SecurityContextAware {
     }
 
     @GetMapping("/logout")
+    @ResponseStatus(code = HttpStatus.OK)
     public Mono<ServerHttpResponse> logout(ServerWebExchange exchange, Authentication authentication) {
 
         MoiraiPrincipal authenticatedUser = (MoiraiPrincipal) authentication.getPrincipal();
@@ -110,6 +120,7 @@ public class AuthenticationController extends SecurityContextAware {
     }
 
     @GetMapping("/user")
+    @ResponseStatus(code = HttpStatus.OK)
     public Mono<UserDataResponse> getAuthenticatedUserDetails() {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
@@ -117,6 +128,15 @@ public class AuthenticationController extends SecurityContextAware {
             GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(authenticatedUser.getId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
+    }
+
+    @PostMapping("/signup")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public Mono<CreateUserResponse> signup(@RequestBody @Valid CreateUserRequest request) {
+
+        return Mono.just(SignupUser.build(request.getDiscordId()))
+                .map(useCaseRunner::run)
+                .map(responseMapper::toResponse);
     }
 
     private DiscordAuthRequest createDiscordAuthRequest(String code) {

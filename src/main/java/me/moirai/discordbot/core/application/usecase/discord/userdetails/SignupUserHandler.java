@@ -3,22 +3,22 @@ package me.moirai.discordbot.core.application.usecase.discord.userdetails;
 import io.micrometer.common.util.StringUtils;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.CreateDiscordUser;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateDiscordUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.SignupUser;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateUserResult;
 import me.moirai.discordbot.core.domain.userdetails.User;
 import me.moirai.discordbot.core.domain.userdetails.UserDomainRepository;
 
 @UseCaseHandler
-public class CreateDiscordUserHandler extends AbstractUseCaseHandler<CreateDiscordUser, CreateDiscordUserResult> {
+public class SignupUserHandler extends AbstractUseCaseHandler<SignupUser, CreateUserResult> {
 
     private final UserDomainRepository repository;
 
-    public CreateDiscordUserHandler(UserDomainRepository repository) {
+    public SignupUserHandler(UserDomainRepository repository) {
         this.repository = repository;
     }
 
     @Override
-    public void validate(CreateDiscordUser useCase) {
+    public void validate(SignupUser useCase) {
 
         if (StringUtils.isBlank(useCase.getDiscordId())) {
             throw new IllegalArgumentException("Discord ID cannot be null");
@@ -26,12 +26,17 @@ public class CreateDiscordUserHandler extends AbstractUseCaseHandler<CreateDisco
     }
 
     @Override
-    public CreateDiscordUserResult execute(CreateDiscordUser useCase) {
+    public CreateUserResult execute(SignupUser useCase) {
 
-        User discordUser = repository.save(User.builder()
+        User user = repository.save(User.builder()
                 .discordId(useCase.getDiscordId())
+                .creatorDiscordId(useCase.getDiscordId())
                 .build());
 
-        return CreateDiscordUserResult.build(discordUser.getId(), discordUser.getDiscordId());
+        return CreateUserResult.builder()
+                .id(user.getId())
+                .discordId(user.getDiscordId())
+                .creationDate(user.getCreationDate())
+                .build();
     }
 }

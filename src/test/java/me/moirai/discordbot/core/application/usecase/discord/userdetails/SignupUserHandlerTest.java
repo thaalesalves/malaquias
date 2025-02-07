@@ -11,19 +11,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.CreateDiscordUser;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateDiscordUserResult;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.SignupUser;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateUserResult;
 import me.moirai.discordbot.core.domain.userdetails.User;
 import me.moirai.discordbot.core.domain.userdetails.UserDomainRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateDiscordUserHandlerTest {
+public class SignupUserHandlerTest {
 
     @Mock
     private UserDomainRepository repository;
 
     @InjectMocks
-    private CreateDiscordUserHandler handler;
+    private SignupUserHandler handler;
 
     @Test
     public void createUser_whenUserIdIsNull_thenThrowException() {
@@ -31,7 +31,7 @@ public class CreateDiscordUserHandlerTest {
         // Given
         String expectedMessage = "Discord ID cannot be null";
         String userId = null;
-        CreateDiscordUser query = CreateDiscordUser.build(userId);
+        SignupUser query = SignupUser.build(userId);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -44,7 +44,7 @@ public class CreateDiscordUserHandlerTest {
 
         // Given
         String userId = "12345";
-        CreateDiscordUser query = CreateDiscordUser.build(userId);
+        SignupUser query = SignupUser.build(userId);
 
         User user = User.builder()
                 .id("QWEQWE")
@@ -53,7 +53,7 @@ public class CreateDiscordUserHandlerTest {
         when(repository.save(any())).thenReturn(user);
 
         // When
-        CreateDiscordUserResult result = handler.handle(query);
+        CreateUserResult result = handler.handle(query);
 
         // Then
         assertThat(result).isNotNull();

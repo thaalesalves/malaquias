@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.OffsetDateTime;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -13,8 +15,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import me.moirai.discordbot.AbstractRestWebTest;
 import me.moirai.discordbot.core.application.port.DiscordAuthenticationPort;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.SignupUser;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.CreateUserResult;
 import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
+import me.moirai.discordbot.infrastructure.inbound.api.request.CreateUserRequest;
+import me.moirai.discordbot.infrastructure.inbound.api.response.CreateUserResponse;
+import me.moirai.discordbot.infrastructure.inbound.api.response.CreateUserResponseFixture;
 import me.moirai.discordbot.infrastructure.inbound.api.response.DiscordAuthResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponseFixture;
@@ -104,6 +111,39 @@ public class AuthenticationControllerTest extends AbstractRestWebTest {
                     assertThat(response.getNickname()).isEqualTo(result.getNickname());
                     assertThat(response.getUsername()).isEqualTo(result.getUsername());
                     assertThat(response.getAvatar()).isEqualTo(result.getAvatar());
+                });
+
+    }
+
+    @Test
+    public void http200WhenUserIsCreated() {
+
+        // Given
+        String userId = "12345";
+        CreateUserRequest request = new CreateUserRequest();
+        request.setDiscordId(userId);
+
+        CreateUserResponse expectedResult = CreateUserResponseFixture.create()
+                .discordId(userId)
+                .creationDate(OffsetDateTime.parse("2024-12-01T12:12:12Z"))
+                .build();
+
+        when(useCaseRunner.run(any(SignupUser.class)))
+                .thenReturn(mock(CreateUserResult.class));
+
+        when(responseMapper.toResponse(any(CreateUserResult.class))).thenReturn(expectedResult);
+
+        // Then
+        webTestClient.post()
+                .uri("/auth/signup")
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(CreateUserResponse.class)
+                .value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.getDiscordId()).isEqualTo(expectedResult.getDiscordId());
+                    assertThat(response.getCreationDate()).isEqualTo(expectedResult.getCreationDate());
                 });
 
     }
