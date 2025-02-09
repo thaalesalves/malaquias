@@ -1,13 +1,13 @@
 package me.moirai.discordbot.infrastructure.outbound.adapter.request;
 
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Collections.unmodifiableMap;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 public class ModelConfigurationRequest {
@@ -17,7 +17,7 @@ public class ModelConfigurationRequest {
     private final Double temperature;
     private final Double frequencyPenalty;
     private final Double presencePenalty;
-    private final List<String> stopSequences;
+    private final Set<String> stopSequences;
     private final Map<String, Double> logitBias;
 
     private ModelConfigurationRequest(Builder builder) {
@@ -28,8 +28,8 @@ public class ModelConfigurationRequest {
         this.frequencyPenalty = builder.frequencyPenalty;
         this.presencePenalty = builder.presencePenalty;
 
-        this.stopSequences = unmodifiableList(
-                builder.stopSequences == null ? emptyList() : new ArrayList<>(builder.stopSequences));
+        this.stopSequences = unmodifiableSet(
+                builder.stopSequences == null ? emptySet() : new HashSet<>(builder.stopSequences));
 
         this.logitBias = unmodifiableMap(
                 builder.logitBias == null ? emptyMap() : new HashMap<>(builder.logitBias));
@@ -60,7 +60,7 @@ public class ModelConfigurationRequest {
         return presencePenalty;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -75,7 +75,7 @@ public class ModelConfigurationRequest {
         private Double temperature;
         private Double frequencyPenalty;
         private Double presencePenalty;
-        private List<String> stopSequences = new ArrayList<>();
+        private Set<String> stopSequences = new HashSet<>();
         private Map<String, Double> logitBias = new HashMap<>();
 
         private Builder() {
@@ -111,7 +111,7 @@ public class ModelConfigurationRequest {
             return this;
         }
 
-        public Builder stopSequences(List<String> stopSequences) {
+        public Builder stopSequences(Set<String> stopSequences) {
 
             if (stopSequences != null) {
                 this.stopSequences = stopSequences;

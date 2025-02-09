@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
-import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreateWorldRequest;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreateWorldRequestFixture;
@@ -59,27 +58,10 @@ public class WorldRequestMapperTest {
         assertThat(command.getDescription()).isEqualTo(request.getDescription());
         assertThat(command.getAdventureStart()).isEqualTo(request.getAdventureStart());
         assertThat(command.getVisibility()).isEqualTo(request.getVisibility());
-        assertThat(command.getRequesterDiscordId()).isEqualTo(requesterId);
         assertThat(command.getUsersAllowedToWriteToAdd()).hasSameElementsAs(request.getUsersAllowedToWriteToAdd());
         assertThat(command.getUsersAllowedToWriteToRemove())
                 .hasSameElementsAs(request.getUsersAllowedToWriteToRemove());
         assertThat(command.getUsersAllowedToReadToAdd()).hasSameElementsAs(request.getUsersAllowedToReadToAdd());
         assertThat(command.getUsersAllowedToReadToRemove()).hasSameElementsAs(request.getUsersAllowedToReadToRemove());
-    }
-
-    @Test
-    public void deleteRequestToCommand() {
-
-        // Given
-        String worldId = "WRLDID";
-        String requesterId = "RQSTRID";
-
-        // When
-        DeleteWorld command = mapper.toCommand(worldId, requesterId);
-
-        // Then
-        assertThat(command).isNotNull();
-        assertThat(command.getId()).isEqualTo(worldId);
-        assertThat(command.getRequesterDiscordId()).isEqualTo(requesterId);
     }
 }

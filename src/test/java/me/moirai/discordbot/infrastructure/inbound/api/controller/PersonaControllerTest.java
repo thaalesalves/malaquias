@@ -228,7 +228,6 @@ public class PersonaControllerTest extends AbstractRestWebTest {
         // Given
         String personaId = "WRLDID";
 
-        when(personaRequestMapper.toCommand(anyString(), anyString())).thenReturn(mock(DeletePersona.class));
         when(useCaseRunner.run(any(DeletePersona.class))).thenReturn(null);
 
         // Then

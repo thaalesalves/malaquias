@@ -5,24 +5,18 @@ import me.moirai.discordbot.common.usecases.UseCase;
 public final class DeletePersona extends UseCase<Void> {
 
     private final String id;
-    private final String requesterDiscordId;
 
-    private DeletePersona(String id, String requesterDiscordId) {
+    private DeletePersona(String id) {
 
         this.id = id;
-        this.requesterDiscordId = requesterDiscordId;
     }
 
-    public static DeletePersona build(String id, String requesterDiscordId) {
+    public static DeletePersona build(String id) {
 
-        return new DeletePersona(id, requesterDiscordId);
+        return new DeletePersona(id);
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterDiscordId;
     }
 }

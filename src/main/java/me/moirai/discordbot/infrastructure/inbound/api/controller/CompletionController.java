@@ -1,6 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class CompletionController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<TextCompletionResponse> generateText(@Valid @RequestBody TextCompletionRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {

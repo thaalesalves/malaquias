@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,11 +85,12 @@ public class PersonaController extends SecurityContextAware {
 
     @GetMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#personaId, 'Persona')")
     public Mono<PersonaResponse> getPersonaById(@PathVariable(required = true) String personaId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetPersonaById query = GetPersonaById.build(personaId, authenticatedUser.getId());
+            GetPersonaById query = GetPersonaById.build(personaId);
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -106,6 +108,7 @@ public class PersonaController extends SecurityContextAware {
 
     @PutMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canWrite(#personaId, 'Persona')")
     public Mono<UpdatePersonaResponse> updatePersona(
             @PathVariable(required = true) String personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
@@ -121,11 +124,12 @@ public class PersonaController extends SecurityContextAware {
 
     @DeleteMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canWrite(#personaId, 'Persona')")
     public Mono<Void> deletePersona(@PathVariable(required = true) String personaId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeletePersona command = requestMapper.toCommand(personaId, authenticatedUser.getId());
+            DeletePersona command = DeletePersona.build(personaId);
             useCaseRunner.run(command);
 
             return Mono.empty();
@@ -134,6 +138,7 @@ public class PersonaController extends SecurityContextAware {
 
     @PostMapping("/favorite")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.assetId, 'Persona')")
     public Mono<Void> addFavoritePersona(@RequestBody FavoriteRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {

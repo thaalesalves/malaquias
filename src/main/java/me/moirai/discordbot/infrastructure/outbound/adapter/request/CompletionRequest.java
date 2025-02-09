@@ -2,6 +2,7 @@ package me.moirai.discordbot.infrastructure.outbound.adapter.request;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +17,7 @@ public class CompletionRequest {
     private List<ChatMessage> messages;
 
     @JsonProperty("stop")
-    private List<String> stop;
+    private Set<String> stop;
 
     @JsonProperty("max_tokens")
     private Integer maxTokens;
@@ -60,7 +61,7 @@ public class CompletionRequest {
         return messages;
     }
 
-    public List<String> getStop() {
+    public Set<String> getStop() {
         return stop;
     }
 
@@ -92,7 +93,7 @@ public class CompletionRequest {
         this.messages = messages;
     }
 
-    public void setStop(List<String> stop) {
+    public void setStop(Set<String> stop) {
         this.stop = stop;
     }
 
@@ -120,7 +121,7 @@ public class CompletionRequest {
 
         private String model;
         private List<ChatMessage> messages;
-        private List<String> stop;
+        private Set<String> stop;
         private Integer maxTokens;
         private Double temperature;
         private Double presencePenalty;
@@ -140,7 +141,7 @@ public class CompletionRequest {
             return this;
         }
 
-        public Builder stop(List<String> stop) {
+        public Builder stop(Set<String> stop) {
             this.stop = stop;
             return this;
         }

@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,11 +85,12 @@ public class WorldController extends SecurityContextAware {
 
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<WorldResponse> getWorldById(@PathVariable(required = true) String worldId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldById query = GetWorldById.build(worldId, authenticatedUser.getId());
+            GetWorldById query = GetWorldById.build(worldId);
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -106,6 +108,7 @@ public class WorldController extends SecurityContextAware {
 
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<UpdateWorldResponse> updateWorld(@PathVariable(required = true) String worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
@@ -118,11 +121,12 @@ public class WorldController extends SecurityContextAware {
 
     @DeleteMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<Void> deleteWorld(@PathVariable(required = true) String worldId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorld command = requestMapper.toCommand(worldId, authenticatedUser.getId());
+            DeleteWorld command = DeleteWorld.build(worldId);
             useCaseRunner.run(command);
 
             return Mono.empty();
@@ -131,6 +135,7 @@ public class WorldController extends SecurityContextAware {
 
     @PostMapping("/favorite")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.assetId, 'World')")
     public Mono<Void> addFavoriteWorld(@RequestBody FavoriteRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {

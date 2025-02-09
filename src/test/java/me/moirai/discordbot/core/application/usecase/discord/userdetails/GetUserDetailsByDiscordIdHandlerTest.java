@@ -43,7 +43,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .id(query.getDiscordUserId())
                 .build();
 
-        User user = UserFixture.sample()
+        User user = UserFixture.player()
                 .discordId(query.getDiscordUserId())
                 .build();
 
@@ -70,7 +70,7 @@ public class GetUserDetailsByDiscordIdHandlerTest extends AbstractDiscordTest {
                 .nickname(null)
                 .build();
 
-        User user = UserFixture.sample()
+        User user = UserFixture.player()
                 .discordId(query.getDiscordUserId())
                 .build();
 

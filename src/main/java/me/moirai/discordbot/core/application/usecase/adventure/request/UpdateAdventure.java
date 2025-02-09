@@ -1,13 +1,13 @@
 package me.moirai.discordbot.core.application.usecase.adventure.request;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -38,13 +38,13 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
     private final Double frequencyPenalty;
     private final Double presencePenalty;
     private final Map<String, Double> logitBiasToAdd;
-    private final List<String> stopSequencesToAdd;
-    private final List<String> stopSequencesToRemove;
-    private final List<String> logitBiasToRemove;
-    private final List<String> usersAllowedToWriteToAdd;
-    private final List<String> usersAllowedToWriteToRemove;
-    private final List<String> usersAllowedToReadToAdd;
-    private final List<String> usersAllowedToReadToRemove;
+    private final Set<String> stopSequencesToAdd;
+    private final Set<String> stopSequencesToRemove;
+    private final Set<String> logitBiasToRemove;
+    private final Set<String> usersAllowedToWriteToAdd;
+    private final Set<String> usersAllowedToWriteToRemove;
+    private final Set<String> usersAllowedToReadToAdd;
+    private final Set<String> usersAllowedToReadToRemove;
     private final boolean isMultiplayer;
 
     private UpdateAdventure(Builder builder) {
@@ -75,26 +75,26 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
         this.logitBiasToAdd = MapUtils.isEmpty(builder.logitBiasToAdd) ? emptyMap()
                 : unmodifiableMap(builder.logitBiasToAdd);
 
-        this.logitBiasToRemove = isEmpty(builder.logitBiasToRemove) ? emptyList()
-                : unmodifiableList(builder.logitBiasToRemove);
+        this.logitBiasToRemove = isEmpty(builder.logitBiasToRemove) ? emptySet()
+                : unmodifiableSet(builder.logitBiasToRemove);
 
-        this.stopSequencesToAdd = isEmpty(builder.stopSequencesToAdd) ? emptyList()
-                : unmodifiableList(builder.stopSequencesToAdd);
+        this.stopSequencesToAdd = isEmpty(builder.stopSequencesToAdd) ? emptySet()
+                : unmodifiableSet(builder.stopSequencesToAdd);
 
-        this.stopSequencesToRemove = isEmpty(builder.stopSequencesToRemove) ? emptyList()
-                : unmodifiableList(builder.stopSequencesToRemove);
+        this.stopSequencesToRemove = isEmpty(builder.stopSequencesToRemove) ? emptySet()
+                : unmodifiableSet(builder.stopSequencesToRemove);
 
-        this.usersAllowedToWriteToAdd = isEmpty(builder.usersAllowedToWriteToAdd) ? emptyList()
-                : unmodifiableList(builder.usersAllowedToWriteToAdd);
+        this.usersAllowedToWriteToAdd = isEmpty(builder.usersAllowedToWriteToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToAdd);
 
-        this.usersAllowedToWriteToRemove = isEmpty(builder.usersAllowedToWriteToRemove) ? emptyList()
-                : unmodifiableList(builder.usersAllowedToWriteToRemove);
+        this.usersAllowedToWriteToRemove = isEmpty(builder.usersAllowedToWriteToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToRemove);
 
-        this.usersAllowedToReadToAdd = isEmpty(builder.usersAllowedToReadToAdd) ? emptyList()
-                : unmodifiableList(builder.usersAllowedToReadToAdd);
+        this.usersAllowedToReadToAdd = isEmpty(builder.usersAllowedToReadToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToAdd);
 
-        this.usersAllowedToReadToRemove = isEmpty(builder.usersAllowedToReadToRemove) ? emptyList()
-                : unmodifiableList(builder.usersAllowedToReadToRemove);
+        this.usersAllowedToReadToRemove = isEmpty(builder.usersAllowedToReadToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToRemove);
     }
 
     public static Builder builder() {
@@ -161,11 +161,11 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
         return presencePenalty;
     }
 
-    public List<String> getStopSequencesToAdd() {
+    public Set<String> getStopSequencesToAdd() {
         return stopSequencesToAdd;
     }
 
-    public List<String> getStopSequencesToRemove() {
+    public Set<String> getStopSequencesToRemove() {
         return stopSequencesToRemove;
     }
 
@@ -173,23 +173,23 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
         return logitBiasToAdd;
     }
 
-    public List<String> getLogitBiasToRemove() {
+    public Set<String> getLogitBiasToRemove() {
         return logitBiasToRemove;
     }
 
-    public List<String> getUsersAllowedToWriteToAdd() {
+    public Set<String> getUsersAllowedToWriteToAdd() {
         return usersAllowedToWriteToAdd;
     }
 
-    public List<String> getUsersAllowedToWriteToRemove() {
+    public Set<String> getUsersAllowedToWriteToRemove() {
         return usersAllowedToWriteToRemove;
     }
 
-    public List<String> getUsersAllowedToReadToAdd() {
+    public Set<String> getUsersAllowedToReadToAdd() {
         return usersAllowedToReadToAdd;
     }
 
-    public List<String> getUsersAllowedToReadToRemove() {
+    public Set<String> getUsersAllowedToReadToRemove() {
         return usersAllowedToReadToRemove;
     }
 
@@ -245,13 +245,13 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
         private Double presencePenalty;
         private Integer maxTokenLimit;
         private Map<String, Double> logitBiasToAdd;
-        private List<String> logitBiasToRemove;
-        private List<String> stopSequencesToAdd;
-        private List<String> stopSequencesToRemove;
-        private List<String> usersAllowedToWriteToAdd;
-        private List<String> usersAllowedToWriteToRemove;
-        private List<String> usersAllowedToReadToAdd;
-        private List<String> usersAllowedToReadToRemove;
+        private Set<String> logitBiasToRemove;
+        private Set<String> stopSequencesToAdd;
+        private Set<String> stopSequencesToRemove;
+        private Set<String> usersAllowedToWriteToAdd;
+        private Set<String> usersAllowedToWriteToRemove;
+        private Set<String> usersAllowedToReadToAdd;
+        private Set<String> usersAllowedToReadToRemove;
         private boolean isMultiplayer;
 
         private Builder() {
@@ -362,13 +362,13 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
             return this;
         }
 
-        public Builder stopSequencesToAdd(List<String> stopSequencesToAdd) {
+        public Builder stopSequencesToAdd(Set<String> stopSequencesToAdd) {
 
             this.stopSequencesToAdd = stopSequencesToAdd;
             return this;
         }
 
-        public Builder stopSequencesToRemove(List<String> stopSequencesToRemove) {
+        public Builder stopSequencesToRemove(Set<String> stopSequencesToRemove) {
 
             this.stopSequencesToRemove = stopSequencesToRemove;
             return this;
@@ -380,31 +380,31 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
             return this;
         }
 
-        public Builder logitBiasToRemove(List<String> logitBiasToRemove) {
+        public Builder logitBiasToRemove(Set<String> logitBiasToRemove) {
 
             this.logitBiasToRemove = logitBiasToRemove;
             return this;
         }
 
-        public Builder usersAllowedToWriteToAdd(List<String> usersAllowedToWriteToAdd) {
+        public Builder usersAllowedToWriteToAdd(Set<String> usersAllowedToWriteToAdd) {
 
             this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
             return this;
         }
 
-        public Builder usersAllowedToWriteToRemove(List<String> usersAllowedToWriteToRemove) {
+        public Builder usersAllowedToWriteToRemove(Set<String> usersAllowedToWriteToRemove) {
 
             this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
             return this;
         }
 
-        public Builder usersAllowedToReadToAdd(List<String> usersAllowedToReadToAdd) {
+        public Builder usersAllowedToReadToAdd(Set<String> usersAllowedToReadToAdd) {
 
             this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
             return this;
         }
 
-        public Builder usersAllowedToReadToRemove(List<String> usersAllowedToReadToRemove) {
+        public Builder usersAllowedToReadToRemove(Set<String> usersAllowedToReadToRemove) {
 
             this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
             return this;

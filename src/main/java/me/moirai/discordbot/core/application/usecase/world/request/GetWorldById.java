@@ -6,23 +6,17 @@ import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult
 public final class GetWorldById extends UseCase<GetWorldResult> {
 
     private final String id;
-    private final String requesterDiscordId;
 
-    public GetWorldById(String id, String requesterDiscordId) {
+    public GetWorldById(String id) {
         this.id = id;
-        this.requesterDiscordId = requesterDiscordId;
     }
 
-    public static GetWorldById build(String id, String requesterDiscordId) {
+    public static GetWorldById build(String id) {
 
-        return new GetWorldById(id, requesterDiscordId);
+        return new GetWorldById(id);
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterDiscordId;
     }
 }

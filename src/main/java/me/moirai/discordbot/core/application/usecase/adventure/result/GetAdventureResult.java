@@ -1,11 +1,11 @@
 package me.moirai.discordbot.core.application.usecase.adventure.result;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class GetAdventureResult {
 
@@ -34,9 +34,9 @@ public final class GetAdventureResult {
     private final OffsetDateTime creationDate;
     private final OffsetDateTime lastUpdateDate;
     private final Map<String, Double> logitBias;
-    private final List<String> stopSequences;
-    private final List<String> usersAllowedToRead;
-    private final List<String> usersAllowedToWrite;
+    private final Set<String> stopSequences;
+    private final Set<String> usersAllowedToRead;
+    private final Set<String> usersAllowedToWrite;
 
     private GetAdventureResult(Builder builder) {
 
@@ -65,9 +65,9 @@ public final class GetAdventureResult {
         this.bump = builder.bump;
         this.bumpFrequency = builder.bumpFrequency;
         this.logitBias = unmodifiableMap(builder.logitBias);
-        this.stopSequences = unmodifiableList(builder.stopSequences);
-        this.usersAllowedToRead = unmodifiableList(builder.usersAllowedToRead);
-        this.usersAllowedToWrite = unmodifiableList(builder.usersAllowedToWrite);
+        this.stopSequences = unmodifiableSet(builder.stopSequences);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
+        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
     }
 
     public static Builder builder() {
@@ -138,7 +138,7 @@ public final class GetAdventureResult {
         return adventureStart;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -150,11 +150,11 @@ public final class GetAdventureResult {
         return ownerDiscordId;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
@@ -213,9 +213,9 @@ public final class GetAdventureResult {
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
         private Map<String, Double> logitBias;
-        private List<String> stopSequences;
-        private List<String> usersAllowedToRead;
-        private List<String> usersAllowedToWrite;
+        private Set<String> stopSequences;
+        private Set<String> usersAllowedToRead;
+        private Set<String> usersAllowedToWrite;
 
         private Builder() {
         }
@@ -325,7 +325,7 @@ public final class GetAdventureResult {
             return this;
         }
 
-        public Builder stopSequences(List<String> stopSequences) {
+        public Builder stopSequences(Set<String> stopSequences) {
 
             this.stopSequences = stopSequences;
             return this;
@@ -342,13 +342,13 @@ public final class GetAdventureResult {
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
             this.usersAllowedToRead = usersAllowedToRead;
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
             this.usersAllowedToWrite = usersAllowedToWrite;
             return this;

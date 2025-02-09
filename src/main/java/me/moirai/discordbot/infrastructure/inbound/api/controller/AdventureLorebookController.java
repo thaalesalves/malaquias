@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +57,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#adventureId, 'Adventure')")
     public Mono<SearchLorebookEntriesResponse> search(
             @PathVariable(required = true) String adventureId,
             LorebookSearchParameters searchParameters) {
@@ -78,6 +80,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#adventureId, 'Adventure')")
     public Mono<LorebookEntryResponse> getLorebookEntryById(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId) {
@@ -96,6 +99,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canModify(#adventureId, 'Adventure')")
     public Mono<CreateLorebookEntryResponse> createLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
@@ -112,6 +116,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#adventureId, 'Adventure')")
     public Mono<UpdateLorebookEntryResponse> updateLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId,
@@ -129,6 +134,7 @@ public class AdventureLorebookController extends SecurityContextAware {
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#adventureId, 'Adventure')")
     public Mono<Void> deleteLorebookEntry(
             @PathVariable(required = true) String adventureId,
             @PathVariable(required = true) String entryId) {

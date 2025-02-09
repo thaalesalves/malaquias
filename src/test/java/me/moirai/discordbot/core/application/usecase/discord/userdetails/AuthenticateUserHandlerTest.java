@@ -63,7 +63,7 @@ public class AuthenticateUserHandlerTest {
         String exchangeCode = "12345";
         AuthenticateUser query = AuthenticateUser.build(exchangeCode);
 
-        User user = UserFixture.sample()
+        User user = UserFixture.player()
                 .id("QWEQWE")
                 .build();
 
@@ -105,7 +105,7 @@ public class AuthenticateUserHandlerTest {
         String exchangeCode = "12345";
         AuthenticateUser query = AuthenticateUser.build(exchangeCode);
 
-        User user = UserFixture.sample()
+        User user = UserFixture.player()
                 .id("QWEQWE")
                 .build();
 

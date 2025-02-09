@@ -8,6 +8,7 @@ public final class UserDetailsResult {
     private final String username;
     private final String nickname;
     private final String avatarUrl;
+    private final String role;
     private final OffsetDateTime joinDate;
 
     private UserDetailsResult(Builder builder) {
@@ -15,6 +16,7 @@ public final class UserDetailsResult {
         this.username = builder.username;
         this.nickname = builder.nickname;
         this.avatarUrl = builder.avatarUrl;
+        this.role = builder.role;
         this.joinDate = builder.joinDate;
     }
 
@@ -39,6 +41,10 @@ public final class UserDetailsResult {
         return avatarUrl;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     public OffsetDateTime getJoinDate() {
         return joinDate;
     }
@@ -49,6 +55,7 @@ public final class UserDetailsResult {
         private String username;
         private String nickname;
         private String avatarUrl;
+        private String role;
         private OffsetDateTime joinDate;
 
         public Builder discordId(String discordId) {
@@ -68,6 +75,11 @@ public final class UserDetailsResult {
 
         public Builder avatarUrl(String avatarUrl) {
             this.avatarUrl = avatarUrl;
+            return this;
+        }
+
+        public Builder role(String role) {
+            this.role = role;
             return this;
         }
 

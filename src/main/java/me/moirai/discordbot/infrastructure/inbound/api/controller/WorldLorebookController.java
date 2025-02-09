@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +57,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<SearchLorebookEntriesResponse> search(
             @PathVariable(required = true) String worldId,
             LorebookSearchParameters searchParameters) {
@@ -78,6 +80,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<LorebookEntryResponse> getLorebookEntryById(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId) {
@@ -96,6 +99,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<CreateLorebookEntryResponse> createLorebookEntry(
             @PathVariable(required = true) String worldId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
@@ -109,6 +113,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<UpdateLorebookEntryResponse> updateLorebookEntry(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId,
@@ -125,6 +130,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<Void> deleteLorebookEntry(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId) {

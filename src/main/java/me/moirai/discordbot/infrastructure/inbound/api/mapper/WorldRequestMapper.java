@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntry;
-import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreateWorldRequest;
 import me.moirai.discordbot.infrastructure.inbound.api.request.UpdateWorldRequest;
@@ -47,12 +46,6 @@ public class WorldRequestMapper {
                 .usersAllowedToWriteToRemove(request.getUsersAllowedToWriteToRemove())
                 .usersAllowedToReadToAdd(request.getUsersAllowedToReadToAdd())
                 .usersAllowedToReadToRemove(request.getUsersAllowedToReadToRemove())
-                .requesterDiscordId(requesterDiscordId)
                 .build();
-    }
-
-    public DeleteWorld toCommand(String worldId, String requesterDiscordId) {
-
-        return DeleteWorld.build(worldId, requesterDiscordId);
     }
 }

@@ -2,6 +2,7 @@ package me.moirai.discordbot.core.application.usecase.discord.userdetails;
 
 import static io.micrometer.common.util.StringUtils.isBlank;
 import static java.lang.String.format;
+import static me.moirai.discordbot.core.domain.userdetails.Role.PLAYER;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -89,6 +90,7 @@ public class AuthenticateUserHandler extends AbstractUseCaseHandler<Authenticate
         return repository.save(User.builder()
                 .discordId(discordUserDetails.getId())
                 .creatorDiscordId(discordUserDetails.getId())
+                .role(PLAYER)
                 .build());
     }
 

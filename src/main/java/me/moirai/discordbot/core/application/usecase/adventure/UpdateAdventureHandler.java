@@ -7,9 +7,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.usecase.adventure.request.UpdateAdventure;
@@ -22,8 +22,8 @@ import me.moirai.discordbot.core.domain.adventure.Moderation;
 @UseCaseHandler
 public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventure, UpdateAdventureResult> {
 
-    private static final String USER_ACCESS_DENIED = "User does not have permission to modify this adventure";
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
+    private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
     private final AdventureDomainRepository repository;
 
@@ -32,14 +32,18 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
     }
 
     @Override
+    public void validate(UpdateAdventure command) {
+
+        if (StringUtils.isBlank(command.getId())) {
+            throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
+        }
+    }
+
+    @Override
     public UpdateAdventureResult execute(UpdateAdventure command) {
 
         Adventure adventure = repository.findById(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
-
-        if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(USER_ACCESS_DENIED);
-        }
 
         if (isNotBlank(command.getName())) {
             adventure.updateName(command.getName());
@@ -134,13 +138,9 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         }
 
         CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToAdd())
-                .stream()
-                .filter(userId -> !adventure.canUserRead(userId))
                 .forEach(adventure::addReaderUser);
 
         CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToAdd())
-                .stream()
-                .filter(userId -> !adventure.canUserWrite(userId))
                 .forEach(adventure::addWriterUser);
 
         CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToRemove())
@@ -155,7 +155,6 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
         MapUtils.emptyIfNull(command.getLogitBiasToAdd())
                 .entrySet()
                 .stream()
-                .filter(entry -> !adventure.getModelConfiguration().getLogitBias().containsKey(entry.getKey()))
                 .forEach(entry -> adventure.addLogitBias(entry.getKey(), entry.getValue()));
 
         CollectionUtils.emptyIfNull(command.getLogitBiasToRemove())
@@ -166,8 +165,6 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
 
         CollectionUtils.emptyIfNull(command.getStopSequencesToAdd())
                 .stream()
-                .filter(stopSequence -> !adventure.getModelConfiguration()
-                        .getStopSequences().contains(stopSequence))
                 .forEach(adventure::addStopSequence);
 
         CollectionUtils.emptyIfNull(command.getStopSequencesToRemove())

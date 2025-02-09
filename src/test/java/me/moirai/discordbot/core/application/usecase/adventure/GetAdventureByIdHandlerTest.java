@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.GetAdventureById;
@@ -31,6 +29,17 @@ public class GetAdventureByIdHandlerTest {
 
     @InjectMocks
     private GetAdventureByIdHandler handler;
+
+    @Test
+    public void errorWhenIdIsNull() {
+
+        // Given
+        String id = null;
+        GetAdventureById query = GetAdventureById.build(id);
+
+        // Then
+        assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
+    }
 
     @Test
     public void errorWhenQueryIsNull() {
@@ -55,7 +64,7 @@ public class GetAdventureByIdHandlerTest {
                         .build())
                 .build();
 
-        GetAdventureById query = GetAdventureById.build(id, requesterId);
+        GetAdventureById query = GetAdventureById.build(id);
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
 
@@ -99,35 +108,11 @@ public class GetAdventureByIdHandlerTest {
     }
 
     @Test
-    public void findAdventure_whenInvalidPermission_thenThrowException() {
-
-        // Given
-        String id = "ADVID";
-        String requesterId = "RQSTRID";
-        GetAdventureById query = GetAdventureById.build(id, requesterId);
-
-        Adventure persona = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("ANTHRUSR")
-                        .usersAllowedToRead(Collections.emptyList())
-                        .build())
-                .build();
-
-        when(queryRepository.findById(anyString())).thenReturn(Optional.of(persona));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));
-    }
-
-    @Test
     public void findAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
         String id = "ADVID";
-        String requesterId = "RQSTRID";
-        GetAdventureById query = GetAdventureById.build(id, requesterId);
+        GetAdventureById query = GetAdventureById.build(id);
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.empty());
 
@@ -141,7 +126,7 @@ public class GetAdventureByIdHandlerTest {
         // Given
         String id = "ADVID";
         String requesterId = "RQSTRID";
-        GetAdventureById query = GetAdventureById.build(id, requesterId);
+        GetAdventureById query = GetAdventureById.build(id);
 
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
                 .id(id)

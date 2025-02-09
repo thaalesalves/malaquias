@@ -1,6 +1,7 @@
 package me.moirai.discordbot.core.application.usecase.completion;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toCollection;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.ASSISTANT;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.SYSTEM;
 import static me.moirai.discordbot.core.application.model.request.ChatMessage.Role.USER;
@@ -35,10 +36,10 @@ import me.moirai.discordbot.core.application.usecase.discord.slashcommands.Token
 import me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaService;
+import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldService;
+import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.AiModelRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
@@ -47,8 +48,12 @@ import reactor.core.publisher.Mono;
 @UseCaseHandler
 public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mono<CompleteTextResult>> {
 
-    private final PersonaService personaService;
-    private final WorldService worldService;
+    private static final String USER_NOT_FOUND = "Discord user not found";
+    private static final String PERSONA_NOT_FOUND = "Persona was not found";
+    private static final String WORLD_NOT_FOUND = "World was not found";
+
+    private final PersonaDomainRepository personaRepository;
+    private final WorldDomainRepository worldRepository;
     private final LorebookEnrichmentHelper lorebookEnrichmentHelper;
     private final TextModerationPort textModerationPort;
     private final TextCompletionPort textCompletionPort;
@@ -56,16 +61,16 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     private final TokenizerPort tokenizerPort;
 
     public CompleteTextHandler(
-            PersonaService personaService,
-            WorldService worldService,
+            PersonaDomainRepository personaRepository,
+            WorldDomainRepository worldRepository,
             LorebookEnrichmentHelper lorebookEnrichmentHelper,
             TextModerationPort textModerationPort,
             TextCompletionPort textCompletionPort,
             DiscordUserDetailsPort discordUserDetailsPort,
             TokenizerPort tokenizerPort) {
 
-        this.personaService = personaService;
-        this.worldService = worldService;
+        this.personaRepository = personaRepository;
+        this.worldRepository = worldRepository;
         this.lorebookEnrichmentHelper = lorebookEnrichmentHelper;
         this.textModerationPort = textModerationPort;
         this.textCompletionPort = textCompletionPort;
@@ -77,14 +82,19 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     public Mono<CompleteTextResult> execute(CompleteText useCase) {
 
         ArtificialIntelligenceModel model = fromString(useCase.getAiModel());
-        Persona persona = personaService.getById(useCase.getPersonaId());
-        World world = worldService.getWorldById(useCase.getWorldId());
+
+        Persona persona = personaRepository.findById(useCase.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+
+        World world = worldRepository.findById(useCase.getWorldId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+
         DiscordUserDetails author = discordUserDetailsPort.getUserById(useCase.getAuthorDiscordId())
-                .orElseThrow(() -> new AssetNotFoundException("User not found"));
+                .orElseThrow(() -> new AssetNotFoundException(USER_NOT_FOUND));
 
         List<ChatMessage> context = useCase.getMessages().stream()
                 .map(this::mapMessage)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(toCollection(ArrayList::new));
 
         ChatMessage personality = ChatMessage.build(SYSTEM, persona.getPersonality());
         ChatMessage lorebook = extractLorebookEntriesFromHistory(useCase, world, author, model);

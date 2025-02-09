@@ -42,21 +42,22 @@ public class GetUserDetailsByDiscordIdHandler extends AbstractUseCaseHandler<Get
     @Override
     public UserDetailsResult execute(GetUserDetailsByDiscordId useCase) {
 
-        DiscordUserDetails discordUserDetails = discordUserDetailsPort.getUserById(useCase.getDiscordUserId())
+        DiscordUserDetails discordDetails = discordUserDetailsPort.getUserById(useCase.getDiscordUserId())
                 .orElseThrow(() -> new DiscordApiException(NOT_FOUND, DISCORD_USER_DOES_NOT_EXIST));
 
-        User discordUser = repository.findByDiscordId(useCase.getDiscordUserId())
+        User moiraiUser = repository.findByDiscordId(useCase.getDiscordUserId())
                 .orElseThrow(() -> new AssetNotFoundException(USER_NOT_REGISTERED_IN_MOIRAI));
 
-        String nickname = isBlank(discordUserDetails.getNickname()) ? discordUserDetails.getUsername()
-                : discordUserDetails.getNickname();
+        String nickname = isBlank(discordDetails.getNickname()) ? discordDetails.getUsername()
+                : discordDetails.getNickname();
 
         return UserDetailsResult.builder()
-                .discordId(discordUser.getDiscordId())
+                .discordId(moiraiUser.getDiscordId())
                 .nickname(nickname)
-                .username(discordUserDetails.getUsername())
-                .avatarUrl(discordUserDetails.getAvatarUrl())
-                .joinDate(discordUser.getCreationDate())
+                .username(discordDetails.getUsername())
+                .avatarUrl(discordDetails.getAvatarUrl())
+                .role(moiraiUser.getRole().name())
+                .joinDate(moiraiUser.getCreationDate())
                 .build();
     }
 }

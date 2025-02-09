@@ -1,13 +1,15 @@
 package me.moirai.discordbot.core.application.helper;
 
+import static java.lang.String.format;
 import static me.moirai.discordbot.common.util.DefaultStringProcessors.replacePersonaNamePlaceholderWith;
 
 import java.util.Map;
 
 import me.moirai.discordbot.common.annotation.Helper;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.util.StringProcessor;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaService;
+import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import reactor.core.publisher.Mono;
@@ -18,16 +20,20 @@ public class PersonaEnrichmentHelperImpl implements PersonaEnrichmentHelper {
     private static final String PERSONA_DESCRIPTION = "[ DEBUG MODE ON: You are an actor interpreting the role of {name}. {name}'s persona is as follows, and you are to maintain character during this conversation: %s ]";
     private static final String PERSONA = "persona";
     private static final String PERSONA_NAME = "personaName";
+    private static final String PERSONA_NOT_FOUND = "Persona not found";
+    private static final String PERSONA_IS_TOO_BIG_FOR_CONTEXT = "Persona is too big to fit in context";
 
     private final TokenizerPort tokenizerPort;
-    private final PersonaService personaService;
+    private final PersonaDomainRepository personaRepository;
     private final ChatMessageHelper chatMessageService;
 
-    public PersonaEnrichmentHelperImpl(TokenizerPort tokenizerPort, PersonaService personaService,
+    public PersonaEnrichmentHelperImpl(
+            TokenizerPort tokenizerPort,
+            PersonaDomainRepository personaRepository,
             ChatMessageHelper chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;
-        this.personaService = personaService;
+        this.personaRepository = personaRepository;
         this.chatMessageService = chatMessageService;
     }
 
@@ -38,7 +44,8 @@ public class PersonaEnrichmentHelperImpl implements PersonaEnrichmentHelper {
         int totalTokens = modelConfiguration.getAiModel().getHardTokenLimit();
         int reservedTokensForPersona = (int) Math.floor(totalTokens * 0.20);
 
-        return Mono.just(personaService.getById(personaId))
+        return Mono.just(personaRepository.findById(personaId)
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND)))
                 .map(persona -> addPersonaToContext(persona, context, reservedTokensForPersona))
                 .map(ctx -> chatMessageService.addMessagesToContext(ctx, reservedTokensForPersona));
     }
@@ -48,12 +55,12 @@ public class PersonaEnrichmentHelperImpl implements PersonaEnrichmentHelper {
 
         StringProcessor processor = new StringProcessor();
         processor.addRule(replacePersonaNamePlaceholderWith(persona.getName()));
-        String formattedPersona = processor.process(String.format(PERSONA_DESCRIPTION, persona.getPersonality()));
+        String formattedPersona = processor.process(format(PERSONA_DESCRIPTION, persona.getPersonality()));
 
         int tokensInPersona = tokenizerPort.getTokenCountFrom(formattedPersona);
 
         if (tokensInPersona > reservedTokensForPersona) {
-            throw new IllegalStateException("Persona is too big to fit in context");
+            throw new IllegalStateException(PERSONA_IS_TOO_BIG_FOR_CONTEXT);
         }
 
         context.put(PERSONA_NAME, persona.getName());

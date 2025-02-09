@@ -1,7 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.persona;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
@@ -13,7 +14,7 @@ import me.moirai.discordbot.core.domain.persona.Persona;
 public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById, GetPersonaResult> {
 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
-    private static final String PERMISSION_VIEW_DENIED = "User does not have permission to view this persona";
+    private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
 
     private final PersonaQueryRepository queryRepository;
 
@@ -22,14 +23,18 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     }
 
     @Override
+    public void validate(GetPersonaById request) {
+
+        if (isBlank(request.getId())) {
+            throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
+        }
+    }
+
+    @Override
     public GetPersonaResult execute(GetPersonaById query) {
 
         Persona persona = queryRepository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
-
-        if (!persona.canUserRead(query.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(PERMISSION_VIEW_DENIED);
-        }
 
         return mapResult(persona);
     }

@@ -1,11 +1,11 @@
 package me.moirai.discordbot.core.application.usecase.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -14,11 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldById;
 import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult;
-import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 
@@ -45,10 +44,9 @@ public class GetWorldByIdHandlerTest {
     public void getWorldById() {
 
         // Given
-        String requesterDiscordId = "586678721356875";
         String id = "HAUDHUAHD";
         World world = WorldFixture.privateWorld().id(id).build();
-        GetWorldById query = GetWorldById.build(id, requesterDiscordId);
+        GetWorldById query = GetWorldById.build(id);
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
 
@@ -61,25 +59,28 @@ public class GetWorldByIdHandlerTest {
     }
 
     @Test
-    public void findWorld_whenNotEnoughPermission_thenThrowException() {
+    public void updateWorld_whenIdIsNull_thenExceptionIsThrown() {
+
+        // Given
+        String id = null;
+        GetWorldById command = GetWorldById.build(id);
+
+        // Then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
         String id = "WRLDID";
-        String requesterId = "RQSTRID";
-        GetWorldById query = GetWorldById.build(id, requesterId);
+        GetWorldById command = GetWorldById.build(id);
 
-        World world = WorldFixture.privateWorld()
-                .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("ANTHRUSR")
-                        .usersAllowedToRead(Collections.emptyList())
-                        .build())
-                .build();
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));
+        assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
     }
 }

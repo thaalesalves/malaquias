@@ -18,7 +18,6 @@ import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntry;
-import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorldLorebookEntry;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldLorebookEntryById;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorldLorebookEntry;
@@ -50,26 +49,6 @@ public class WorldServiceImpl implements WorldService {
         this.moderationPort = moderationPort;
         this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
-    }
-
-    @Override
-    public World getWorldById(String worldId) {
-
-        return repository.findById(worldId)
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-    }
-
-    @Override
-    public void deleteWorld(DeleteWorld command) {
-
-        World world = repository.findById(command.getId())
-                .orElseThrow(() -> new AssetNotFoundException("World to be deleted was not found"));
-
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD);
-        }
-
-        repository.deleteById(command.getId());
     }
 
     @Override

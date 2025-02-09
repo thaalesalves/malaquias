@@ -1,8 +1,13 @@
 package me.moirai.discordbot.core.application.usecase.completion;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.util.Lists.list;
+import static org.assertj.core.util.Maps.newHashMap;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -14,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AIModelNotSupportedException;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.helper.LorebookEnrichmentHelper;
 import me.moirai.discordbot.core.application.model.result.TextGenerationResult;
@@ -31,12 +37,12 @@ import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetailsF
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResult;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResultFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
-import me.moirai.discordbot.core.domain.persona.PersonaService;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.core.domain.world.World;
+import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
-import me.moirai.discordbot.core.domain.world.WorldService;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,10 +50,10 @@ import reactor.test.StepVerifier;
 public class CompleteTextHandlerTest {
 
     @Mock
-    private PersonaService personaService;
+    private PersonaDomainRepository personaRepository;
 
     @Mock
-    private WorldService worldService;
+    private WorldDomainRepository worldRepository;
 
     @Mock
     private LorebookEnrichmentHelper lorebookEnrichmentHelper;
@@ -79,12 +85,14 @@ public class CompleteTextHandlerTest {
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withoutFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
         when(tokenizerPort.tokenize(anyString())).thenReturn(tokenizeResult);
         when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
+        when(lorebookEnrichmentHelper.enrichContextWithLorebook(anyList(), anyString(), any()))
+                .thenReturn(newHashMap("lorebook", "Some lorebook definition"));
 
         // When
         Mono<CompleteTextResult> result = handler.handle(command);
@@ -100,7 +108,10 @@ public class CompleteTextHandlerTest {
     public void whenFlaggedContent_andModerationIsDisabled_thenResultIsReturned() {
 
         // Given
-        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+        CompleteText command = CompleteTextFixture.withModerationDisabled()
+                .messages(list(CompleteTextFixture.botMessage().build()))
+                .build();
+
         Persona persona = PersonaFixture.privatePersona().build();
         World world = WorldFixture.privateWorld().build();
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
@@ -108,8 +119,8 @@ public class CompleteTextHandlerTest {
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
         when(tokenizerPort.tokenize(anyString())).thenReturn(tokenizeResult);
@@ -137,8 +148,8 @@ public class CompleteTextHandlerTest {
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withoutFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
         when(tokenizerPort.tokenize(anyString())).thenReturn(tokenizeResult);
@@ -166,8 +177,8 @@ public class CompleteTextHandlerTest {
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withoutFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
         when(tokenizerPort.tokenize(anyString())).thenReturn(tokenizeResult);
@@ -193,8 +204,8 @@ public class CompleteTextHandlerTest {
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
 
@@ -216,8 +227,8 @@ public class CompleteTextHandlerTest {
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textModerationPort.moderate(anyString())).thenReturn(Mono.just(textModerationResult));
 
@@ -241,8 +252,8 @@ public class CompleteTextHandlerTest {
         TextModerationResult badModerationResult = TextModerationResultFixture.withFlags().build();
         TextModerationResult goodModerationResult = TextModerationResultFixture.withoutFlags().build();
 
-        when(personaService.getById(anyString())).thenReturn(persona);
-        when(worldService.getWorldById(anyString())).thenReturn(world);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.of(userDetails));
         when(textCompletionPort.generateTextFrom(any())).thenReturn(Mono.just(textGenerationResult));
         when(textModerationPort.moderate(anyString()))
@@ -268,5 +279,47 @@ public class CompleteTextHandlerTest {
         // Then
         assertThrows(AIModelNotSupportedException.class,
                 () -> handler.handle(command));
+    }
+
+    @Test
+    public void whenPersonaNotFound_thenThrowException() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void whenWorldNotFound_thenThrowException() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(mock(Persona.class)));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void whenDiscordUserNotFound_thenThrowException() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(mock(Persona.class)));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(mock(World.class)));
+        when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
     }
 }

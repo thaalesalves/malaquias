@@ -1,12 +1,9 @@
 package me.moirai.discordbot.core.domain.persona;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.model.result.TextModerationResultFixture;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
@@ -76,39 +72,6 @@ public class PersonaServiceImplTest {
                     assertThat(createdPersona.getVisibility()).isEqualTo(expectedPersona.getVisibility());
                 })
                 .verifyComplete();
-    }
-
-    @Test
-    public void findPersona_whenValidId_thenReturnPersona() {
-
-        // Given
-        String id = "PRSNID";
-
-        Persona persona = PersonaFixture.privatePersona()
-                .id(id)
-                .name("New name")
-                .build();
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
-
-        // When
-        Persona result = service.getById(id);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo(persona.getName());
-    }
-
-    @Test
-    public void findPersona_whenPersonaNotFound_thenThrowException() {
-
-        // Given
-        String id = "PRSNID";
-
-        when(repository.findById(anyString())).thenReturn(Optional.empty());
-
-        // Then
-        assertThrows(AssetNotFoundException.class, () -> service.getById(id));
     }
 
     @Test

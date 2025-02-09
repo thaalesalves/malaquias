@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,18 +94,20 @@ public class AdventureController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#adventureId, 'Adventure')")
     public Mono<AdventureResponse> getAdventureById(
             @PathVariable(required = true) String adventureId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetAdventureById query = GetAdventureById.build(adventureId, authenticatedUser.getId());
+            GetAdventureById query = GetAdventureById.build(adventureId);
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<CreateAdventureResponse> createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
@@ -117,6 +120,7 @@ public class AdventureController extends SecurityContextAware {
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#adventureId, 'Adventure') && canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<UpdateAdventureResponse> updateAdventure(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
@@ -130,6 +134,7 @@ public class AdventureController extends SecurityContextAware {
 
     @DeleteMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#adventureId, 'Adventure')")
     public Mono<Void> deleteAdventure(
             @PathVariable(required = true) String adventureId) {
 
@@ -144,6 +149,7 @@ public class AdventureController extends SecurityContextAware {
 
     @PostMapping("/favorite")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.assetId, 'Adventure')")
     public Mono<Void> addFavoriteAdventure(@RequestBody FavoriteRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {

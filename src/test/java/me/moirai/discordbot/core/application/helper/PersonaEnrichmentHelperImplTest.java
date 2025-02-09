@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
-import me.moirai.discordbot.core.domain.persona.PersonaService;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequestFixture;
@@ -33,7 +34,7 @@ public class PersonaEnrichmentHelperImplTest {
     private TokenizerPort tokenizerPort;
 
     @Mock
-    private PersonaService personaService;
+    private PersonaDomainRepository personaRepository;
 
     @Mock
     private ChatMessageHelper chatMessageService;
@@ -53,7 +54,7 @@ public class PersonaEnrichmentHelperImplTest {
                 "[ DEBUG MODE ON: You are an actor interpreting the role of %s. %s's persona is as follows, and you are to maintain character during this conversation: %s ]",
                 persona.getName(), persona.getName(), persona.getPersonality());
 
-        when(personaService.getById(anyString())).thenReturn(persona);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString())).thenReturn(100);
 
         when(chatMessageService.addMessagesToContext(anyMap(), anyInt()))
@@ -83,7 +84,7 @@ public class PersonaEnrichmentHelperImplTest {
                 "[ DEBUG MODE ON: You are an actor interpreting the role of %s. %s's persona is as follows, and you are to maintain character during this conversation: %s ]",
                 persona.getName(), persona.getName(), persona.getPersonality());
 
-        when(personaService.getById(anyString())).thenReturn(persona);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(100)
                 .thenReturn(100)
@@ -112,7 +113,7 @@ public class PersonaEnrichmentHelperImplTest {
         ModelConfigurationRequest modelConfiguration = ModelConfigurationRequestFixture.gpt4Mini().build();
         Map<String, Object> context = contextWithSummaryAndMessages(5);
 
-        when(personaService.getById(anyString())).thenReturn(persona);
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
         when(tokenizerPort.getTokenCountFrom(anyString()))
                 .thenReturn(100000)
                 .thenReturn(100);

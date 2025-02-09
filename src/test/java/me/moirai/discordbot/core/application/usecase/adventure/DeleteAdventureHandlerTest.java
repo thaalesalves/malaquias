@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.adventure.request.DeleteAdventure;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
@@ -55,28 +54,6 @@ public class DeleteAdventureHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void deleteAdventure_whenInvalidPermission_thenThrowException() {
-
-        // Given
-        String id = "ADVID";
-        String requesterId = "RQSTRID";
-        DeleteAdventure command = DeleteAdventure.build(id, requesterId);
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("ANTHRUSR")
-                        .build())
-                .build();
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 
     @Test

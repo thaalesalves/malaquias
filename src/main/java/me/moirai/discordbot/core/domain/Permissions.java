@@ -1,17 +1,17 @@
 package me.moirai.discordbot.core.domain;
 
 import static java.util.Collections.disjoint;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.Formula;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
-import me.moirai.discordbot.common.dbutil.StringListConverter;
+import me.moirai.discordbot.common.dbutil.StringSetConverter;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 
 @Embeddable
@@ -21,15 +21,15 @@ public final class Permissions {
     private String ownerDiscordId;
 
     @Column(name = "discord_users_allowed_to_read")
-    @Convert(converter = StringListConverter.class)
-    private List<String> usersAllowedToRead;
+    @Convert(converter = StringSetConverter.class)
+    private Set<String> usersAllowedToRead;
 
     @Formula(value = "discord_users_allowed_to_read")
     private String usersAllowedToReadString;
 
     @Column(name = "discord_users_allowed_to_write")
-    @Convert(converter = StringListConverter.class)
-    private List<String> usersAllowedToWrite;
+    @Convert(converter = StringSetConverter.class)
+    private Set<String> usersAllowedToWrite;
 
     @Formula(value = "discord_users_allowed_to_write")
     private String usersAllowedToWriteString;
@@ -37,8 +37,8 @@ public final class Permissions {
     private Permissions(Builder builder) {
 
         this.ownerDiscordId = builder.ownerDiscordId;
-        this.usersAllowedToRead = unmodifiableList(builder.usersAllowedToRead);
-        this.usersAllowedToWrite = unmodifiableList(builder.usersAllowedToWrite);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
+        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
     }
 
     protected Permissions() {
@@ -61,11 +61,11 @@ public final class Permissions {
         return ownerDiscordId;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
@@ -86,7 +86,7 @@ public final class Permissions {
     public Permissions allowUserToWrite(String userDiscordId, String currentOwnerDiscordId) {
 
         validateOwnership(currentOwnerDiscordId);
-        List<String> usersAllowedToWrite = new ArrayList<>(this.usersAllowedToWrite);
+        Set<String> usersAllowedToWrite = new HashSet<>(this.usersAllowedToWrite);
         usersAllowedToWrite.add(userDiscordId);
 
         return cloneFrom(this).usersAllowedToWrite(usersAllowedToWrite).build();
@@ -95,7 +95,7 @@ public final class Permissions {
     public Permissions disallowUserToWrite(String userDiscordId, String currentOwnerDiscordId) {
 
         validateOwnership(currentOwnerDiscordId);
-        List<String> usersAllowedToWrite = new ArrayList<>(this.usersAllowedToWrite);
+        Set<String> usersAllowedToWrite = new HashSet<>(this.usersAllowedToWrite);
         usersAllowedToWrite.remove(userDiscordId);
 
         return cloneFrom(this).usersAllowedToWrite(usersAllowedToWrite).build();
@@ -104,7 +104,7 @@ public final class Permissions {
     public Permissions allowUserToRead(String userDiscordId, String currentOwnerDiscordId) {
 
         validateOwnership(currentOwnerDiscordId);
-        List<String> usersAllowedToRead = new ArrayList<>(this.usersAllowedToRead);
+        Set<String> usersAllowedToRead = new HashSet<>(this.usersAllowedToRead);
         usersAllowedToRead.add(userDiscordId);
 
         return cloneFrom(this).usersAllowedToRead(usersAllowedToRead).build();
@@ -113,7 +113,7 @@ public final class Permissions {
     public Permissions disallowUserToRead(String userDiscordId, String currentOwnerDiscordId) {
 
         validateOwnership(currentOwnerDiscordId);
-        List<String> usersAllowedToRead = new ArrayList<>(this.usersAllowedToRead);
+        Set<String> usersAllowedToRead = new HashSet<>(this.usersAllowedToRead);
         usersAllowedToRead.remove(userDiscordId);
 
         return cloneFrom(this).usersAllowedToRead(usersAllowedToRead).build();
@@ -141,14 +141,14 @@ public final class Permissions {
         return this.usersAllowedToRead.contains(discordUserId) || isAllowedToWrite(discordUserId);
     }
 
-    public boolean areAllowedToWrite(List<String> discordUserIds) {
+    public boolean areAllowedToWrite(Set<String> discordUserIds) {
 
         boolean isOwnerFound = discordUserIds.stream().anyMatch(this::isOwner);
 
         return !disjoint(this.usersAllowedToWrite, discordUserIds) || isOwnerFound;
     }
 
-    public boolean areAllowedToRead(List<String> discordUserIds) {
+    public boolean areAllowedToRead(Set<String> discordUserIds) {
 
         return !disjoint(this.usersAllowedToRead, discordUserIds) || areAllowedToWrite(discordUserIds);
     }
@@ -156,8 +156,8 @@ public final class Permissions {
     public static final class Builder {
 
         private String ownerDiscordId;
-        private List<String> usersAllowedToRead = new ArrayList<>();
-        private List<String> usersAllowedToWrite = new ArrayList<>();
+        private Set<String> usersAllowedToRead = new HashSet<>();
+        private Set<String> usersAllowedToWrite = new HashSet<>();
 
         private Builder() {
         }
@@ -168,7 +168,7 @@ public final class Permissions {
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
             if (usersAllowedToRead != null) {
                 this.usersAllowedToRead = usersAllowedToRead;
@@ -177,7 +177,7 @@ public final class Permissions {
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
             if (usersAllowedToWrite != null) {
                 this.usersAllowedToWrite = usersAllowedToWrite;

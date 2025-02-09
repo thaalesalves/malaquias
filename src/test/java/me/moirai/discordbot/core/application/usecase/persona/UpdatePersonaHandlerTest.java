@@ -1,18 +1,21 @@
 package me.moirai.discordbot.core.application.usecase.persona;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Sets.set;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.util.Lists;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.model.result.TextModerationResultFixture;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
@@ -21,15 +24,11 @@ import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
-import me.moirai.discordbot.core.domain.persona.PersonaServiceImpl;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdatePersonaHandlerTest {
-
-    @Mock
-    private PersonaServiceImpl service;
 
     @Mock
     private PersonaDomainRepository repository;
@@ -39,6 +38,34 @@ public class UpdatePersonaHandlerTest {
 
     @InjectMocks
     private UpdatePersonaHandler handler;
+
+    @Test
+    public void updatePersona_whenPersonaNotFound_thenThrowException() {
+
+        // Given
+        String id = "PRSNID";
+        UpdatePersona command = UpdatePersona.builder()
+                .id(id)
+                .name("MoirAI")
+                .personality("I am a Discord chatbot")
+                .visibility("PUBLIC")
+                .usersAllowedToReadToAdd(set("123456"))
+                .usersAllowedToWriteToAdd(set("123456"))
+                .usersAllowedToReadToRemove(set("123456"))
+                .usersAllowedToWriteToRemove(set("123456"))
+                .build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
+        when(moderationPort.moderate(anyString()))
+                .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
+
+        // Then
+        StepVerifier.create(handler.handle(command))
+                .verifyErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(AssetNotFoundException.class);
+                    assertThat(error).message().isEqualTo("Persona was not found");
+                });
+    }
 
     @Test
     public void updatePersona_whenValidData_thenPersonaIsUpdated() {
@@ -51,12 +78,10 @@ public class UpdatePersonaHandlerTest {
                 .name("MoirAI")
                 .personality("I am a Discord chatbot")
                 .visibility("PUBLIC")
-                .requesterDiscordId("CRTID")
-                .requesterDiscordId(requesterId)
-                .usersAllowedToReadToAdd(Lists.list("123456"))
-                .usersAllowedToWriteToAdd(Lists.list("123456"))
-                .usersAllowedToReadToRemove(Lists.list("123456"))
-                .usersAllowedToWriteToRemove(Lists.list("123456"))
+                .usersAllowedToReadToAdd(set("123456"))
+                .usersAllowedToWriteToAdd(set("123456"))
+                .usersAllowedToReadToRemove(set("123456"))
+                .usersAllowedToWriteToRemove(set("123456"))
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -74,7 +99,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -98,12 +123,10 @@ public class UpdatePersonaHandlerTest {
                 .name("MoirAI")
                 .personality("I am a Discord chatbot")
                 .visibility("PUBLIC")
-                .requesterDiscordId("CRTID")
-                .requesterDiscordId(requesterId)
-                .usersAllowedToReadToAdd(Lists.list("123456"))
+                .usersAllowedToReadToAdd(set("123456"))
                 .usersAllowedToWriteToAdd(null)
-                .usersAllowedToReadToRemove(Lists.list("4567"))
-                .usersAllowedToWriteToRemove(Lists.list("4567"))
+                .usersAllowedToReadToRemove(set("4567"))
+                .usersAllowedToWriteToRemove(set("4567"))
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -121,7 +144,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -145,12 +168,10 @@ public class UpdatePersonaHandlerTest {
                 .name("MoirAI")
                 .personality("I am a Discord chatbot")
                 .visibility("PUBLIC")
-                .requesterDiscordId("CRTID")
-                .requesterDiscordId(requesterId)
                 .usersAllowedToReadToAdd(null)
-                .usersAllowedToWriteToAdd(Lists.list("123456"))
-                .usersAllowedToReadToRemove(Lists.list("4567"))
-                .usersAllowedToWriteToRemove(Lists.list("4567"))
+                .usersAllowedToWriteToAdd(set("123456"))
+                .usersAllowedToReadToRemove(set("4567"))
+                .usersAllowedToWriteToRemove(set("4567"))
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -168,7 +189,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -192,12 +213,10 @@ public class UpdatePersonaHandlerTest {
                 .name("MoirAI")
                 .personality("I am a Discord chatbot")
                 .visibility("PUBLIC")
-                .requesterDiscordId("CRTID")
-                .requesterDiscordId(requesterId)
-                .usersAllowedToReadToAdd(Lists.list("123456"))
-                .usersAllowedToWriteToAdd(Lists.list("123456"))
+                .usersAllowedToReadToAdd(set("123456"))
+                .usersAllowedToWriteToAdd(set("123456"))
                 .usersAllowedToReadToRemove(null)
-                .usersAllowedToWriteToRemove(Lists.list("4567"))
+                .usersAllowedToWriteToRemove(set("4567"))
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -215,7 +234,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -239,11 +258,9 @@ public class UpdatePersonaHandlerTest {
                 .name("MoirAI")
                 .personality("I am a Discord chatbot")
                 .visibility("PUBLIC")
-                .requesterDiscordId("CRTID")
-                .requesterDiscordId(requesterId)
-                .usersAllowedToReadToAdd(Lists.list("123456"))
-                .usersAllowedToWriteToAdd(Lists.list("123456"))
-                .usersAllowedToReadToRemove(Lists.list("4567"))
+                .usersAllowedToReadToAdd(set("123456"))
+                .usersAllowedToWriteToAdd(set("123456"))
+                .usersAllowedToReadToRemove(set("4567"))
                 .usersAllowedToWriteToRemove(null)
                 .build();
 
@@ -262,7 +279,7 @@ public class UpdatePersonaHandlerTest {
                 .name("New name")
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
         when(moderationPort.moderate(anyString()))
                 .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
@@ -283,7 +300,6 @@ public class UpdatePersonaHandlerTest {
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
-                .requesterDiscordId(requesterId)
                 .visibility("private")
                 .build();
 
@@ -297,7 +313,7 @@ public class UpdatePersonaHandlerTest {
                 .id(id)
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
 
         // Then
@@ -316,7 +332,6 @@ public class UpdatePersonaHandlerTest {
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
-                .requesterDiscordId(requesterId)
                 .visibility("invalid")
                 .build();
 
@@ -330,7 +345,7 @@ public class UpdatePersonaHandlerTest {
                 .id(id)
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(expectedUpdatedPersona);
 
         // Then
@@ -346,14 +361,11 @@ public class UpdatePersonaHandlerTest {
 
         // Given
         String id = "PRSNID";
-        String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
                 .name("MoirAI")
                 .personality("I am a Discord chatbot")
                 .visibility("PUBLIC")
-                .requesterDiscordId("CRTID")
-                .requesterDiscordId(requesterId)
                 .build();
 
         when(moderationPort.moderate(anyString()))
@@ -372,7 +384,6 @@ public class UpdatePersonaHandlerTest {
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
-                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -381,7 +392,7 @@ public class UpdatePersonaHandlerTest {
                         .build())
                 .build();
 
-        when(service.getById(anyString())).thenReturn(unchangedPersona);
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
         when(repository.save(any(Persona.class))).thenReturn(unchangedPersona);
 
         // Then
@@ -393,25 +404,15 @@ public class UpdatePersonaHandlerTest {
     }
 
     @Test
-    public void updatePersona_whenNotEnoughPermissions_thenThrowException() {
+    public void errorWhenIdIsNull() {
 
         // Given
-        String id = "PRSNID";
-
+        String id = null;
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
-                .requesterDiscordId("USRID")
                 .build();
-
-        Persona persona = PersonaFixture.privatePersona()
-                .id(id)
-                .name("New name")
-                .build();
-
-        when(service.getById(anyString())).thenReturn(persona);
 
         // Then
-        StepVerifier.create(handler.handle(command))
-                .verifyError(AssetAccessDeniedException.class);
+        assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
     }
 }

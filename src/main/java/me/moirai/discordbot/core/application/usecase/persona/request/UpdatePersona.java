@@ -1,9 +1,9 @@
 package me.moirai.discordbot.core.application.usecase.persona.request;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 import me.moirai.discordbot.core.application.usecase.persona.result.UpdatePersonaResult;
@@ -15,11 +15,10 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
     private final String name;
     private final String personality;
     private final String visibility;
-    private final List<String> usersAllowedToWriteToAdd;
-    private final List<String> usersAllowedToWriteToRemove;
-    private final List<String> usersAllowedToReadToAdd;
-    private final List<String> usersAllowedToReadToRemove;
-    private final String requesterDiscordId;
+    private final Set<String> usersAllowedToWriteToAdd;
+    private final Set<String> usersAllowedToWriteToRemove;
+    private final Set<String> usersAllowedToReadToAdd;
+    private final Set<String> usersAllowedToReadToRemove;
 
     private UpdatePersona(Builder builder) {
 
@@ -27,11 +26,10 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
         this.name = builder.name;
         this.personality = builder.personality;
         this.visibility = builder.visibility;
-        this.usersAllowedToWriteToAdd = unmodifiableList(builder.usersAllowedToWriteToAdd);
-        this.usersAllowedToWriteToRemove = unmodifiableList(builder.usersAllowedToWriteToRemove);
-        this.usersAllowedToReadToAdd = unmodifiableList(builder.usersAllowedToReadToAdd);
-        this.usersAllowedToReadToRemove = unmodifiableList(builder.usersAllowedToReadToRemove);
-        this.requesterDiscordId = builder.requesterDiscordId;
+        this.usersAllowedToWriteToAdd = unmodifiableSet(builder.usersAllowedToWriteToAdd);
+        this.usersAllowedToWriteToRemove = unmodifiableSet(builder.usersAllowedToWriteToRemove);
+        this.usersAllowedToReadToAdd = unmodifiableSet(builder.usersAllowedToReadToAdd);
+        this.usersAllowedToReadToRemove = unmodifiableSet(builder.usersAllowedToReadToRemove);
     }
 
     public static Builder builder() {
@@ -54,24 +52,20 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
         return visibility;
     }
 
-    public List<String> getUsersAllowedToWriteToAdd() {
+    public Set<String> getUsersAllowedToWriteToAdd() {
         return usersAllowedToWriteToAdd;
     }
 
-    public List<String> getUsersAllowedToWriteToRemove() {
+    public Set<String> getUsersAllowedToWriteToRemove() {
         return usersAllowedToWriteToRemove;
     }
 
-    public List<String> getUsersAllowedToReadToAdd() {
+    public Set<String> getUsersAllowedToReadToAdd() {
         return usersAllowedToReadToAdd;
     }
 
-    public List<String> getUsersAllowedToReadToRemove() {
+    public Set<String> getUsersAllowedToReadToRemove() {
         return usersAllowedToReadToRemove;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterDiscordId;
     }
 
     public static final class Builder {
@@ -79,11 +73,10 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
         private String name;
         private String personality;
         private String visibility;
-        private List<String> usersAllowedToWriteToAdd = new ArrayList<>();
-        private List<String> usersAllowedToWriteToRemove = new ArrayList<>();
-        private List<String> usersAllowedToReadToAdd = new ArrayList<>();
-        private List<String> usersAllowedToReadToRemove = new ArrayList<>();
-        private String requesterDiscordId;
+        private Set<String> usersAllowedToWriteToAdd = new HashSet<>();
+        private Set<String> usersAllowedToWriteToRemove = new HashSet<>();
+        private Set<String> usersAllowedToReadToAdd = new HashSet<>();
+        private Set<String> usersAllowedToReadToRemove = new HashSet<>();
 
         private Builder() {
         }
@@ -108,7 +101,7 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
             return this;
         }
 
-        public Builder usersAllowedToWriteToAdd(List<String> usersAllowedToWriteToAdd) {
+        public Builder usersAllowedToWriteToAdd(Set<String> usersAllowedToWriteToAdd) {
 
             if (usersAllowedToWriteToAdd != null) {
                 this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
@@ -117,7 +110,7 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
             return this;
         }
 
-        public Builder usersAllowedToWriteToRemove(List<String> usersAllowedToWriteToRemove) {
+        public Builder usersAllowedToWriteToRemove(Set<String> usersAllowedToWriteToRemove) {
 
             if (usersAllowedToWriteToRemove != null) {
                 this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
@@ -126,7 +119,7 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
             return this;
         }
 
-        public Builder usersAllowedToReadToAdd(List<String> usersAllowedToReadToAdd) {
+        public Builder usersAllowedToReadToAdd(Set<String> usersAllowedToReadToAdd) {
 
             if (usersAllowedToReadToAdd != null) {
                 this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
@@ -135,17 +128,12 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
             return this;
         }
 
-        public Builder usersAllowedToReadToRemove(List<String> usersAllowedToReadToRemove) {
+        public Builder usersAllowedToReadToRemove(Set<String> usersAllowedToReadToRemove) {
 
             if (usersAllowedToReadToRemove != null) {
                 this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
             }
 
-            return this;
-        }
-
-        public Builder requesterDiscordId(String requesterDiscordId) {
-            this.requesterDiscordId = requesterDiscordId;
             return this;
         }
 

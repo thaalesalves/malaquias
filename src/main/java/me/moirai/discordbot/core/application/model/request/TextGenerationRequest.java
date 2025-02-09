@@ -2,17 +2,20 @@ package me.moirai.discordbot.core.application.model.request;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class TextGenerationRequest {
 
     private final String model;
     private final List<ChatMessage> messages;
-    private final List<String> stopSequences;
+    private final Set<String> stopSequences;
     private final Integer maxTokens;
     private final Double temperature;
     private final Double presencePenalty;
@@ -27,7 +30,7 @@ public final class TextGenerationRequest {
         this.presencePenalty = builder.presencePenalty;
         this.frequencyPenalty = builder.frequencyPenalty;
         this.messages = unmodifiableList(builder.messages);
-        this.stopSequences = unmodifiableList(builder.stopSequences);
+        this.stopSequences = unmodifiableSet(builder.stopSequences);
         this.logitBias = unmodifiableMap(builder.logitBias);
     }
 
@@ -43,7 +46,7 @@ public final class TextGenerationRequest {
         return messages;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -71,7 +74,7 @@ public final class TextGenerationRequest {
 
         private String model;
         private List<ChatMessage> messages = new ArrayList<>();
-        private List<String> stopSequences = new ArrayList<>();
+        private Set<String> stopSequences = new HashSet<>();
         private Integer maxTokens;
         private Double temperature;
         private Double presencePenalty;
@@ -96,7 +99,7 @@ public final class TextGenerationRequest {
             return this;
         }
 
-        public Builder stopSequences(List<String> stopSequences) {
+        public Builder stopSequences(Set<String> stopSequences) {
 
             if (stopSequences != null) {
                 this.stopSequences = stopSequences;

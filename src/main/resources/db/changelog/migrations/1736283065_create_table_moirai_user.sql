@@ -5,6 +5,7 @@
 CREATE TABLE moirai_user (
     id VARCHAR(100) PRIMARY KEY,
     discord_id VARCHAR(100) NOT NULL UNIQUE,
+    role VARCHAR(50) NOT NULL DEFAULT 'PLAYER',
     version INT DEFAULT 0 NOT NULL,
     creator_discord_id VARCHAR(100) NOT NULL DEFAULT 'SYSTEM',
     creation_date TIMESTAMP WITH TIME ZONE,

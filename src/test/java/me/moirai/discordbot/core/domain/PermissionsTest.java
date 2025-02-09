@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -240,7 +240,7 @@ public class PermissionsTest {
     public void validateValidMultipleWritingRightsWhenOwner() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("543545");
         discordUserIds.add("586678721356875");
 
@@ -257,7 +257,7 @@ public class PermissionsTest {
     public void validateValidMultipleWritingRightsWhenWriter() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("613226587696519");
         discordUserIds.add("55325325235");
 
@@ -274,7 +274,7 @@ public class PermissionsTest {
     public void validateValidMultipleWritingRightsWhenDisallowed() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("543545");
         discordUserIds.add("4234234");
 
@@ -291,7 +291,7 @@ public class PermissionsTest {
     public void validateValidMultipleReadingRightsWhenReader() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("613226587696519");
         discordUserIds.add("55325325235");
 
@@ -308,7 +308,7 @@ public class PermissionsTest {
     public void validateValidMultipleReadingRightsWhenOwner() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("55325325235");
         discordUserIds.add("586678721356875");
 
@@ -325,7 +325,7 @@ public class PermissionsTest {
     public void validateValidMultipleReadingRightsWhenWriter() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("423423423");
         discordUserIds.add("55325325235");
 
@@ -343,7 +343,7 @@ public class PermissionsTest {
     public void validateValidMultipleReadingRightsWhenDisallowed() {
 
         // Given
-        List<String> discordUserIds = new ArrayList<>();
+        Set<String> discordUserIds = new HashSet<>();
         discordUserIds.add("423423423");
         discordUserIds.add("4234234");
 

@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.adventure.request.UpdateAdventure;
 import me.moirai.discordbot.core.application.usecase.adventure.request.UpdateAdventureFixture;
@@ -34,6 +33,19 @@ public class UpdateAdventureHandlerTest {
 
     @InjectMocks
     private UpdateAdventureHandler handler;
+
+    @Test
+    public void errorWhenIdIsNull() {
+
+        // Given
+        String id = null;
+        UpdateAdventure command = UpdateAdventureFixture.sample()
+                .id(id)
+                .build();
+
+        // Then
+        assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
+    }
 
     @Test
     public void updateAdventure() {
@@ -66,27 +78,6 @@ public class UpdateAdventureHandlerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getLastUpdatedDateTime()).isEqualTo(expectedUpdatedAdventure.getLastUpdateDate());
-    }
-
-    @Test
-    public void updateAdventure_whenUserCantWrite_thenThrowException() {
-
-        // Given
-        String requesterUserId = "LALALA";
-        UpdateAdventure updateAdventure = UpdateAdventureFixture.sample()
-                .requesterDiscordId(requesterUserId)
-                .build();
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("INVLD")
-                        .build())
-                .build();
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.execute(updateAdventure));
     }
 
     @Test

@@ -6,23 +6,17 @@ import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventu
 public final class GetAdventureById extends UseCase<GetAdventureResult> {
 
     private final String id;
-    private final String requesterDiscordId;
 
-    private GetAdventureById(String id, String requesterDiscordId) {
+    private GetAdventureById(String id) {
         this.id = id;
-        this.requesterDiscordId = requesterDiscordId;
     }
 
-    public static GetAdventureById build(String id, String requesterDiscordId) {
+    public static GetAdventureById build(String id) {
 
-        return new GetAdventureById(id, requesterDiscordId);
+        return new GetAdventureById(id);
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterDiscordId;
     }
 }

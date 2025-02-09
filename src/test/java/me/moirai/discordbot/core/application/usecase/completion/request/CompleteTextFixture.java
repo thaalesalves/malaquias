@@ -1,7 +1,7 @@
 package me.moirai.discordbot.core.application.usecase.completion.request;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,12 @@ public class CompleteTextFixture {
 
         return CompleteText.Message.builder()
                 .isAuthorBot(false)
+                .messageContent("Message");
+    }
+    public static CompleteText.Message.Builder botMessage() {
+
+        return CompleteText.Message.builder()
+                .isAuthorBot(true)
                 .messageContent("Message");
     }
 
@@ -30,7 +36,7 @@ public class CompleteTextFixture {
                 .moderationLevel("disabled")
                 .personaId("1234")
                 .presencePenalty(0D)
-                .stopSequences(emptyList())
+                .stopSequences(emptySet())
                 .temperature(1D)
                 .worldId("12345");
     }
@@ -50,7 +56,7 @@ public class CompleteTextFixture {
                 .moderationLevel("strict")
                 .personaId("1234")
                 .presencePenalty(0D)
-                .stopSequences(emptyList())
+                .stopSequences(emptySet())
                 .temperature(1D)
                 .worldId("12345");
     }
@@ -70,7 +76,7 @@ public class CompleteTextFixture {
                 .moderationLevel("permissive")
                 .personaId("1234")
                 .presencePenalty(0D)
-                .stopSequences(emptyList())
+                .stopSequences(emptySet())
                 .temperature(1D)
                 .worldId("12345");
     }

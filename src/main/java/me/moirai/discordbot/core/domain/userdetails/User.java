@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import me.moirai.discordbot.common.annotation.NanoId;
@@ -20,12 +22,17 @@ public class User extends Asset {
     @Column(name = "discord_id", unique = true, nullable = false)
     private String discordId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
+
     public User(Builder builder) {
 
         super(builder.creatorDiscordId, builder.creationDate, builder.lastUpdateDate, builder.version);
 
         this.id = builder.id;
         this.discordId = builder.discordId;
+        this.role = builder.role;
     }
 
     protected User() {
@@ -45,10 +52,15 @@ public class User extends Asset {
         return discordId;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
     public static final class Builder {
 
         private String id;
         private String discordId;
+        private Role role;
         private String creatorDiscordId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
@@ -66,6 +78,12 @@ public class User extends Asset {
         public Builder discordId(String discordId) {
 
             this.discordId = discordId;
+            return this;
+        }
+
+        public Builder role(Role role) {
+
+            this.role = role;
             return this;
         }
 

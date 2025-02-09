@@ -1,9 +1,12 @@
 package me.moirai.discordbot.core.application.usecase.world.request;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 import me.moirai.discordbot.core.application.usecase.world.result.CreateWorldResult;
@@ -16,8 +19,8 @@ public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
     private final String adventureStart;
     private final String visibility;
     private final List<CreateWorldLorebookEntry> lorebookEntries;
-    private final List<String> usersAllowedToWrite;
-    private final List<String> usersAllowedToRead;
+    private final Set<String> usersAllowedToWrite;
+    private final Set<String> usersAllowedToRead;
     private final String requesterDiscordId;
 
     private CreateWorld(Builder builder) {
@@ -27,8 +30,8 @@ public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
         this.adventureStart = builder.adventureStart;
         this.visibility = builder.visibility;
         this.lorebookEntries = unmodifiableList(builder.lorebookEntries);
-        this.usersAllowedToWrite = unmodifiableList(builder.usersAllowedToWrite);
-        this.usersAllowedToRead = unmodifiableList(builder.usersAllowedToRead);
+        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
         this.requesterDiscordId = builder.requesterDiscordId;
     }
 
@@ -56,11 +59,11 @@ public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
         return lorebookEntries;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -75,8 +78,8 @@ public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
         private String adventureStart;
         private String visibility;
         private List<CreateWorldLorebookEntry> lorebookEntries = new ArrayList<>();
-        private List<String> usersAllowedToWrite = new ArrayList<>();
-        private List<String> usersAllowedToRead = new ArrayList<>();
+        private Set<String> usersAllowedToWrite = new HashSet<>();
+        private Set<String> usersAllowedToRead = new HashSet<>();
         private String requesterDiscordId;
 
         private Builder() {
@@ -111,7 +114,7 @@ public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
             if (usersAllowedToWrite != null) {
                 this.usersAllowedToWrite = usersAllowedToWrite;
@@ -120,7 +123,7 @@ public final class CreateWorld extends UseCase<Mono<CreateWorldResult>> {
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
             if (usersAllowedToRead != null) {
                 this.usersAllowedToRead = usersAllowedToRead;

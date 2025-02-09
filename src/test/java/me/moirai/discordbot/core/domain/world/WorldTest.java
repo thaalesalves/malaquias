@@ -4,9 +4,9 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -128,7 +128,7 @@ public class WorldTest {
         String userId = "1234567890";
         World.Builder worldBuilder = WorldFixture.publicWorld();
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(new ArrayList<>()).build();
+                .usersAllowedToWrite(new HashSet<>()).build();
 
         worldBuilder.permissions(permissions);
 
@@ -148,7 +148,7 @@ public class WorldTest {
         String userId = "1234567890";
         World.Builder worldBuilder = WorldFixture.publicWorld();
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(new ArrayList<>()).build();
+                .usersAllowedToRead(new HashSet<>()).build();
 
         worldBuilder.permissions(permissions);
 
@@ -168,7 +168,7 @@ public class WorldTest {
         String userId = "1234567890";
         World.Builder worldBuilder = WorldFixture.publicWorld();
 
-        List<String> usersAllowedToRead = new ArrayList<>();
+        Set<String> usersAllowedToRead = new HashSet<>();
         usersAllowedToRead.add(userId);
 
         Permissions permissions = PermissionsFixture.samplePermissions()
@@ -192,7 +192,7 @@ public class WorldTest {
         String userId = "1234567890";
         World.Builder worldBuilder = WorldFixture.publicWorld();
 
-        List<String> usersAllowedToWrite = new ArrayList<>();
+        Set<String> usersAllowedToWrite = new HashSet<>();
         usersAllowedToWrite.add(userId);
 
         Permissions permissions = PermissionsFixture.samplePermissions()
@@ -233,7 +233,7 @@ public class WorldTest {
         // Given
         String testedUserId = "1234567890";
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(Collections.singletonList(testedUserId))
+                .usersAllowedToWrite(Collections.singleton(testedUserId))
                 .build();
 
         World world = WorldFixture.privateWorld().permissions(permissions).build();
@@ -269,7 +269,7 @@ public class WorldTest {
         // Given
         String testedUserId = "1234567890";
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(Collections.singletonList(testedUserId))
+                .usersAllowedToWrite(Collections.singleton(testedUserId))
                 .build();
 
         World world = WorldFixture.privateWorld().permissions(permissions).build();
@@ -287,7 +287,7 @@ public class WorldTest {
         // Given
         String testedUserId = "1234567890";
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(Collections.singletonList(testedUserId))
+                .usersAllowedToRead(Collections.singleton(testedUserId))
                 .build();
 
         World world = WorldFixture.privateWorld().permissions(permissions).build();

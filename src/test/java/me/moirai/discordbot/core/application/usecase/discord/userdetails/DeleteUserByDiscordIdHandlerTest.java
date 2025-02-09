@@ -61,7 +61,7 @@ public class DeleteUserByDiscordIdHandlerTest {
         // Given
         String userId = "123123";
         DeleteUserByDiscordId command = DeleteUserByDiscordId.build(userId);
-        User user = UserFixture.sample().build();
+        User user = UserFixture.player().build();
 
         when(repository.findByDiscordId(anyString())).thenReturn(Optional.of(user));
 

@@ -13,6 +13,7 @@ public final class MoiraiPrincipal implements UserDetails {
     private final String email;
     private final String authorizationToken;
     private final String refreshToken;
+    private final String role;
     private final Long expiresAt;
 
     private MoiraiPrincipal(Builder builder) {
@@ -21,6 +22,7 @@ public final class MoiraiPrincipal implements UserDetails {
         this.email = builder.email;
         this.authorizationToken = builder.authorizationToken;
         this.refreshToken = builder.refreshToken;
+        this.role = builder.role;
         this.expiresAt = builder.expiresAt;
     }
 
@@ -42,6 +44,10 @@ public final class MoiraiPrincipal implements UserDetails {
 
     public String getRefreshToken() {
         return refreshToken;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public Long getExpiresAt() {
@@ -90,6 +96,7 @@ public final class MoiraiPrincipal implements UserDetails {
         private String email;
         private String authorizationToken;
         private String refreshToken;
+        private String role;
         private Long expiresAt;
 
         private Builder() {
@@ -117,6 +124,11 @@ public final class MoiraiPrincipal implements UserDetails {
 
         public Builder refreshToken(String refreshToken) {
             this.refreshToken = refreshToken;
+            return this;
+        }
+
+        public Builder role(String role) {
+            this.role = role;
             return this;
         }
 

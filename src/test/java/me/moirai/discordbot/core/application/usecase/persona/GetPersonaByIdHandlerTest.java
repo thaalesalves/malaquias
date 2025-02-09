@@ -13,10 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.GetPersonaById;
 import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaResult;
-import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 
@@ -30,29 +30,38 @@ public class GetPersonaByIdHandlerTest {
     private GetPersonaByIdHandler handler;
 
     @Test
-    public void errorWhenQueryIsNull() {
+    public void getPersonaById_whenIdIsNull_thenThrowException() {
 
         // Given
-        GetPersonaById query = null;
+        GetPersonaById query = GetPersonaById.build(null);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
     }
 
     @Test
-    public void getPersonaById() {
+    public void getPersonaById_whenPersonaNotFound_thenThrowException() {
 
         // Given
         String id = "HAUDHUAHD";
-        String requesterId = "RQSTRID";
+        GetPersonaById query = GetPersonaById.build(id);
+
+        when(queryRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
+    }
+
+    @Test
+    public void getPersonaById_whenPersonaExists_thenReturnPersonaDetails() {
+
+        // Given
+        String id = "HAUDHUAHD";
         Persona persona = PersonaFixture.privatePersona()
                 .id(id)
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId(requesterId)
-                        .build())
                 .build();
 
-        GetPersonaById query = GetPersonaById.build(id, requesterId);
+        GetPersonaById query = GetPersonaById.build(id);
 
         when(queryRepository.findById(anyString())).thenReturn(Optional.of(persona));
 

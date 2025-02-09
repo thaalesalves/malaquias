@@ -38,17 +38,18 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
                 .map(userDetails -> getUserDetails(userDetails, token));
     }
 
-    private MoiraiPrincipal getUserDetails(DiscordUserDataResponse userDetails, String token) {
+    private MoiraiPrincipal getUserDetails(DiscordUserDataResponse discordUser, String token) {
 
         try {
-            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(userDetails.getId());
-            UserDetailsResult discordUserResult = useCaseRunner.run(query);
+            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(discordUser.getId());
+            UserDetailsResult moiraiUser = useCaseRunner.run(query);
 
             return MoiraiPrincipal.builder()
-                    .id(discordUserResult.getDiscordId())
-                    .username(discordUserResult.getUsername())
-                    .email(userDetails.getEmail())
+                    .id(moiraiUser.getDiscordId())
+                    .username(moiraiUser.getUsername())
+                    .email(discordUser.getEmail())
                     .authorizationToken(token.replace(BEARER, EMPTY))
+                    .role(moiraiUser.getRole())
                     .build();
         } catch (AssetNotFoundException e) {
             throw new AuthenticationFailedException("Invalid user requested authentication", e);

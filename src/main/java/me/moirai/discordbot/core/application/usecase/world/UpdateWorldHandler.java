@@ -1,25 +1,27 @@
 package me.moirai.discordbot.core.application.usecase.world;
 
+import static me.moirai.discordbot.core.domain.Visibility.PRIVATE;
+import static me.moirai.discordbot.core.domain.Visibility.PUBLIC;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.discordbot.core.application.usecase.world.result.UpdateWorldResult;
-import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
-import me.moirai.discordbot.core.domain.world.WorldService;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -27,25 +29,22 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
 
     private static final String WORLD_FLAGGED_BY_MODERATION = "World flagged by moderation";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
-    private static final String PERMISSION_MODIFY_DENIED = "User does not have permission to modify this world";
+    private static final String WORLD_NOT_FOUND = "World to be updated was not found";
 
     private final WorldDomainRepository repository;
-    private final WorldService domainService;
     private final TextModerationPort moderationPort;
 
     public UpdateWorldHandler(WorldDomainRepository repository,
-            WorldService domainService,
             TextModerationPort moderationPort) {
 
         this.repository = repository;
-        this.domainService = domainService;
         this.moderationPort = moderationPort;
     }
 
     @Override
     public void validate(UpdateWorld command) {
 
-        if (StringUtils.isBlank(command.getId())) {
+        if (isBlank(command.getId())) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
@@ -55,58 +54,45 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
 
         return moderateContent(command.getAdventureStart())
                 .flatMap(__ -> moderateContent(command.getName()))
-                .map(__ -> {
-                    World world = domainService.getWorldById(command.getId());
-                    if (!world.canUserWrite(command.getRequesterDiscordId())) {
-                        throw new AssetAccessDeniedException(PERMISSION_MODIFY_DENIED);
-                    }
-
-                    return world;
-                })
-                .map(world -> updateWorld(command, world))
+                .map(__ -> updateWorld(command))
                 .map(worldUpdated -> UpdateWorldResult.build(worldUpdated.getLastUpdateDate()));
     }
 
-    public World updateWorld(UpdateWorld command, World world) {
+    public World updateWorld(UpdateWorld command) {
 
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(PERMISSION_MODIFY_DENIED);
-        }
+        World world = repository.findById(command.getId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
-        if (StringUtils.isNotBlank(command.getName())) {
+        if (isNotBlank(command.getName())) {
             world.updateName(command.getName());
         }
 
-        if (StringUtils.isNotBlank(command.getDescription())) {
+        if (isNotBlank(command.getDescription())) {
             world.updateDescription(command.getDescription());
         }
 
-        if (StringUtils.isNotBlank(command.getAdventureStart())) {
+        if (isNotBlank(command.getAdventureStart())) {
             world.updateAdventureStart(command.getAdventureStart());
         }
 
-        if (StringUtils.isNotBlank(command.getVisibility())) {
-            if (command.getVisibility().equalsIgnoreCase(Visibility.PUBLIC.name())) {
+        if (isNotBlank(command.getVisibility())) {
+            if (command.getVisibility().equalsIgnoreCase(PUBLIC.name())) {
                 world.makePublic();
-            } else if (command.getVisibility().equalsIgnoreCase(Visibility.PRIVATE.name())) {
+            } else if (command.getVisibility().equalsIgnoreCase(PRIVATE.name())) {
                 world.makePrivate();
             }
         }
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToAdd())
-                .stream()
-                .filter(userId -> !world.canUserRead(userId))
+        emptyIfNull(command.getUsersAllowedToReadToAdd())
                 .forEach(world::addReaderUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToAdd())
-                .stream()
-                .filter(userId -> !world.canUserWrite(userId))
+        emptyIfNull(command.getUsersAllowedToWriteToAdd())
                 .forEach(world::addWriterUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToRemove())
+        emptyIfNull(command.getUsersAllowedToReadToRemove())
                 .forEach(world::removeReaderUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToRemove())
+        emptyIfNull(command.getUsersAllowedToWriteToRemove())
                 .forEach(world::removeWriterUser);
 
         return repository.save(world);
@@ -114,13 +100,13 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
 
     private Mono<List<String>> moderateContent(String content) {
 
-        if (StringUtils.isBlank(content)) {
+        if (isBlank(content)) {
             return Mono.just(Collections.emptyList());
         }
 
         return getTopicsFlaggedByModeration(content)
                 .map(flaggedTopics -> {
-                    if (CollectionUtils.isNotEmpty(flaggedTopics)) {
+                    if (isNotEmpty(flaggedTopics)) {
                         throw new ModerationException(WORLD_FLAGGED_BY_MODERATION, flaggedTopics);
                     }
 

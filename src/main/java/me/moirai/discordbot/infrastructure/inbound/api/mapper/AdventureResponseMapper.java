@@ -58,6 +58,7 @@ public class AdventureResponseMapper {
                 .remember(result.getRemember())
                 .bump(result.getBump())
                 .bumpFrequency(result.getBumpFrequency())
+                .ownerDiscordId(result.getOwnerDiscordId())
                 .build();
     }
 

@@ -1,7 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.adventure;
 
+import org.apache.commons.lang3.StringUtils;
+
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
@@ -13,7 +14,7 @@ import me.moirai.discordbot.core.domain.adventure.Adventure;
 public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventureById, GetAdventureResult> {
 
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be viewed was not found";
-    private static final String PERMISSION_VIEW_DENIED = "User does not have permission to view this adventure";
+    private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
     private final AdventureQueryRepository queryRepository;
 
@@ -22,14 +23,18 @@ public class GetAdventureByIdHandler extends AbstractUseCaseHandler<GetAdventure
     }
 
     @Override
+    public void validate(GetAdventureById command) {
+
+        if (StringUtils.isBlank(command.getId())) {
+            throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
+        }
+    }
+
+    @Override
     public GetAdventureResult execute(GetAdventureById query) {
 
         Adventure adventure = queryRepository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
-
-        if (!adventure.canUserRead(query.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(PERMISSION_VIEW_DENIED);
-        }
 
         return mapResult(adventure);
     }

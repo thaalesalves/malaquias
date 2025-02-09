@@ -4,10 +4,10 @@ import static me.moirai.discordbot.core.domain.Visibility.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -115,7 +115,7 @@ public class AdventureTest {
         String userId = "1234567890";
         Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(new ArrayList<>()).build();
+                .usersAllowedToWrite(new HashSet<>()).build();
 
         adventureBuilder.permissions(permissions);
 
@@ -137,7 +137,7 @@ public class AdventureTest {
         String userId = "1234567890";
         Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(new ArrayList<>()).build();
+                .usersAllowedToRead(new HashSet<>()).build();
 
         adventureBuilder.permissions(permissions);
 
@@ -159,7 +159,7 @@ public class AdventureTest {
         String userId = "1234567890";
         Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
 
-        List<String> usersAllowedToRead = new ArrayList<>();
+        Set<String> usersAllowedToRead = new HashSet<>();
         usersAllowedToRead.add(userId);
 
         Permissions permissions = PermissionsFixture.samplePermissions()
@@ -185,7 +185,7 @@ public class AdventureTest {
         String userId = "1234567890";
         Adventure.Builder adventureBuilder = AdventureFixture.privateSingleplayerAdventure();
 
-        List<String> usersAllowedToWrite = new ArrayList<>();
+        Set<String> usersAllowedToWrite = new HashSet<>();
         usersAllowedToWrite.add(userId);
 
         Permissions permissions = PermissionsFixture.samplePermissions()
@@ -500,7 +500,7 @@ public class AdventureTest {
         // Given
         String token = "TOKEN";
         ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini()
-                .stopSequences(new ArrayList<>())
+                .stopSequences(new HashSet<>())
                 .build();
 
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure()
@@ -520,7 +520,7 @@ public class AdventureTest {
         // Given
         String token = "TOKEN";
         ModelConfiguration modelConfiguration = ModelConfigurationFixture.gpt4Mini()
-                .stopSequences(Collections.singletonList(token))
+                .stopSequences(Collections.singleton(token))
                 .build();
 
         Adventure adventure = AdventureFixture.privateSingleplayerAdventure()

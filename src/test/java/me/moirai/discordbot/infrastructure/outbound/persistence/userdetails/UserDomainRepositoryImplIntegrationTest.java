@@ -43,7 +43,7 @@ public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegration
     public void findUserById_whenUserFound_thenReturnUser() {
 
         // Given
-        User user = repository.save(UserFixture.sample()
+        User user = repository.save(UserFixture.player()
                 .id(null)
                 .build());
 
@@ -60,7 +60,7 @@ public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegration
     public void createUser() {
 
         // Given
-        User user = UserFixture.sample()
+        User user = UserFixture.player()
                 .id(null)
                 .build();
 
@@ -75,7 +75,7 @@ public class UserDomainRepositoryImplIntegrationTest extends AbstractIntegration
     public void deleteUser() {
 
         // Given
-        User user = repository.save(UserFixture.sample()
+        User user = repository.save(UserFixture.player()
                 .id(null)
                 .build());
 

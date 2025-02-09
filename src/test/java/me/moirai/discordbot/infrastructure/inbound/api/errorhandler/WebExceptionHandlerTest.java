@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurity
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
 
@@ -124,12 +125,32 @@ public class WebExceptionHandlerTest extends AbstractRestWebTest {
     }
 
     @Test
-    public void http403WhenAccessDenied() {
+    public void http403WhenAssetAccessDenied() {
 
         // Given
         String worldId = "WRLDID";
 
         when(useCaseRunner.run(any(GetWorldById.class))).thenThrow(AssetAccessDeniedException.class);
+
+        // Then
+        webTestClient.get()
+                .uri("/world/" + worldId)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(ErrorResponse.class)
+                .value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.getCode()).isEqualTo(HttpStatus.FORBIDDEN);
+                });
+    }
+
+    @Test
+    public void http403WhenAccessDenied() {
+
+        // Given
+        String worldId = "WRLDID";
+
+        when(useCaseRunner.run(any(GetWorldById.class))).thenThrow(AuthorizationDeniedException.class);
 
         // Then
         webTestClient.get()

@@ -45,7 +45,7 @@ public class TextCompletionAdapterTest extends AbstractWebMockTest {
                 .maxTokens(100)
                 .model("gpt-3.5")
                 .logitBias(Collections.singletonMap("token", 1.0))
-                .stopSequences(Collections.singletonList("token"))
+                .stopSequences(Collections.singleton("token"))
                 .build();
 
         CompletionResponse expectedResponse = CompletionResponse.builder()
@@ -86,7 +86,7 @@ public class TextCompletionAdapterTest extends AbstractWebMockTest {
                 .maxTokens(100)
                 .model("gpt-3.5")
                 .logitBias(Collections.singletonMap("token", 1.0))
-                .stopSequences(Collections.singletonList("token"))
+                .stopSequences(Collections.singleton("token"))
                 .build();
 
         CompletionResponseError errorResponse = CompletionResponseError.builder()
@@ -114,7 +114,7 @@ public class TextCompletionAdapterTest extends AbstractWebMockTest {
                 .maxTokens(100)
                 .model("gpt-3.5")
                 .logitBias(Collections.singletonMap("token", 1.0))
-                .stopSequences(Collections.singletonList("token"))
+                .stopSequences(Collections.singleton("token"))
                 .build();
 
         CompletionResponseError errorResponse = CompletionResponseError.builder()
@@ -142,7 +142,7 @@ public class TextCompletionAdapterTest extends AbstractWebMockTest {
                 .maxTokens(100)
                 .model("gpt-3.5")
                 .logitBias(Collections.singletonMap("token", 1.0))
-                .stopSequences(Collections.singletonList("token"))
+                .stopSequences(Collections.singleton("token"))
                 .build();
 
         CompletionResponseError errorResponse = CompletionResponseError.builder()

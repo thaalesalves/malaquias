@@ -26,7 +26,6 @@ import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntry;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntryFixture;
-import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorldLorebookEntry;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldLorebookEntryById;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorldLorebookEntry;
@@ -146,68 +145,6 @@ public class WorldServiceImplTest {
                     assertThat(createdWorld.getVisibility()).isEqualTo(expectedWorld.getVisibility());
                 })
                 .verifyComplete();
-    }
-
-    @Test
-    public void deleteWorld_whenWorldNotFound_thenThrowException() {
-
-        // Given
-        String id = "WRLDID";
-        String requesterId = "RQSTRID";
-        DeleteWorld command = DeleteWorld.build(id, requesterId);
-
-        when(worldRepository.findById(anyString())).thenReturn(Optional.empty());
-
-        // Then
-        assertThrows(AssetNotFoundException.class, () -> service.deleteWorld(command));
-    }
-
-    @Test
-    public void deleteWorld_whenNotEnoughPermission_thenThrowException() {
-
-        // Given
-        String id = "WRLDID";
-        String requesterId = "RQSTRID";
-        DeleteWorld command = DeleteWorld.build(id, requesterId);
-
-        World world = WorldFixture.privateWorld()
-                .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("ANTHRUSR")
-                        .build())
-                .build();
-
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> service.deleteWorld(command));
-    }
-
-    @Test
-    public void deleteWorld_whenProperIdAndPermission_thenWorldIsDeleted() {
-
-        // Given
-        String id = "WRLDID";
-        String requesterId = "RQSTRID";
-        DeleteWorld command = DeleteWorld.build(id, requesterId);
-
-        World world = WorldFixture.privateWorld()
-                .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId(requesterId)
-                        .build())
-                .build();
-
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
-
-        // When
-        service.deleteWorld(command);
-
-        // Then
-        verify(worldRepository, times(1)).findById(anyString());
-        verify(worldRepository, times(1)).deleteById(anyString());
     }
 
     @Test

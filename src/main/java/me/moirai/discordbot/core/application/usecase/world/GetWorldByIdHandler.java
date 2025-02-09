@@ -1,7 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.world;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
-import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.port.WorldQueryRepository;
@@ -12,8 +13,8 @@ import me.moirai.discordbot.core.domain.world.World;
 @UseCaseHandler
 public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, GetWorldResult> {
 
+    private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be deleted was not found";
-    private static final String PERMISSION_VIEW_DENIED = "User does not have permission to view this world";
 
     private final WorldQueryRepository queryRepository;
 
@@ -22,14 +23,18 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
     }
 
     @Override
+    public void validate(GetWorldById request) {
+
+        if (isBlank(request.getId())) {
+            throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
+        }
+    }
+
+    @Override
     public GetWorldResult execute(GetWorldById query) {
 
         World world = queryRepository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
-
-        if (!world.canUserRead(query.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(PERMISSION_VIEW_DENIED);
-        }
 
         return mapResult(world);
     }

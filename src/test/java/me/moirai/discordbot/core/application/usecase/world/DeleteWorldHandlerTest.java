@@ -1,7 +1,7 @@
 package me.moirai.discordbot.core.application.usecase.world;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,17 +17,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.world.World;
+import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
-import me.moirai.discordbot.core.domain.world.WorldService;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteWorldHandlerTest {
 
     @Mock
-    private WorldService domainService;
+    private WorldDomainRepository domainRepository;
 
     @InjectMocks
     private DeleteWorldHandler handler;
@@ -35,10 +37,8 @@ public class DeleteWorldHandlerTest {
     public void errorWhenIdIsNull() {
 
         // Given
-        String requesterDiscordId = "84REAC";
         String id = null;
-
-        DeleteWorld config = DeleteWorld.build(id, requesterDiscordId);
+        DeleteWorld config = DeleteWorld.build(id);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(config));
@@ -54,19 +54,33 @@ public class DeleteWorldHandlerTest {
         World world = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerDiscordId(requesterDiscordId)
-                        .usersAllowedToRead(Collections.emptyList())
+                        .usersAllowedToRead(Collections.emptySet())
                         .build())
                 .build();
 
-        DeleteWorld command = DeleteWorld.build(id, requesterDiscordId);
+        DeleteWorld command = DeleteWorld.build(id);
 
-        when(domainService.getWorldById(anyString())).thenReturn(world);
-        doNothing().when(domainService).deleteWorld(any(DeleteWorld.class));
+        when(domainRepository.findById(anyString())).thenReturn(Optional.of(world));
+        doNothing().when(domainRepository).deleteById(anyString());
 
         // When
         handler.handle(command);
 
         // Then
-        verify(domainService, times(1)).deleteWorld(any());
+        verify(domainRepository, times(1)).deleteById(anyString());
+    }
+
+    @Test
+    public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
+
+        // Given
+        String id = "WRLDID";
+        DeleteWorld command = DeleteWorld.build(id);
+
+        when(domainRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
     }
 }

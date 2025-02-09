@@ -1,14 +1,14 @@
 package me.moirai.discordbot.infrastructure.inbound.api.request;
 
-import java.util.List;
+import java.util.Set;
 
 public class CreatePersonaRequest {
 
     private String name;
     private String personality;
     private String visibility;
-    private List<String> usersAllowedToWrite;
-    private List<String> usersAllowedToRead;
+    private Set<String> usersAllowedToWrite;
+    private Set<String> usersAllowedToRead;
 
     public CreatePersonaRequest() {
     }
@@ -25,11 +25,11 @@ public class CreatePersonaRequest {
         return visibility;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -45,11 +45,11 @@ public class CreatePersonaRequest {
         this.visibility = visibility;
     }
 
-    public void setUsersAllowedToWrite(List<String> usersAllowedToWrite) {
+    public void setUsersAllowedToWrite(Set<String> usersAllowedToWrite) {
         this.usersAllowedToWrite = usersAllowedToWrite;
     }
 
-    public void setUsersAllowedToRead(List<String> usersAllowedToRead) {
+    public void setUsersAllowedToRead(Set<String> usersAllowedToRead) {
         this.usersAllowedToRead = usersAllowedToRead;
     }
 }

@@ -1,10 +1,10 @@
 package me.moirai.discordbot.core.application.usecase.persona.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Sets.set;
 
-import java.util.List;
+import java.util.Set;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
 public class UpdatePersonaTest {
@@ -16,17 +16,15 @@ public class UpdatePersonaTest {
         String name = "name";
         String personality = "personality";
         String visibility = "PRIVATE";
-        String requesterDiscordId = "123123";
-        List<String> usersAllowedToReadToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToReadToRemove = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToRemove = Lists.list("123123", "123123");
+        Set<String> usersAllowedToReadToAdd = set("123123", "123123");
+        Set<String> usersAllowedToWriteToAdd = set("123123", "123123");
+        Set<String> usersAllowedToReadToRemove = set("123123", "123123");
+        Set<String> usersAllowedToWriteToRemove = set("123123", "123123");
 
         UpdatePersona.Builder updatePersonaBuilder = UpdatePersona.builder()
                 .name(name)
                 .personality(personality)
                 .visibility(visibility)
-                .requesterDiscordId(requesterDiscordId)
                 .usersAllowedToReadToAdd(usersAllowedToReadToAdd)
                 .usersAllowedToWriteToAdd(usersAllowedToWriteToAdd)
                 .usersAllowedToReadToRemove(usersAllowedToReadToRemove)
@@ -40,7 +38,6 @@ public class UpdatePersonaTest {
         assertThat(updatePersona.getName()).isNotNull().isNotEmpty().isEqualTo(name);
         assertThat(updatePersona.getPersonality()).isNotNull().isNotEmpty().isEqualTo(personality);
         assertThat(updatePersona.getVisibility()).isNotNull().isNotEmpty().isEqualTo(visibility);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
         assertThat(updatePersona.getUsersAllowedToReadToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToReadToAdd);
         assertThat(updatePersona.getUsersAllowedToWriteToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToWriteToAdd);
         assertThat(updatePersona.getUsersAllowedToReadToRemove()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToReadToRemove);
@@ -54,17 +51,15 @@ public class UpdatePersonaTest {
         String name = "name";
         String personality = "personality";
         String visibility = "PRIVATE";
-        String requesterDiscordId = "123123";
-        List<String> usersAllowedToReadToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToAdd = null;
-        List<String> usersAllowedToReadToRemove = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToRemove = Lists.list("123123", "123123");
+        Set<String> usersAllowedToReadToAdd = set("123123", "123123");
+        Set<String> usersAllowedToWriteToAdd = null;
+        Set<String> usersAllowedToReadToRemove = set("123123", "123123");
+        Set<String> usersAllowedToWriteToRemove = set("123123", "123123");
 
         UpdatePersona.Builder updatePersonaBuilder = UpdatePersona.builder()
                 .name(name)
                 .personality(personality)
                 .visibility(visibility)
-                .requesterDiscordId(requesterDiscordId)
                 .usersAllowedToReadToAdd(usersAllowedToReadToAdd)
                 .usersAllowedToWriteToAdd(usersAllowedToWriteToAdd)
                 .usersAllowedToReadToRemove(usersAllowedToReadToRemove)
@@ -78,7 +73,6 @@ public class UpdatePersonaTest {
         assertThat(updatePersona.getName()).isNotNull().isNotEmpty().isEqualTo(name);
         assertThat(updatePersona.getPersonality()).isNotNull().isNotEmpty().isEqualTo(personality);
         assertThat(updatePersona.getVisibility()).isNotNull().isNotEmpty().isEqualTo(visibility);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
         assertThat(updatePersona.getUsersAllowedToReadToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToReadToAdd);
         assertThat(updatePersona.getUsersAllowedToWriteToAdd()).isNotNull().isEmpty();
         assertThat(updatePersona.getUsersAllowedToReadToRemove()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToReadToRemove);
@@ -92,17 +86,15 @@ public class UpdatePersonaTest {
         String name = "name";
         String personality = "personality";
         String visibility = "PRIVATE";
-        String requesterDiscordId = "123123";
-        List<String> usersAllowedToReadToAdd = null;
-        List<String> usersAllowedToWriteToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToReadToRemove = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToRemove = Lists.list("123123", "123123");
+        Set<String> usersAllowedToReadToAdd = null;
+        Set<String> usersAllowedToWriteToAdd = set("123123", "123123");
+        Set<String> usersAllowedToReadToRemove = set("123123", "123123");
+        Set<String> usersAllowedToWriteToRemove = set("123123", "123123");
 
         UpdatePersona.Builder updatePersonaBuilder = UpdatePersona.builder()
                 .name(name)
                 .personality(personality)
                 .visibility(visibility)
-                .requesterDiscordId(requesterDiscordId)
                 .usersAllowedToReadToAdd(usersAllowedToReadToAdd)
                 .usersAllowedToWriteToAdd(usersAllowedToWriteToAdd)
                 .usersAllowedToReadToRemove(usersAllowedToReadToRemove)
@@ -116,8 +108,6 @@ public class UpdatePersonaTest {
         assertThat(updatePersona.getName()).isNotNull().isNotEmpty().isEqualTo(name);
         assertThat(updatePersona.getPersonality()).isNotNull().isNotEmpty().isEqualTo(personality);
         assertThat(updatePersona.getVisibility()).isNotNull().isNotEmpty().isEqualTo(visibility);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
         assertThat(updatePersona.getUsersAllowedToReadToAdd()).isNotNull().isEmpty();
         assertThat(updatePersona.getUsersAllowedToWriteToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToWriteToAdd);
         assertThat(updatePersona.getUsersAllowedToReadToRemove()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToReadToRemove);
@@ -131,17 +121,15 @@ public class UpdatePersonaTest {
         String name = "name";
         String personality = "personality";
         String visibility = "PRIVATE";
-        String requesterDiscordId = "123123";
-        List<String> usersAllowedToReadToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToReadToRemove = null;
-        List<String> usersAllowedToWriteToRemove = Lists.list("123123", "123123");
+        Set<String> usersAllowedToReadToAdd = set("123123", "123123");
+        Set<String> usersAllowedToWriteToAdd = set("123123", "123123");
+        Set<String> usersAllowedToReadToRemove = null;
+        Set<String> usersAllowedToWriteToRemove = set("123123", "123123");
 
         UpdatePersona.Builder updatePersonaBuilder = UpdatePersona.builder()
                 .name(name)
                 .personality(personality)
                 .visibility(visibility)
-                .requesterDiscordId(requesterDiscordId)
                 .usersAllowedToReadToAdd(usersAllowedToReadToAdd)
                 .usersAllowedToWriteToAdd(usersAllowedToWriteToAdd)
                 .usersAllowedToReadToRemove(usersAllowedToReadToRemove)
@@ -155,8 +143,6 @@ public class UpdatePersonaTest {
         assertThat(updatePersona.getName()).isNotNull().isNotEmpty().isEqualTo(name);
         assertThat(updatePersona.getPersonality()).isNotNull().isNotEmpty().isEqualTo(personality);
         assertThat(updatePersona.getVisibility()).isNotNull().isNotEmpty().isEqualTo(visibility);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
         assertThat(updatePersona.getUsersAllowedToReadToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToWriteToAdd);
         assertThat(updatePersona.getUsersAllowedToWriteToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToWriteToAdd);
         assertThat(updatePersona.getUsersAllowedToReadToRemove()).isNotNull().isEmpty();
@@ -170,17 +156,15 @@ public class UpdatePersonaTest {
         String name = "name";
         String personality = "personality";
         String visibility = "PRIVATE";
-        String requesterDiscordId = "123123";
-        List<String> usersAllowedToReadToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToAdd = Lists.list("123123", "123123");
-        List<String> usersAllowedToReadToRemove = Lists.list("123123", "123123");
-        List<String> usersAllowedToWriteToRemove = null;
+        Set<String> usersAllowedToReadToAdd = set("123123", "123123");
+        Set<String> usersAllowedToWriteToAdd = set("123123", "123123");
+        Set<String> usersAllowedToReadToRemove = set("123123", "123123");
+        Set<String> usersAllowedToWriteToRemove = null;
 
         UpdatePersona.Builder updatePersonaBuilder = UpdatePersona.builder()
                 .name(name)
                 .personality(personality)
                 .visibility(visibility)
-                .requesterDiscordId(requesterDiscordId)
                 .usersAllowedToReadToAdd(usersAllowedToReadToAdd)
                 .usersAllowedToWriteToAdd(usersAllowedToWriteToAdd)
                 .usersAllowedToReadToRemove(usersAllowedToReadToRemove)
@@ -194,8 +178,6 @@ public class UpdatePersonaTest {
         assertThat(updatePersona.getName()).isNotNull().isNotEmpty().isEqualTo(name);
         assertThat(updatePersona.getPersonality()).isNotNull().isNotEmpty().isEqualTo(personality);
         assertThat(updatePersona.getVisibility()).isNotNull().isNotEmpty().isEqualTo(visibility);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
-        assertThat(updatePersona.getRequesterDiscordId()).isNotNull().isNotEmpty().isEqualTo(requesterDiscordId);
         assertThat(updatePersona.getUsersAllowedToReadToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToWriteToAdd);
         assertThat(updatePersona.getUsersAllowedToWriteToAdd()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToWriteToAdd);
         assertThat(updatePersona.getUsersAllowedToReadToRemove()).isNotNull().isNotEmpty().hasSameElementsAs(usersAllowedToReadToRemove);

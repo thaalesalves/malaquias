@@ -14,7 +14,7 @@ public class AssetBaseDataAssigner {
     @PrePersist
     public void setBaseData(Asset asset) {
 
-        MoiraiPrincipal authenticatedUser = SecuritySessionContext.getCurrentUser();
+        MoiraiPrincipal authenticatedUser = SecuritySessionContext.getAuthenticatedUser();
         if (asset.getCreatorDiscordId() == null) {
             asset.setCreatorDiscordId(authenticatedUser.getId());
         }
