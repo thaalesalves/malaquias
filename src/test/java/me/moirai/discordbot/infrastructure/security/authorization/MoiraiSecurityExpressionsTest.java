@@ -89,4 +89,20 @@ public class MoiraiSecurityExpressionsTest {
         // Then
         assertThat(result).isTrue();
     }
+
+    @Test
+    public void isAuthenticatedUser() {
+
+        // Given
+        String userId = "1234";
+        SecuritySessionContext.setCurrentUser(principal);
+
+        when(principal.getId()).thenReturn(userId);
+
+        // When
+        boolean result = securityExpressions.isAuthenticatedUser(userId);
+
+        // Then
+        assertThat(result).isTrue();
+    }
 }

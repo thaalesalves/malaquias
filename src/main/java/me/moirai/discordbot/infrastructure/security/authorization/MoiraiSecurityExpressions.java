@@ -28,6 +28,11 @@ public class MoiraiSecurityExpressions extends SecurityExpressionRoot implements
         return principal.getRole().equals(ADMIN);
     }
 
+    public boolean isAuthenticatedUser(String userId) {
+        MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        return principal.getId().equals(userId);
+    }
+
     public boolean canModify(String assetId, String assetType) {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();

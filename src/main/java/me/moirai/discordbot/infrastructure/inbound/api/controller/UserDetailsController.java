@@ -1,6 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ public class UserDetailsController extends SecurityContextAware {
 
     @GetMapping("/{discordUserId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("isAdmin()")
     public Mono<UserDataResponse> getUserByDiscordId(@PathVariable(required = true) String discordUserId) {
 
         return Mono.just(GetUserDetailsByDiscordId.build(discordUserId))
@@ -40,7 +42,8 @@ public class UserDetailsController extends SecurityContextAware {
 
     @DeleteMapping("/{discordUserId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public void deleteUserByDiscordIdd(@PathVariable(required = true) String discordUserId) {
+    @PreAuthorize("isAdmin() || isAuthenticatedUser(#discordUserId)")
+    public void deleteUserByDiscordId(@PathVariable(required = true) String discordUserId) {
 
         DeleteUserByDiscordId command = DeleteUserByDiscordId.build(discordUserId);
         useCaseRunner.run(command);
