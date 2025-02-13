@@ -154,7 +154,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private void processBumpCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
-        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
         GetAdventureResult result = useCaseRunner.run(request);
 
         TextInput bumpContent = TextInput.create("bumpContent", CONTENT, TextInputStyle.PARAGRAPH)
@@ -181,7 +181,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private void processAuthorsNoteCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
-        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
         GetAdventureResult result = useCaseRunner.run(request);
 
         TextInput authorsNoteContent = TextInput
@@ -201,7 +201,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private void processNudgeCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
-        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
         GetAdventureResult result = useCaseRunner.run(request);
 
         TextInput nudgeContent = TextInput.create("nudgeContent", CONTENT, TextInputStyle.PARAGRAPH)
@@ -220,7 +220,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private void processRememberCommand(SlashCommandInteractionEvent event, TextChannel textChannel) {
 
-        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId());
+        GetAdventureByChannelId request = GetAdventureByChannelId.build(textChannel.getId(), event.getMember().getId());
         GetAdventureResult result = useCaseRunner.run(request);
 
         TextInput rememberContent = TextInput

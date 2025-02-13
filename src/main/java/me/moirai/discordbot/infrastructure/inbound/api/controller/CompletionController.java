@@ -50,7 +50,7 @@ public class CompletionController extends SecurityContextAware {
                     .logitBias(request.getLogitBias())
                     .stopSequences(request.getStopSequences())
                     .moderationLevel(request.getModerationLevel())
-                    .authorDiscordId(authenticatedUser.getId())
+                    .authorDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return useCaseRunner.run(command)

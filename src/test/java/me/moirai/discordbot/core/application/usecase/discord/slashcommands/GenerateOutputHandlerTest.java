@@ -15,11 +15,11 @@ import org.mockito.Mock;
 
 import me.moirai.discordbot.AbstractDiscordTest;
 import me.moirai.discordbot.core.application.helper.StoryGenerationHelper;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageDataFixture;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -27,7 +27,7 @@ import reactor.test.StepVerifier;
 public class GenerateOutputHandlerTest extends AbstractDiscordTest {
 
     @Mock
-    private AdventureQueryRepository adventureRepository;
+    private AdventureRepository adventureRepository;
 
     @Mock
     private DiscordChannelPort discordChannelPort;

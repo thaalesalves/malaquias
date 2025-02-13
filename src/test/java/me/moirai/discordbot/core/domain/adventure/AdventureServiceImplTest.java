@@ -45,7 +45,7 @@ public class AdventureServiceImplTest {
     private AdventureLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
-    private AdventureDomainRepository repository;
+    private AdventureRepository repository;
 
     @InjectMocks
     private AdventureServiceImpl service;

@@ -36,11 +36,11 @@ public class AdventureServiceImpl implements AdventureService {
 
     private final TextModerationPort moderationPort;
     private final AdventureLorebookEntryRepository lorebookEntryRepository;
-    private final AdventureDomainRepository repository;
+    private final AdventureRepository repository;
 
     public AdventureServiceImpl(TextModerationPort moderationPort,
             AdventureLorebookEntryRepository lorebookEntryRepository,
-            AdventureDomainRepository repository) {
+            AdventureRepository repository) {
 
         this.moderationPort = moderationPort;
         this.lorebookEntryRepository = lorebookEntryRepository;

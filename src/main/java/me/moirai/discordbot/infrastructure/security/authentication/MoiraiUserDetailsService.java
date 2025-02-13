@@ -45,7 +45,7 @@ public class MoiraiUserDetailsService implements ReactiveUserDetailsService {
             UserDetailsResult moiraiUser = useCaseRunner.run(query);
 
             return MoiraiPrincipal.builder()
-                    .id(moiraiUser.getDiscordId())
+                    .discordId(moiraiUser.getDiscordId())
                     .username(moiraiUser.getUsername())
                     .email(discordUser.getEmail())
                     .authorizationToken(token.replace(BEARER, EMPTY))

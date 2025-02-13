@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public final class MoiraiPrincipal implements UserDetails {
 
-    private final String id;
+    private final String discordId;
     private final String username;
     private final String email;
     private final String authorizationToken;
@@ -17,7 +17,7 @@ public final class MoiraiPrincipal implements UserDetails {
     private final Long expiresAt;
 
     private MoiraiPrincipal(Builder builder) {
-        this.id = builder.id;
+        this.discordId = builder.discordId;
         this.username = builder.username;
         this.email = builder.email;
         this.authorizationToken = builder.authorizationToken;
@@ -30,8 +30,8 @@ public final class MoiraiPrincipal implements UserDetails {
         return new Builder();
     }
 
-    public String getId() {
-        return id;
+    public String getDiscordId() {
+        return discordId;
     }
 
     public String getEmail() {
@@ -91,7 +91,7 @@ public final class MoiraiPrincipal implements UserDetails {
 
     public static final class Builder {
 
-        private String id;
+        private String discordId;
         private String username;
         private String email;
         private String authorizationToken;
@@ -102,8 +102,8 @@ public final class MoiraiPrincipal implements UserDetails {
         private Builder() {
         }
 
-        public Builder id(String id) {
-            this.id = id;
+        public Builder discordId(String discordId) {
+            this.discordId = discordId;
             return this;
         }
 

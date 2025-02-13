@@ -3,31 +3,33 @@ package me.moirai.discordbot.core.application.usecase.adventure;
 import static me.moirai.discordbot.core.domain.Visibility.PRIVATE;
 import static me.moirai.discordbot.core.domain.Visibility.PUBLIC;
 import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel.fromString;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.usecase.adventure.request.UpdateAdventure;
 import me.moirai.discordbot.core.application.usecase.adventure.result.UpdateAdventureResult;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.GameMode;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 
 @UseCaseHandler
 public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventure, UpdateAdventureResult> {
 
+    private static final String USER_NO_PERMISSION = "User does not have permission to delete adventure";
     private static final String ADVENTURE_NOT_FOUND = "Adventure to be updated was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
-    private final AdventureDomainRepository repository;
+    private final AdventureRepository repository;
 
-    public UpdateAdventureHandler(AdventureDomainRepository repository) {
+    public UpdateAdventureHandler(AdventureRepository repository) {
         this.repository = repository;
     }
 
@@ -44,6 +46,10 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
 
         Adventure adventure = repository.findById(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
+
+        if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION);
+        }
 
         if (isNotBlank(command.getName())) {
             adventure.updateName(command.getName());
@@ -137,37 +143,37 @@ public class UpdateAdventureHandler extends AbstractUseCaseHandler<UpdateAdventu
             }
         }
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToAdd())
+        emptyIfNull(command.getUsersAllowedToReadToAdd())
                 .forEach(adventure::addReaderUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToAdd())
+        emptyIfNull(command.getUsersAllowedToWriteToAdd())
                 .forEach(adventure::addWriterUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToRemove())
+        emptyIfNull(command.getUsersAllowedToReadToRemove())
                 .forEach(adventure::removeReaderUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToRemove())
+        emptyIfNull(command.getUsersAllowedToWriteToRemove())
                 .forEach(adventure::removeWriterUser);
     }
 
     private void updateLogitBias(UpdateAdventure command, Adventure adventure) {
 
-        MapUtils.emptyIfNull(command.getLogitBiasToAdd())
+        emptyIfNull(command.getLogitBiasToAdd())
                 .entrySet()
                 .stream()
                 .forEach(entry -> adventure.addLogitBias(entry.getKey(), entry.getValue()));
 
-        CollectionUtils.emptyIfNull(command.getLogitBiasToRemove())
+        emptyIfNull(command.getLogitBiasToRemove())
                 .forEach(adventure::removeLogitBias);
     }
 
     private void updateStopSequences(UpdateAdventure command, Adventure adventure) {
 
-        CollectionUtils.emptyIfNull(command.getStopSequencesToAdd())
+        emptyIfNull(command.getStopSequencesToAdd())
                 .stream()
                 .forEach(adventure::addStopSequence);
 
-        CollectionUtils.emptyIfNull(command.getStopSequencesToRemove())
+        emptyIfNull(command.getStopSequencesToRemove())
                 .forEach(adventure::removeStopSequence);
     }
 

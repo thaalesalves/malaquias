@@ -16,7 +16,7 @@ public class AssetBaseDataAssigner {
 
         MoiraiPrincipal authenticatedUser = SecuritySessionContext.getAuthenticatedUser();
         if (asset.getCreatorDiscordId() == null) {
-            asset.setCreatorDiscordId(authenticatedUser.getId());
+            asset.setCreatorDiscordId(authenticatedUser.getDiscordId());
         }
 
         OffsetDateTime now = OffsetDateTime.now();

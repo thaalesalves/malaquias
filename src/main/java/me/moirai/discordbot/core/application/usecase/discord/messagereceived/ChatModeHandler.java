@@ -9,10 +9,10 @@ import java.util.List;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.helper.StoryGenerationHelper;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageData;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.AiModelRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
@@ -25,11 +25,11 @@ public class ChatModeHandler extends AbstractUseCaseHandler<ChatModeRequest, Mon
     private static final String CHANNEL_HAS_NO_MESSAGES = "Channel has no messages";
 
     private final StoryGenerationHelper storyGenerationPort;
-    private final AdventureQueryRepository adventureRepository;
+    private final AdventureRepository adventureRepository;
     private final DiscordChannelPort discordChannelPort;
 
     public ChatModeHandler(StoryGenerationHelper storyGenerationPort,
-            AdventureQueryRepository adventureRepository,
+            AdventureRepository adventureRepository,
             DiscordChannelPort discordChannelPort) {
 
         this.adventureRepository = adventureRepository;

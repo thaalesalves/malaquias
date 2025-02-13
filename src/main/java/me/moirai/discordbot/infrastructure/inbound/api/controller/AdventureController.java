@@ -85,7 +85,7 @@ public class AdventureController extends SecurityContextAware {
                     .direction(getDirection(searchParameters.getDirection()))
                     .visibility(getVisibility(searchParameters.getVisibility()))
                     .operation(getOperation(searchParameters.getOperation()))
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -100,7 +100,7 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetAdventureById query = GetAdventureById.build(adventureId);
+            GetAdventureById query = GetAdventureById.build(adventureId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -113,7 +113,7 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateAdventure command = requestMapper.toCommand(request, authenticatedUser.getId());
+            CreateAdventure command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
     }
@@ -127,7 +127,7 @@ public class AdventureController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateAdventure command = requestMapper.toCommand(request, adventureId, authenticatedUser.getId());
+            UpdateAdventure command = requestMapper.toCommand(request, adventureId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
     }
@@ -140,7 +140,7 @@ public class AdventureController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteAdventure command = requestMapper.toCommand(adventureId, authenticatedUser.getId());
+            DeleteAdventure command = requestMapper.toCommand(adventureId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();
@@ -156,7 +156,7 @@ public class AdventureController extends SecurityContextAware {
 
             AddFavoriteAdventure command = AddFavoriteAdventure.builder()
                     .assetId(request.getAssetId())
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
@@ -173,7 +173,7 @@ public class AdventureController extends SecurityContextAware {
 
             RemoveFavoriteAdventure command = RemoveFavoriteAdventure.builder()
                     .assetId(assetId)
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);

@@ -1,14 +1,14 @@
 package me.moirai.discordbot.core.application.helper;
 
 import me.moirai.discordbot.common.annotation.Helper;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 
 @Helper
 public class AdventureHelperImpl implements AdventureHelper {
 
-    private final AdventureQueryRepository adventureQueryRepository;
+    private final AdventureRepository adventureQueryRepository;
 
-    public AdventureHelperImpl(AdventureQueryRepository adventureQueryRepository) {
+    public AdventureHelperImpl(AdventureRepository adventureQueryRepository) {
         this.adventureQueryRepository = adventureQueryRepository;
     }
 

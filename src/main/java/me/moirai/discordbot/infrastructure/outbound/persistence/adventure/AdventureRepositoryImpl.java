@@ -21,15 +21,16 @@ import org.springframework.stereotype.Repository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.SearchAdventures;
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventuresResult;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
+import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.mapper.AdventurePersistenceMapper;
 
 @Repository
-public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
+public class AdventureRepositoryImpl implements AdventureRepository {
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_ITEMS = 10;
@@ -51,13 +52,54 @@ public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
     private static final String AI_MODEL = "aiModel";
 
     private final AdventureJpaRepository jpaRepository;
+    private final FavoriteRepository favoriteRepository;
     private final AdventurePersistenceMapper mapper;
 
-    public AdventureQueryRepositoryImpl(AdventureJpaRepository jpaRepository,
+    public AdventureRepositoryImpl(
+            AdventureJpaRepository jpaRepository,
+            FavoriteRepository favoriteRepository,
             AdventurePersistenceMapper mapper) {
 
         this.jpaRepository = jpaRepository;
+        this.favoriteRepository = favoriteRepository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public Adventure save(Adventure adventure) {
+
+        return jpaRepository.save(adventure);
+    }
+
+    @Override
+    public void deleteById(String id) {
+
+        favoriteRepository.deleteAllByAssetId(id);
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateRememberByChannelId(String remember, String channelId) {
+
+        jpaRepository.updateRememberByChannelId(remember, channelId);
+    }
+
+    @Override
+    public void updateAuthorsNoteByChannelId(String authorsNote, String channelId) {
+
+        jpaRepository.updateAuthorsNoteByChannelId(authorsNote, channelId);
+    }
+
+    @Override
+    public void updateNudgeByChannelId(String nudge, String channelId) {
+
+        jpaRepository.updateNudgeByChannelId(nudge, channelId);
+    }
+
+    @Override
+    public void updateBumpByChannelId(String bumpContent, int bumpFrequency, String channelId) {
+
+        jpaRepository.updateBumpByChannelId(bumpContent, bumpFrequency, channelId);
     }
 
     @Override
@@ -127,7 +169,8 @@ public class AdventureQueryRepositoryImpl implements AdventureQueryRepository {
             }
 
             if (isNotBlank(request.getOwnerDiscordId())) {
-                predicates.add(contains(cb, root, OWNER_DISCORD_ID, request.getOwnerDiscordId()));
+                predicates.add(cb.equal(root.get("permissions")
+                        .get(OWNER_DISCORD_ID), cb.literal(request.getOwnerDiscordId())));
             }
 
             if (isNotBlank(request.getModel())) {

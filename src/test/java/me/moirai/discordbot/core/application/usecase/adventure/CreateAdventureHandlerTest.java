@@ -15,15 +15,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
+import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.CreateAdventure;
 import me.moirai.discordbot.core.application.usecase.adventure.request.CreateAdventureFixture;
 import me.moirai.discordbot.core.application.usecase.adventure.result.CreateAdventureResult;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntryRepository;
+import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntryFixture;
@@ -39,7 +44,10 @@ public class CreateAdventureHandlerTest {
     private WorldQueryRepository worldQueryRepository;
 
     @Mock
-    private AdventureDomainRepository repository;
+    private PersonaQueryRepository personaQueryRepository;
+
+    @Mock
+    private AdventureRepository repository;
 
     @Mock
     private AdventureLorebookEntryRepository lorebookEntryRepository;
@@ -60,16 +68,96 @@ public class CreateAdventureHandlerTest {
     }
 
     @Test
+    public void createAdventure_whenNoWorldPermission_thenThrowException() {
+
+        // Given
+        String userId = "someUserId";
+        CreateAdventure command = CreateAdventureFixture.sample()
+                .requesterDiscordId(userId)
+                .build();
+
+        World world = WorldFixture.privateWorld().build();
+
+        when(worldQueryRepository.findById(anyString())).thenReturn(Optional.of(world));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
+    }
+
+    @Test
+    public void createAdventure_whenPersonaNotFound_thenThrowException() {
+
+        // Given
+        String userId = "someUserId";
+        CreateAdventure command = CreateAdventureFixture.sample()
+                .requesterDiscordId(userId)
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(userId)
+                        .build())
+                .build();
+
+        when(worldQueryRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(personaQueryRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+    }
+
+    @Test
+    public void createAdventure_whenNoPersonaPermission_thenThrowException() {
+
+        // Given
+        String userId = "someUserId";
+        CreateAdventure command = CreateAdventureFixture.sample()
+                .requesterDiscordId(userId)
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(userId)
+                        .build())
+                .build();
+
+        Persona persona = PersonaFixture.privatePersona().build();
+
+        when(worldQueryRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(personaQueryRepository.findById(anyString())).thenReturn(Optional.of(persona));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
+    }
+
+    @Test
     public void createAdventure_whenValidDate_thenAdventureIsCreated() {
 
         // Given
         String id = "HAUDHUAHD";
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().id(id).build();
-        World world = WorldFixture.privateWorld().build();
-
         CreateAdventure command = CreateAdventureFixture.sample().build();
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+                .id(id)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
 
         when(worldQueryRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(personaQueryRepository.findById(anyString())).thenReturn(Optional.of(persona));
         when(repository.save(any(Adventure.class))).thenReturn(adventure);
         when(worldLorebookEntryRepository.findAllByWorldId(anyString()))
                 .thenReturn(list(WorldLorebookEntryFixture.sampleLorebookEntry().build()));

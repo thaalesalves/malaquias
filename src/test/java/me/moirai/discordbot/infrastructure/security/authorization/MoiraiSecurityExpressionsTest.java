@@ -39,7 +39,7 @@ public class MoiraiSecurityExpressionsTest {
 
         SecuritySessionContext.setCurrentUser(principal);
 
-        when(principal.getId()).thenReturn(userId);
+        when(principal.getDiscordId()).thenReturn(userId);
         when(authorizerFactory.getAuthorizerByAssetType(anyString())).thenReturn(authorizer);
         when(authorizer.canRead(anyString(), anyString())).thenReturn(canRead);
 
@@ -62,7 +62,7 @@ public class MoiraiSecurityExpressionsTest {
 
         SecuritySessionContext.setCurrentUser(principal);
 
-        when(principal.getId()).thenReturn(userId);
+        when(principal.getDiscordId()).thenReturn(userId);
         when(authorizerFactory.getAuthorizerByAssetType(anyString())).thenReturn(authorizer);
         when(authorizer.canModify(anyString(), anyString())).thenReturn(canModify);
 
@@ -97,7 +97,7 @@ public class MoiraiSecurityExpressionsTest {
         String userId = "1234";
         SecuritySessionContext.setCurrentUser(principal);
 
-        when(principal.getId()).thenReturn(userId);
+        when(principal.getDiscordId()).thenReturn(userId);
 
         // When
         boolean result = securityExpressions.isAuthenticatedUser(userId);

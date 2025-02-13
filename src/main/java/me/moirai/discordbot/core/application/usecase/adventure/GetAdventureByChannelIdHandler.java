@@ -1,32 +1,41 @@
 package me.moirai.discordbot.core.application.usecase.adventure;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.GetAdventureByChannelId;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResult;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 
 @UseCaseHandler
 public class GetAdventureByChannelIdHandler
         extends AbstractUseCaseHandler<GetAdventureByChannelId, GetAdventureResult> {
 
-    private final AdventureQueryRepository queryRepository;
+    private static final String ADVENTURE_NOT_FOUND = "No adventures exist for this channel";
+    private static final String USER_NO_PERMISSION = "User does not have permission to view adventure";
 
-    public GetAdventureByChannelIdHandler(AdventureQueryRepository queryRepository) {
+    private final AdventureRepository queryRepository;
+
+    public GetAdventureByChannelIdHandler(AdventureRepository queryRepository) {
         this.queryRepository = queryRepository;
     }
 
     @Override
     public GetAdventureResult execute(GetAdventureByChannelId useCase) {
 
-        return queryRepository.findByDiscordChannelId(useCase.getChannelId())
-                .map(this::mapResult)
-                .orElseThrow(() -> new AssetNotFoundException("No adventures exist for this channel"));
+        Adventure adventure = queryRepository.findByDiscordChannelId(useCase.getChannelId())
+                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
+
+        if (!adventure.canUserRead(useCase.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION);
+        }
+
+        return toResult(adventure);
     }
 
-    private GetAdventureResult mapResult(Adventure adventure) {
+    private GetAdventureResult toResult(Adventure adventure) {
 
         return GetAdventureResult.builder()
                 .id(adventure.getId())

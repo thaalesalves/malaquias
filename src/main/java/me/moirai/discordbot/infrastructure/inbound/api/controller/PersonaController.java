@@ -76,7 +76,7 @@ public class PersonaController extends SecurityContextAware {
                     .direction(getDirection(searchParameters.getDirection()))
                     .visibility(getVisibility(searchParameters.getVisibility()))
                     .operation(getOperation(searchParameters.getOperation()))
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -101,7 +101,7 @@ public class PersonaController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreatePersona command = requestMapper.toCommand(request, authenticatedUser.getId());
+            CreatePersona command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
     }
@@ -116,7 +116,7 @@ public class PersonaController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             UpdatePersona command = requestMapper.toCommand(request, personaId,
-                    authenticatedUser.getId());
+                    authenticatedUser.getDiscordId());
 
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
@@ -145,7 +145,7 @@ public class PersonaController extends SecurityContextAware {
 
             AddFavoritePersona command = AddFavoritePersona.builder()
                     .assetId(request.getAssetId())
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
@@ -162,7 +162,7 @@ public class PersonaController extends SecurityContextAware {
 
             RemoveFavoritePersona command = RemoveFavoritePersona.builder()
                     .assetId(assetId)
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);

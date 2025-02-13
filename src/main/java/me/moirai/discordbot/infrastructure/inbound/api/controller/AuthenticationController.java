@@ -115,7 +115,7 @@ public class AuthenticationController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(authenticatedUser.getId());
+            GetUserDetailsByDiscordId query = GetUserDetailsByDiscordId.build(authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }

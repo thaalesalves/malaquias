@@ -70,7 +70,7 @@ public class WorldLorebookController extends SecurityContextAware {
                     .sortingField(getSortingField(searchParameters.getSortingField()))
                     .direction(getDirection(searchParameters.getDirection()))
                     .name(searchParameters.getName())
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .worldId(worldId)
                     .build();
 
@@ -90,7 +90,7 @@ public class WorldLorebookController extends SecurityContextAware {
             GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
                     .entryId(entryId)
                     .worldId(worldId)
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -106,7 +106,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorldLorebookEntry command = requestMapper.toCommand(request, worldId, authenticatedUser.getId());
+            CreateWorldLorebookEntry command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
     }
@@ -122,7 +122,7 @@ public class WorldLorebookController extends SecurityContextAware {
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             UpdateWorldLorebookEntry command = requestMapper.toCommand(request, entryId,
-                    worldId, authenticatedUser.getId());
+                    worldId, authenticatedUser.getDiscordId());
 
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
@@ -137,7 +137,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorldLorebookEntry command = requestMapper.toCommand(entryId, worldId, authenticatedUser.getId());
+            DeleteWorldLorebookEntry command = requestMapper.toCommand(entryId, worldId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();

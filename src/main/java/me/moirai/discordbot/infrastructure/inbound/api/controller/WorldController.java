@@ -76,7 +76,7 @@ public class WorldController extends SecurityContextAware {
                     .direction(getDirection(searchParameters.getDirection()))
                     .visibility(getVisibility(searchParameters.getVisibility()))
                     .operation(getOperation(searchParameters.getOperation()))
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -101,7 +101,7 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorld command = requestMapper.toCommand(request, authenticatedUser.getId());
+            CreateWorld command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
     }
@@ -114,7 +114,7 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateWorld command = requestMapper.toCommand(request, worldId, authenticatedUser.getId());
+            UpdateWorld command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
     }
@@ -142,7 +142,7 @@ public class WorldController extends SecurityContextAware {
 
             AddFavoriteWorld command = AddFavoriteWorld.builder()
                     .assetId(request.getAssetId())
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
@@ -159,7 +159,7 @@ public class WorldController extends SecurityContextAware {
 
             RemoveFavoriteWorld command = RemoveFavoriteWorld.builder()
                     .assetId(assetId)
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);

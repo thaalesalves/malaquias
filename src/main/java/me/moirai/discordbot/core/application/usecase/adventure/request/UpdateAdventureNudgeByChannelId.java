@@ -6,14 +6,16 @@ public final class UpdateAdventureNudgeByChannelId extends UseCase<Void> {
 
     private final String nudge;
     private final String channelId;
+    private final String requesterDiscordId;
 
-    private UpdateAdventureNudgeByChannelId(String nudge, String channelId) {
-        this.nudge = nudge;
-        this.channelId = channelId;
+    private UpdateAdventureNudgeByChannelId(Builder builder) {
+        this.nudge = builder.nudge;
+        this.channelId = builder.channelId;
+        this.requesterDiscordId = builder.requesterDiscordId;
     }
 
-    public static UpdateAdventureNudgeByChannelId build(String nudge, String channelId) {
-        return new UpdateAdventureNudgeByChannelId(nudge, channelId);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getNudge() {
@@ -22,5 +24,35 @@ public final class UpdateAdventureNudgeByChannelId extends UseCase<Void> {
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
+    }
+
+    public static final class Builder {
+
+        private String nudge;
+        private String channelId;
+        private String requesterDiscordId;
+
+        public Builder nudge(String nudge) {
+            this.nudge = nudge;
+            return this;
+        }
+
+        public Builder channelId(String channelId) {
+            this.channelId = channelId;
+            return this;
+        }
+
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
+            return this;
+        }
+
+        public UpdateAdventureNudgeByChannelId build() {
+            return new UpdateAdventureNudgeByChannelId(this);
+        }
     }
 }

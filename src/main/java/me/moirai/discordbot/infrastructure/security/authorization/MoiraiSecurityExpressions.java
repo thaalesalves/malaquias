@@ -30,21 +30,21 @@ public class MoiraiSecurityExpressions extends SecurityExpressionRoot implements
 
     public boolean isAuthenticatedUser(String userId) {
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
-        return principal.getId().equals(userId);
+        return principal.getDiscordId().equals(userId);
     }
 
     public boolean canModify(String assetId, String assetType) {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         return authorizerFactory.getAuthorizerByAssetType(assetType)
-                .canModify(assetId, principal.getId());
+                .canModify(assetId, principal.getDiscordId());
     }
 
     public boolean canRead(String assetId, String assetType) {
 
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
         return authorizerFactory.getAuthorizerByAssetType(assetType)
-                .canRead(assetId, principal.getId());
+                .canRead(assetId, principal.getDiscordId());
     }
 
     @Override

@@ -2,9 +2,10 @@ package me.moirai.discordbot.core.domain.adventure;
 
 import java.util.Optional;
 
-public interface AdventureDomainRepository {
+import me.moirai.discordbot.core.application.usecase.adventure.request.SearchAdventures;
+import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventuresResult;
 
-    Optional<Adventure> findById(String id);
+public interface AdventureRepository {
 
     Adventure save(Adventure adventure);
 
@@ -17,4 +18,12 @@ public interface AdventureDomainRepository {
     void updateNudgeByChannelId(String nudge, String channelId);
 
     void updateBumpByChannelId(String bumpContent, int bumpFrequency, String channelId);
+
+    Optional<Adventure> findById(String id);
+
+    SearchAdventuresResult search(SearchAdventures request);
+
+    Optional<Adventure> findByDiscordChannelId(String channelId);
+
+    String getGameModeByDiscordChannelId(String discordChannelId);
 }

@@ -29,9 +29,9 @@ public class AdventureAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean isOwner(String assetId, String userId) {
 
-        GetAdventureById request = GetAdventureById.build(assetId);
-        GetAdventureResult adventureDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetAdventureById request = GetAdventureById.build(assetId, principal.getDiscordId());
+        GetAdventureResult adventureDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = adventureDetails.getOwnerDiscordId().equals(userId);
@@ -42,9 +42,9 @@ public class AdventureAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean canModify(String assetId, String userId) {
 
-        GetAdventureById request = GetAdventureById.build(assetId);
-        GetAdventureResult adventureDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetAdventureById request = GetAdventureById.build(assetId, principal.getDiscordId());
+        GetAdventureResult adventureDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = adventureDetails.getOwnerDiscordId().equals(userId);
@@ -56,9 +56,9 @@ public class AdventureAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean canRead(String assetId, String userId) {
 
-        GetAdventureById request = GetAdventureById.build(assetId);
-        GetAdventureResult adventureDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetAdventureById request = GetAdventureById.build(assetId, principal.getDiscordId());
+        GetAdventureResult adventureDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = adventureDetails.getOwnerDiscordId().equals(userId);

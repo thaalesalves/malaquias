@@ -19,9 +19,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import me.moirai.discordbot.AbstractIntegrationTest;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.SearchAdventures;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResult;
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventuresResult;
@@ -29,30 +31,252 @@ import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.GameMode;
 import me.moirai.discordbot.core.domain.adventure.ModelConfigurationFixture;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
-public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegrationTest {
+public class AdventureRepositoryImplIntegrationTest extends AbstractIntegrationTest {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
-    private AdventureQueryRepository repository;
+    private AdventureRepository repository;
 
     @Autowired
     private AdventureJpaRepository jpaRepository;
 
     @Autowired
-    private AdventureLorebookEntryJpaRepository lorebookEntryJpaRepository;
+    private FavoriteRepository favoriteRepository;
 
     @Autowired
-    private FavoriteRepository favoriteRepository;
+    private AdventureLorebookEntryJpaRepository lorebookEntryJpaRepository;
 
     @BeforeEach
     public void before() {
         lorebookEntryJpaRepository.deleteAllInBatch();
         jpaRepository.deleteAllInBatch();
+    }
+
+    @Test
+    public void createAdventure() {
+
+        // Given
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .build();
+
+        // When
+        Adventure createdAdventure = repository.save(adventure);
+
+        // Then
+        assertThat(createdAdventure).isNotNull();
+
+        assertThat(createdAdventure.getCreationDate()).isNotNull();
+        assertThat(createdAdventure.getLastUpdateDate()).isNotNull();
+
+        assertThat(createdAdventure.getModelConfiguration().getAiModel().toString())
+                .isEqualTo((adventure.getModelConfiguration().getAiModel().toString()));
+
+        assertThat(createdAdventure.getModelConfiguration().getFrequencyPenalty())
+                .isEqualTo((adventure.getModelConfiguration().getFrequencyPenalty()));
+
+        assertThat(createdAdventure.getModelConfiguration().getPresencePenalty())
+                .isEqualTo((adventure.getModelConfiguration().getPresencePenalty()));
+
+        assertThat(createdAdventure.getModelConfiguration().getTemperature())
+                .isEqualTo((adventure.getModelConfiguration().getTemperature()));
+
+        assertThat(createdAdventure.getModelConfiguration().getLogitBias())
+                .isEqualTo((adventure.getModelConfiguration().getLogitBias()));
+
+        assertThat(createdAdventure.getModelConfiguration().getMaxTokenLimit())
+                .isEqualTo((adventure.getModelConfiguration().getMaxTokenLimit()));
+
+        assertThat(createdAdventure.getModelConfiguration().getStopSequences())
+                .isEqualTo((adventure.getModelConfiguration().getStopSequences()));
+
+    }
+
+    @Test
+    public void emptyResultWhenAssetDoesntExist() {
+
+        // Given
+        String adventureId = "WRLDID";
+
+        // When
+        Optional<Adventure> retrievedAdventureOptional = repository.findById(adventureId);
+
+        // Then
+        assertThat(retrievedAdventureOptional).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void deleteAdventure() {
+
+        // Given
+        Adventure adventure = repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .build());
+
+        // When
+        repository.deleteById(adventure.getId());
+
+        // Then
+        assertThat(repository.findById(adventure.getId())).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void updateAdventure() {
+
+        // Given
+        Adventure originalAdventure = repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .version(0)
+                .build());
+
+        Adventure worldToUbeUpdated = AdventureFixture.privateMultiplayerAdventure()
+                .id(originalAdventure.getId())
+                .visibility(Visibility.PUBLIC)
+                .version(originalAdventure.getVersion())
+                .build();
+
+        // When
+        Adventure updatedAdventure = repository.save(worldToUbeUpdated);
+
+        // Then
+        assertThat(originalAdventure.getVersion()).isZero();
+        assertThat(updatedAdventure.getVersion()).isOne();
+    }
+
+    @Test
+    @Transactional
+    public void updateRememberAdventure() {
+
+        // Given
+        String remember = "new value";
+        String channelId = "123123123";
+
+        repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .version(0)
+                .discordChannelId(channelId)
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // When
+        repository.updateRememberByChannelId(remember, channelId);
+
+        // Then
+        Adventure updatedAdventure = repository.findByDiscordChannelId(channelId).get();
+        assertThat(updatedAdventure.getContextAttributes().getRemember()).isEqualTo(remember);
+    }
+
+    @Test
+    @Transactional
+    public void updateAuthorsNoteAdventure() {
+
+        // Given
+        String authorsNote = "new value";
+        String channelId = "123123123";
+
+        repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .version(0)
+                .discordChannelId(channelId)
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // When
+        repository.updateAuthorsNoteByChannelId(authorsNote, channelId);
+
+        // Then
+        Adventure updatedAdventure = repository.findByDiscordChannelId(channelId).get();
+        assertThat(updatedAdventure.getContextAttributes().getAuthorsNote()).isEqualTo(authorsNote);
+    }
+
+    @Test
+    @Transactional
+    public void updateNudgeAdventure() {
+
+        // Given
+        String nudge = "new value";
+        String channelId = "123123123";
+
+        repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .version(0)
+                .discordChannelId(channelId)
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // When
+        repository.updateNudgeByChannelId(nudge, channelId);
+
+        // Then
+        Adventure updatedAdventure = repository.findByDiscordChannelId(channelId).get();
+        assertThat(updatedAdventure.getContextAttributes().getNudge()).isEqualTo(nudge);
+    }
+
+    @Test
+    @Transactional
+    public void updateBumpAdventure() {
+
+        // Given
+        int bumpFrequency = 35;
+        String bump = "new value";
+        String channelId = "123123123";
+
+        repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .version(0)
+                .discordChannelId(channelId)
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // When
+        repository.updateBumpByChannelId(bump, bumpFrequency, channelId);
+
+        // Then
+        Adventure updatedAdventure = repository.findByDiscordChannelId(channelId).get();
+        assertThat(updatedAdventure.getContextAttributes().getBump()).isEqualTo(bump);
+        assertThat(updatedAdventure.getContextAttributes().getBumpFrequency()).isEqualTo(bumpFrequency);
+    }
+
+    @Test
+    @Transactional
+    public void deleteAdventure_whenIsFavorite_thenDeleteFavorites() {
+
+        // Given
+        String userId = "1234";
+        Adventure adventure = repository.save(AdventureFixture.privateMultiplayerAdventure()
+                .id(null)
+                .build());
+
+        FavoriteEntity favorite = favoriteRepository.save(FavoriteEntity.builder()
+                .playerDiscordId(userId)
+                .assetId(adventure.getId())
+                .assetType("adventure")
+                .build());
+
+        // When
+        repository.deleteById(adventure.getId());
+
+        // Then
+        assertThat(repository.findById(adventure.getId())).isNotNull().isEmpty();
+        assertThat(favoriteRepository.existsById(favorite.getId())).isFalse();
+        assertThat(lorebookEntryJpaRepository.findAllByAdventureId(adventure.getId())).isEmpty();
     }
 
     @Test
@@ -1650,6 +1874,60 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
     }
 
     @Test
+    public void searchAdventureFilterByOwner() {
+
+        // Given
+        String ownerDiscordId = "586678721358363";
+        Adventure gpt4Omni = AdventureFixture.publicMultiplayerAdventure()
+                .id(null)
+                .name("Number 1")
+                .moderation(STRICT)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .discordChannelId("CHNLID1")
+                .gameMode(AUTHOR)
+                .build();
+
+        Adventure gpt4Mini = AdventureFixture.publicMultiplayerAdventure()
+                .id(null)
+                .name("Number 2")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .moderation(PERMISSIVE)
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .discordChannelId("CHNLID2")
+                .gameMode(CHAT)
+                .build();
+
+        Adventure gpt354k = AdventureFixture.publicMultiplayerAdventure()
+                .id(null)
+                .name("Number 3")
+                .moderation(PERMISSIVE)
+                .discordChannelId("CHNLID3")
+                .gameMode(RPG)
+                .build();
+
+        jpaRepository.saveAll(list(gpt4Omni, gpt4Mini, gpt354k));
+
+        SearchAdventures query = SearchAdventures.builder()
+                .ownerDiscordId(ownerDiscordId)
+                .requesterDiscordId(ownerDiscordId)
+                .build();
+
+        // When
+        SearchAdventuresResult result = repository.search(query);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.getTotalItems()).isOne();
+        assertThat(result.getTotalPages()).isOne();
+
+        List<GetAdventureResult> adventures = result.getResults();
+        assertThat(adventures.get(0).getName()).isEqualTo(gpt4Mini.getName());
+    }
+
+    @Test
     public void searchAdventures_whenFilterByWorldId_andWriterOnly_thenReturnResults() {
 
         // Given
@@ -2152,6 +2430,58 @@ public class AdventureQueryRepositoryImplIntegrationTest extends AbstractIntegra
         SearchAdventures query = SearchAdventures.builder()
                 .requesterDiscordId(ownerDiscordId)
                 .persona(personaId)
+                .favorites(true)
+                .build();
+
+        // When
+        SearchAdventuresResult result = repository.search(query);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result.getTotalItems()).isOne();
+        assertThat(result.getTotalPages()).isOne();
+    }
+
+    @Test
+    public void searchFavoriteAdventures_whenFilterByOwnerId_thenReturnResults() {
+
+        // Given
+        String ownerDiscordId = "1234123";
+        Adventure gpt4Omni = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
+                .id(null)
+                .name("Number 1")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Omni().build())
+                .discordChannelId("CHNLID1")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .build());
+
+        Adventure gpt4Mini = jpaRepository.save(AdventureFixture.publicMultiplayerAdventure()
+                .id(null)
+                .name("Number 2")
+                .modelConfiguration(ModelConfigurationFixture.gpt4Mini().build())
+                .discordChannelId("CHNLID2")
+                .build());
+
+        FavoriteEntity favorite1 = FavoriteEntity.builder()
+                .playerDiscordId(ownerDiscordId)
+                .assetType("adventure")
+                .assetId(gpt4Omni.getId())
+                .build();
+
+        FavoriteEntity favorite2 = FavoriteEntity.builder()
+                .playerDiscordId(ownerDiscordId)
+                .assetType("adventure")
+                .assetId(gpt4Mini.getId())
+                .build();
+
+        favoriteRepository.saveAll(list(favorite1, favorite2));
+
+        SearchAdventures query = SearchAdventures.builder()
+                .requesterDiscordId(ownerDiscordId)
+                .ownerDiscordId(ownerDiscordId)
                 .favorites(true)
                 .build();
 

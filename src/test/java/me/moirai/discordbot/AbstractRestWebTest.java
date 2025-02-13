@@ -55,7 +55,7 @@ public abstract class AbstractRestWebTest {
     public void before() {
 
         UserDetails userDetails = MoiraiPrincipal.builder()
-                .id("USRID")
+                .discordId("USRID")
                 .email("user@email.com")
                 .username("username")
                 .build();

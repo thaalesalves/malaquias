@@ -70,7 +70,7 @@ public class AdventureLorebookController extends SecurityContextAware {
                     .sortingField(getSortingField(searchParameters.getSortingField()))
                     .direction(getDirection(searchParameters.getDirection()))
                     .name(searchParameters.getName())
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .adventureId(adventureId)
                     .build();
 
@@ -90,7 +90,7 @@ public class AdventureLorebookController extends SecurityContextAware {
             GetAdventureLorebookEntryById query = GetAdventureLorebookEntryById.builder()
                     .entryId(entryId)
                     .adventureId(adventureId)
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -107,7 +107,7 @@ public class AdventureLorebookController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             CreateAdventureLorebookEntry command = requestMapper.toCommand(request,
-                    adventureId, authenticatedUser.getId());
+                    adventureId, authenticatedUser.getDiscordId());
 
             return useCaseRunner.run(command)
                     .map(responseMapper::toResponse);
@@ -125,7 +125,7 @@ public class AdventureLorebookController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             UpdateAdventureLorebookEntry command = requestMapper.toCommand(request, entryId,
-                    adventureId, authenticatedUser.getId());
+                    adventureId, authenticatedUser.getDiscordId());
 
             return useCaseRunner.run(command)
                     .map(responseMapper::toResponse);
@@ -142,7 +142,7 @@ public class AdventureLorebookController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             DeleteAdventureLorebookEntry command = requestMapper.toCommand(entryId,
-                    adventureId, authenticatedUser.getId());
+                    adventureId, authenticatedUser.getDiscordId());
 
             useCaseRunner.run(command);
 
