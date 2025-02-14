@@ -26,12 +26,6 @@ public class WorldLorebookEntry extends Asset {
     @Column(name = "regex", nullable = false)
     private String regex;
 
-    @Column(name = "player_discord_id")
-    private String playerDiscordId;
-
-    @Column(name = "is_player_character", nullable = false)
-    private boolean isPlayerCharacter;
-
     @Column(name = "world_id", nullable = false)
     private String worldId;
 
@@ -43,8 +37,6 @@ public class WorldLorebookEntry extends Asset {
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
-        this.playerDiscordId = builder.playerDiscordId;
-        this.isPlayerCharacter = builder.isPlayerCharacter;
         this.worldId = builder.worldId;
     }
 
@@ -73,14 +65,6 @@ public class WorldLorebookEntry extends Asset {
         return description;
     }
 
-    public String getPlayerDiscordId() {
-        return playerDiscordId;
-    }
-
-    public boolean isPlayerCharacter() {
-        return isPlayerCharacter;
-    }
-
     public String getWorldId() {
         return worldId;
     }
@@ -100,27 +84,13 @@ public class WorldLorebookEntry extends Asset {
         this.regex = regex;
     }
 
-    public void assignPlayer(String playerDiscordId) {
-
-        this.isPlayerCharacter = true;
-        this.playerDiscordId = playerDiscordId;
-    }
-
-    public void unassignPlayer() {
-
-        this.isPlayerCharacter = false;
-        this.playerDiscordId = null;
-    }
-
     public static final class Builder {
 
         private String id;
         private String name;
         private String regex;
         private String description;
-        private String playerDiscordId;
         private String creatorDiscordId;
-        private boolean isPlayerCharacter;
         private String worldId;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
@@ -150,18 +120,6 @@ public class WorldLorebookEntry extends Asset {
         public Builder regex(String regex) {
 
             this.regex = regex;
-            return this;
-        }
-
-        public Builder playerDiscordId(String playerDiscordId) {
-
-            this.playerDiscordId = playerDiscordId;
-            return this;
-        }
-
-        public Builder isPlayerCharacter(boolean isPlayerCharacter) {
-
-            this.isPlayerCharacter = isPlayerCharacter;
             return this;
         }
 

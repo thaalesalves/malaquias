@@ -21,7 +21,7 @@ import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.discordbot.core.application.usecase.world.result.UpdateWorldResult;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -31,10 +31,10 @@ public class UpdateWorldHandler extends AbstractUseCaseHandler<UpdateWorld, Mono
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be updated was not found";
 
-    private final WorldDomainRepository repository;
+    private final WorldRepository repository;
     private final TextModerationPort moderationPort;
 
-    public UpdateWorldHandler(WorldDomainRepository repository,
+    public UpdateWorldHandler(WorldRepository repository,
             TextModerationPort moderationPort) {
 
         this.repository = repository;

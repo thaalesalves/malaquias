@@ -45,8 +45,6 @@ public class GetWorldLorebookEntryByIdHandler extends AbstractUseCaseHandler<Get
                 .name(entry.getName())
                 .regex(entry.getRegex())
                 .description(entry.getDescription())
-                .playerDiscordId(entry.getPlayerDiscordId())
-                .isPlayerCharacter(entry.isPlayerCharacter())
                 .creationDate(entry.getCreationDate())
                 .lastUpdateDate(entry.getLastUpdateDate())
                 .build();

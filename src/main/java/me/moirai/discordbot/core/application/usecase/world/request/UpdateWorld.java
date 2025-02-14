@@ -1,6 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.world.request;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,10 +30,18 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
         this.visibility = builder.visibility;
-        this.usersAllowedToWriteToAdd = unmodifiableSet(builder.usersAllowedToWriteToAdd);
-        this.usersAllowedToWriteToRemove = unmodifiableSet(builder.usersAllowedToWriteToRemove);
-        this.usersAllowedToReadToAdd = unmodifiableSet(builder.usersAllowedToReadToAdd);
-        this.usersAllowedToReadToRemove = unmodifiableSet(builder.usersAllowedToReadToRemove);
+
+        this.usersAllowedToWriteToAdd = isEmpty(builder.usersAllowedToWriteToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToAdd);
+
+        this.usersAllowedToWriteToRemove = isEmpty(builder.usersAllowedToWriteToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToRemove);
+
+        this.usersAllowedToReadToAdd = isEmpty(builder.usersAllowedToReadToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToAdd);
+
+        this.usersAllowedToReadToRemove = isEmpty(builder.usersAllowedToReadToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToRemove);
     }
 
     public static Builder builder() {
@@ -116,37 +126,25 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
 
         public Builder usersAllowedToWriteToAdd(Set<String> usersAllowedToWriteToAdd) {
 
-            if (usersAllowedToWriteToAdd != null) {
-                this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
-            }
-
+            this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
             return this;
         }
 
         public Builder usersAllowedToWriteToRemove(Set<String> usersAllowedToWriteToRemove) {
 
-            if (usersAllowedToWriteToRemove != null) {
-                this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
-            }
-
+            this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
             return this;
         }
 
         public Builder usersAllowedToReadToAdd(Set<String> usersAllowedToReadToAdd) {
 
-            if (usersAllowedToReadToAdd != null) {
-                this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
-            }
-
+            this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
             return this;
         }
 
         public Builder usersAllowedToReadToRemove(Set<String> usersAllowedToReadToRemove) {
 
-            if (usersAllowedToReadToRemove != null) {
-                this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
-            }
-
+            this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
             return this;
         }
 

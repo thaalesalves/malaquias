@@ -21,14 +21,14 @@ import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteWorldHandlerTest {
 
     @Mock
-    private WorldDomainRepository domainRepository;
+    private WorldRepository domainRepository;
 
     @InjectMocks
     private DeleteWorldHandler handler;

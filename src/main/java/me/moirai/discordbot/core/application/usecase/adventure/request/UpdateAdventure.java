@@ -5,11 +5,10 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.MapUtils.isEmpty;
 
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.collections4.MapUtils;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 import me.moirai.discordbot.core.application.usecase.adventure.result.UpdateAdventureResult;
@@ -72,7 +71,7 @@ public final class UpdateAdventure extends UseCase<UpdateAdventureResult> {
         this.bump = builder.bump;
         this.bumpFrequency = builder.bumpFrequency;
 
-        this.logitBiasToAdd = MapUtils.isEmpty(builder.logitBiasToAdd) ? emptyMap()
+        this.logitBiasToAdd = isEmpty(builder.logitBiasToAdd) ? emptyMap()
                 : unmodifiableMap(builder.logitBiasToAdd);
 
         this.logitBiasToRemove = isEmpty(builder.logitBiasToRemove) ? emptySet()

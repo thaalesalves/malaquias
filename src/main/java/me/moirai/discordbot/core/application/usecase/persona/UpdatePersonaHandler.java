@@ -21,7 +21,7 @@ import me.moirai.discordbot.core.application.usecase.persona.request.UpdatePerso
 import me.moirai.discordbot.core.application.usecase.persona.result.UpdatePersonaResult;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
@@ -31,10 +31,10 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
 
-    private final PersonaDomainRepository repository;
+    private final PersonaRepository repository;
     private final TextModerationPort moderationPort;
 
-    public UpdatePersonaHandler(PersonaDomainRepository repository,
+    public UpdatePersonaHandler(PersonaRepository repository,
             TextModerationPort moderationPort) {
 
         this.repository = repository;

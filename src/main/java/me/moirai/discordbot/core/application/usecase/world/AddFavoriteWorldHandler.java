@@ -3,8 +3,8 @@ package me.moirai.discordbot.core.application.usecase.world;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.AddFavoriteWorld;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
@@ -13,19 +13,21 @@ public class AddFavoriteWorldHandler extends AbstractUseCaseHandler<AddFavoriteW
 
     private static final String ASSET_TYPE = "world";
 
-    private final WorldQueryRepository worldQueryRepository;
+    private final WorldRepository worldRepository;
     private final FavoriteRepository favoriteRepository;
 
-    public AddFavoriteWorldHandler(WorldQueryRepository worldQueryRepository,
+    public AddFavoriteWorldHandler(
+            WorldRepository worldRepository,
             FavoriteRepository favoriteRepository) {
-        this.worldQueryRepository = worldQueryRepository;
+
+        this.worldRepository = worldRepository;
         this.favoriteRepository = favoriteRepository;
     }
 
     @Override
     public Void execute(AddFavoriteWorld command) {
 
-        worldQueryRepository.findById(command.getAssetId())
+        worldRepository.findById(command.getAssetId())
                 .orElseThrow(() -> new AssetNotFoundException("The world to be favorited could not be found"));
 
         favoriteRepository.save(FavoriteEntity.builder()

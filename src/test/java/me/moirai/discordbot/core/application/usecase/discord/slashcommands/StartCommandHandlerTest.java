@@ -21,7 +21,7 @@ import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.StoryGenerationRequest;
 import reactor.core.publisher.Mono;
@@ -33,7 +33,7 @@ public class StartCommandHandlerTest extends AbstractDiscordTest {
     private AdventureRepository adventureRepository;
 
     @Mock
-    private WorldDomainRepository worldRepository;
+    private WorldRepository worldRepository;
 
     @Mock
     private StoryGenerationHelper storyGenerationPort;

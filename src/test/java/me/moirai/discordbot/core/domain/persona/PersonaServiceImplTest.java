@@ -26,7 +26,7 @@ public class PersonaServiceImplTest {
     private TextModerationPort moderationPort;
 
     @Mock
-    private PersonaDomainRepository repository;
+    private PersonaRepository repository;
 
     @InjectMocks
     private PersonaServiceImpl service;

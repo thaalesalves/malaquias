@@ -9,7 +9,7 @@ import me.moirai.discordbot.common.annotation.Helper;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.util.StringProcessor;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import reactor.core.publisher.Mono;
@@ -24,12 +24,12 @@ public class PersonaEnrichmentHelperImpl implements PersonaEnrichmentHelper {
     private static final String PERSONA_IS_TOO_BIG_FOR_CONTEXT = "Persona is too big to fit in context";
 
     private final TokenizerPort tokenizerPort;
-    private final PersonaDomainRepository personaRepository;
+    private final PersonaRepository personaRepository;
     private final ChatMessageHelper chatMessageService;
 
     public PersonaEnrichmentHelperImpl(
             TokenizerPort tokenizerPort,
-            PersonaDomainRepository personaRepository,
+            PersonaRepository personaRepository,
             ChatMessageHelper chatMessageService) {
 
         this.tokenizerPort = tokenizerPort;

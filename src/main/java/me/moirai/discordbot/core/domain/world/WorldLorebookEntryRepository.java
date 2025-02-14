@@ -19,6 +19,4 @@ public interface WorldLorebookEntryRepository {
     List<WorldLorebookEntry> findAllByRegex(String regex, String worldId);
 
     List<WorldLorebookEntry> findAllByWorldId(String worldId);
-
-    Optional<WorldLorebookEntry> findByPlayerDiscordId(String playerDiscordId, String worldId);
 }

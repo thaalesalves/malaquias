@@ -15,17 +15,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldById;
 import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetWorldByIdHandlerTest {
 
     @Mock
-    private WorldQueryRepository repository;
+    private WorldRepository repository;
 
     @InjectMocks
     private GetWorldByIdHandler handler;

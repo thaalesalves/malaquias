@@ -6,7 +6,7 @@ import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @UseCaseHandler
 public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void> {
@@ -14,9 +14,9 @@ public class DeleteWorldHandler extends AbstractUseCaseHandler<DeleteWorld, Void
     private static final String WORLD_TO_BE_VIEWED_WAS_NOT_FOUND = "World to be viewed was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
 
-    private final WorldDomainRepository repository;
+    private final WorldRepository repository;
 
-    public DeleteWorldHandler(WorldDomainRepository repository) {
+    public DeleteWorldHandler(WorldRepository repository) {
         this.repository = repository;
     }
 

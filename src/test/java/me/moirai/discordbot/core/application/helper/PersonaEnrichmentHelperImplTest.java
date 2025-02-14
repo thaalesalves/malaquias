@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
@@ -34,7 +34,7 @@ public class PersonaEnrichmentHelperImplTest {
     private TokenizerPort tokenizerPort;
 
     @Mock
-    private PersonaDomainRepository personaRepository;
+    private PersonaRepository personaRepository;
 
     @Mock
     private ChatMessageHelper chatMessageService;

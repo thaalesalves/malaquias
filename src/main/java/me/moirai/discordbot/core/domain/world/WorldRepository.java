@@ -1,14 +1,17 @@
-package me.moirai.discordbot.core.application.port;
+package me.moirai.discordbot.core.domain.world;
 
 import java.util.Optional;
 
 import me.moirai.discordbot.core.application.usecase.world.request.SearchWorlds;
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldsResult;
-import me.moirai.discordbot.core.domain.world.World;
 
-public interface WorldQueryRepository {
+public interface WorldRepository {
+
+    World save(World world);
 
     Optional<World> findById(String id);
+
+    void deleteById(String id);
 
     SearchWorldsResult search(SearchWorlds request);
 }

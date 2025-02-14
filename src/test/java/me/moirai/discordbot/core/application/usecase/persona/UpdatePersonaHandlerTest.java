@@ -22,7 +22,7 @@ import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.persona.request.UpdatePersona;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -31,7 +31,7 @@ import reactor.test.StepVerifier;
 public class UpdatePersonaHandlerTest {
 
     @Mock
-    private PersonaDomainRepository repository;
+    private PersonaRepository repository;
 
     @Mock
     private TextModerationPort moderationPort;

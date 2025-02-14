@@ -3,8 +3,8 @@ package me.moirai.discordbot.core.application.usecase.persona;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.AddFavoritePersona;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
@@ -13,19 +13,21 @@ public class AddFavoritePersonaHandler extends AbstractUseCaseHandler<AddFavorit
 
     private static final String ASSET_TYPE = "persona";
 
-    private final PersonaQueryRepository personaQueryRepository;
+    private final PersonaRepository personaRepository;
     private final FavoriteRepository favoriteRepository;
 
-    public AddFavoritePersonaHandler(PersonaQueryRepository personaQueryRepository,
+    public AddFavoritePersonaHandler(
+            PersonaRepository personaRepository,
             FavoriteRepository favoriteRepository) {
-        this.personaQueryRepository = personaQueryRepository;
+
+        this.personaRepository = personaRepository;
         this.favoriteRepository = favoriteRepository;
     }
 
     @Override
     public Void execute(AddFavoritePersona command) {
 
-        personaQueryRepository.findById(command.getAssetId())
+        personaRepository.findById(command.getAssetId())
                 .orElseThrow(() -> new AssetNotFoundException("The persona to be favorited could not be found"));
 
         favoriteRepository.save(FavoriteEntity.builder()

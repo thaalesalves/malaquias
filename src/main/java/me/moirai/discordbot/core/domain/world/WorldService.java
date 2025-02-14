@@ -1,7 +1,5 @@
 package me.moirai.discordbot.core.domain.world;
 
-import java.util.List;
-
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntry;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorldLorebookEntry;
@@ -16,10 +14,6 @@ public interface WorldService {
     WorldLorebookEntry createLorebookEntry(CreateWorldLorebookEntry command);
 
     WorldLorebookEntry updateLorebookEntry(UpdateWorldLorebookEntry command);
-
-    List<WorldLorebookEntry> findAllLorebookEntriesByRegex(String worldId, String valueToSearch);
-
-    WorldLorebookEntry findLorebookEntryByPlayerDiscordId(String worldId, String playerDiscordId);
 
     WorldLorebookEntry findLorebookEntryById(GetWorldLorebookEntryById query);
 

@@ -1,8 +1,5 @@
 package me.moirai.discordbot.core.domain.world;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +37,11 @@ public class WorldServiceImpl implements WorldService {
 
     private final TextModerationPort moderationPort;
     private final WorldLorebookEntryRepository lorebookEntryRepository;
-    private final WorldDomainRepository repository;
+    private final WorldRepository repository;
 
     public WorldServiceImpl(TextModerationPort moderationPort,
             WorldLorebookEntryRepository lorebookEntryRepository,
-            WorldDomainRepository repository) {
+            WorldRepository repository) {
 
         this.moderationPort = moderationPort;
         this.lorebookEntryRepository = lorebookEntryRepository;
@@ -78,33 +75,12 @@ public class WorldServiceImpl implements WorldService {
                                     .name(entry.getName())
                                     .description(entry.getDescription())
                                     .regex(entry.getRegex())
-                                    .playerDiscordId(entry.getPlayerDiscordId())
-                                    .isPlayerCharacter(isNotEmpty(entry.getPlayerDiscordId()))
                                     .worldId(world.getId())
                                     .build())
                             .forEach(lorebookEntryRepository::save);
 
                     return world;
                 });
-    }
-
-    @Override
-    public WorldLorebookEntry findLorebookEntryByPlayerDiscordId(String playerDiscordId, String worldId) {
-
-        repository.findById(worldId)
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-
-        return lorebookEntryRepository.findByPlayerDiscordId(playerDiscordId, worldId)
-                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
-    }
-
-    @Override
-    public List<WorldLorebookEntry> findAllLorebookEntriesByRegex(String valueToMatch, String worldId) {
-
-        repository.findById(worldId)
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-
-        return lorebookEntryRepository.findAllByRegex(valueToMatch, worldId);
     }
 
     @Override
@@ -135,8 +111,6 @@ public class WorldServiceImpl implements WorldService {
                 .name(command.getName())
                 .regex(command.getRegex())
                 .description(command.getDescription())
-                .playerDiscordId(command.getPlayerDiscordId())
-                .isPlayerCharacter(isEmpty(command.getPlayerDiscordId()))
                 .worldId(world.getId())
                 .creatorDiscordId(command.getRequesterDiscordId())
                 .build();
@@ -167,12 +141,6 @@ public class WorldServiceImpl implements WorldService {
 
         if (StringUtils.isNotBlank(command.getDescription())) {
             lorebookEntry.updateDescription(command.getDescription());
-        }
-
-        if (command.isPlayerCharacter()) {
-            lorebookEntry.assignPlayer(command.getPlayerDiscordId());
-        } else {
-            lorebookEntry.unassignPlayer();
         }
 
         return lorebookEntryRepository.save(lorebookEntry);

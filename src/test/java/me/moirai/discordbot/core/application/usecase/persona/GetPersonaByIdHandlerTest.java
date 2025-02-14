@@ -14,17 +14,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.GetPersonaById;
 import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaResult;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetPersonaByIdHandlerTest {
 
     @Mock
-    private PersonaQueryRepository queryRepository;
+    private PersonaRepository repository;
 
     @InjectMocks
     private GetPersonaByIdHandler handler;
@@ -46,7 +46,7 @@ public class GetPersonaByIdHandlerTest {
         String id = "HAUDHUAHD";
         GetPersonaById query = GetPersonaById.build(id);
 
-        when(queryRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(query));
@@ -63,7 +63,7 @@ public class GetPersonaByIdHandlerTest {
 
         GetPersonaById query = GetPersonaById.build(id);
 
-        when(queryRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
 
         // When
         GetPersonaResult result = handler.handle(query);

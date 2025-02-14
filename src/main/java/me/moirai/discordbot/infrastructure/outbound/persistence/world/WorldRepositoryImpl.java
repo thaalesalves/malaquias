@@ -1,4 +1,4 @@
-package me.moirai.discordbot.infrastructure.outbound.persistence.persona;
+package me.moirai.discordbot.infrastructure.outbound.persistence.world;
 
 import static me.moirai.discordbot.infrastructure.outbound.persistence.SearchPredicates.canUserRead;
 import static me.moirai.discordbot.infrastructure.outbound.persistence.SearchPredicates.canUserWrite;
@@ -21,54 +21,67 @@ import org.springframework.stereotype.Repository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
-import me.moirai.discordbot.core.application.usecase.persona.request.SearchPersonas;
-import me.moirai.discordbot.core.application.usecase.persona.result.SearchPersonasResult;
-import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.application.usecase.world.request.SearchWorlds;
+import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.discordbot.core.domain.world.World;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
-import me.moirai.discordbot.infrastructure.outbound.persistence.mapper.PersonaPersistenceMapper;
+import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
+import me.moirai.discordbot.infrastructure.outbound.persistence.mapper.WorldPersistenceMapper;
 
 @Repository
-public class PersonaQueryRepositoryImpl implements PersonaQueryRepository {
+public class WorldRepositoryImpl implements WorldRepository {
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_ITEMS = 10;
 
     private static final String ID = "id";
-    private static final String NAME = "name";
     private static final String WRITE = "WRITE";
+    private static final String NAME = "name";
     private static final String ASSET_ID = "assetId";
     private static final String ASSET_TYPE = "assetType";
-    private static final String PERSONA = "persona";
-    private static final String OWNER_DISCORD_ID = "ownerDiscordId";
+    private static final String WORLD = "world";
     private static final String VISIBILITY = "visibility";
-    private static final String DEFAULT_SORT_BY_FIELD = NAME;
+    private static final String OWNER_DISCORD_ID = "ownerDiscordId";
+    private static final String DEFAULT_SORT_BY_FIELD = "name";
+    private static final String PERMISSIONS = "permissions";
 
-    private final PersonaJpaRepository jpaRepository;
-    private final PersonaPersistenceMapper mapper;
+    private final WorldJpaRepository jpaRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final WorldPersistenceMapper mapper;
 
-    public PersonaQueryRepositoryImpl(
-            PersonaJpaRepository jpaRepository,
-            PersonaPersistenceMapper mapper) {
+    public WorldRepositoryImpl(
+            WorldJpaRepository jpaRepository,
+            FavoriteRepository favoriteRepository,
+            WorldPersistenceMapper mapper) {
 
         this.jpaRepository = jpaRepository;
+        this.favoriteRepository = favoriteRepository;
         this.mapper = mapper;
     }
 
     @Override
-    public Optional<Persona> findById(String id) {
+    public World save(World world) {
+
+        return jpaRepository.save(world);
+    }
+
+    @Override
+    public Optional<World> findById(String id) {
 
         return jpaRepository.findById(id);
     }
 
     @Override
-    public boolean existsById(String id) {
+    public void deleteById(String id) {
 
-        return jpaRepository.existsById(id);
+        favoriteRepository.deleteAllByAssetId(id);
+
+        jpaRepository.deleteById(id);
     }
 
     @Override
-    public SearchPersonasResult search(SearchPersonas request) {
+    public SearchWorldsResult search(SearchWorlds request) {
 
         int page = extractPageNumber(request.getPage());
         int size = extractPageSize(request.getSize());
@@ -76,16 +89,16 @@ public class PersonaQueryRepositoryImpl implements PersonaQueryRepository {
         Direction direction = extractDirection(request.getDirection());
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortByField));
-        Specification<Persona> query = buildSearchQuery(request);
-        Page<Persona> pagedResult = jpaRepository.findAll(query, pageRequest);
+        Specification<World> query = buildSearchQuery(request);
+        Page<World> pagedResult = jpaRepository.findAll(query, pageRequest);
 
         return mapper.mapToResult(pagedResult);
     }
 
-    private Specification<Persona> buildSearchQuery(SearchPersonas request) {
+    private Specification<World> buildSearchQuery(SearchWorlds request) {
 
         return (root, cq, cb) -> {
-            final List<Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
 
             if (WRITE.equals(request.getOperation())) {
                 predicates.add(canUserWrite(cb, root, request.getRequesterDiscordId()));
@@ -98,7 +111,7 @@ public class PersonaQueryRepositoryImpl implements PersonaQueryRepository {
                 Root<FavoriteEntity> favoriteRoot = subquery.from(FavoriteEntity.class);
 
                 subquery.select(favoriteRoot.get(ASSET_ID))
-                        .where(cb.equal(favoriteRoot.get(ASSET_TYPE), PERSONA));
+                        .where(cb.equal(favoriteRoot.get(ASSET_TYPE), WORLD));
 
                 predicates.add(root.get(ID).in(subquery));
             }
@@ -108,7 +121,8 @@ public class PersonaQueryRepositoryImpl implements PersonaQueryRepository {
             }
 
             if (isNotBlank(request.getOwnerDiscordId())) {
-                predicates.add(contains(cb, root, OWNER_DISCORD_ID, request.getOwnerDiscordId()));
+                predicates.add(cb.equal(root.get(PERMISSIONS)
+                        .get(OWNER_DISCORD_ID), cb.literal(request.getOwnerDiscordId())));
             }
 
             if (isNotBlank(request.getVisibility())) {

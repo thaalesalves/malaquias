@@ -36,8 +36,6 @@ public class UpdateWorldLorebookEntryHandlerTest {
                 .name("MoirAI")
                 .regex("MoirAI")
                 .description("This is an RPG world")
-                .playerDiscordId("PLAYERID")
-                .isPlayerCharacter(true)
                 .build();
 
         WorldLorebookEntry expectedUpdatedEntry = WorldLorebookEntryFixture.sampleLorebookEntry().build();

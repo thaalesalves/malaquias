@@ -36,10 +36,10 @@ import me.moirai.discordbot.core.application.usecase.discord.slashcommands.Token
 import me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.AiModelRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
@@ -52,8 +52,8 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String WORLD_NOT_FOUND = "World was not found";
 
-    private final PersonaDomainRepository personaRepository;
-    private final WorldDomainRepository worldRepository;
+    private final PersonaRepository personaRepository;
+    private final WorldRepository worldRepository;
     private final LorebookEnrichmentHelper lorebookEnrichmentHelper;
     private final TextModerationPort textModerationPort;
     private final TextCompletionPort textCompletionPort;
@@ -61,8 +61,8 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
     private final TokenizerPort tokenizerPort;
 
     public CompleteTextHandler(
-            PersonaDomainRepository personaRepository,
-            WorldDomainRepository worldRepository,
+            PersonaRepository personaRepository,
+            WorldRepository worldRepository,
             LorebookEnrichmentHelper lorebookEnrichmentHelper,
             TextModerationPort textModerationPort,
             TextCompletionPort textCompletionPort,

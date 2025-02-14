@@ -37,11 +37,11 @@ import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetailsF
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResult;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResultFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import me.moirai.discordbot.core.domain.port.TokenizerPort;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -50,10 +50,10 @@ import reactor.test.StepVerifier;
 public class CompleteTextHandlerTest {
 
     @Mock
-    private PersonaDomainRepository personaRepository;
+    private PersonaRepository personaRepository;
 
     @Mock
-    private WorldDomainRepository worldRepository;
+    private WorldRepository worldRepository;
 
     @Mock
     private LorebookEnrichmentHelper lorebookEnrichmentHelper;

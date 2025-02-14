@@ -50,6 +50,7 @@ public class AdventureRepositoryImpl implements AdventureRepository {
     private static final String MODEL_CONFIGURATION = "modelConfiguration";
     private static final String DEFAULT_SORT_BY_FIELD = "creationDate";
     private static final String AI_MODEL = "aiModel";
+    private static final String PERMISSIONS = "permissions";
 
     private final AdventureJpaRepository jpaRepository;
     private final FavoriteRepository favoriteRepository;
@@ -169,7 +170,7 @@ public class AdventureRepositoryImpl implements AdventureRepository {
             }
 
             if (isNotBlank(request.getOwnerDiscordId())) {
-                predicates.add(cb.equal(root.get("permissions")
+                predicates.add(cb.equal(root.get(PERMISSIONS)
                         .get(OWNER_DISCORD_ID), cb.literal(request.getOwnerDiscordId())));
             }
 

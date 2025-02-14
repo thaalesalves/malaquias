@@ -18,14 +18,14 @@ import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.persona.request.DeletePersona;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class DeletePersonaHandlerTest {
 
     @Mock
-    private PersonaDomainRepository repository;
+    private PersonaRepository repository;
 
     @InjectMocks
     private DeletePersonaHandler handler;

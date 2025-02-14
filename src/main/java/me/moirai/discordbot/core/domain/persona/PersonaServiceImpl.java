@@ -23,9 +23,9 @@ public class PersonaServiceImpl implements PersonaService {
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
 
     private final TextModerationPort moderationPort;
-    private final PersonaDomainRepository repository;
+    private final PersonaRepository repository;
 
-    public PersonaServiceImpl(TextModerationPort moderationPort, PersonaDomainRepository repository) {
+    public PersonaServiceImpl(TextModerationPort moderationPort, PersonaRepository repository) {
         this.moderationPort = moderationPort;
         this.repository = repository;
     }

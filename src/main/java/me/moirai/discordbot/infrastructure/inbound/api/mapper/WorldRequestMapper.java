@@ -28,7 +28,6 @@ public class WorldRequestMapper {
                                 .name(entry.getName())
                                 .description(entry.getDescription())
                                 .regex(entry.getRegex())
-                                .playerDiscordId(entry.getPlayerDiscordId())
                                 .build())
                         .toList())
                 .build();

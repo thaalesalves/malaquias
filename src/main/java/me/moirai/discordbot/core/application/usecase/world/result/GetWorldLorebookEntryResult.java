@@ -8,8 +8,6 @@ public final class GetWorldLorebookEntryResult {
     private final String name;
     private final String regex;
     private final String description;
-    private final String playerDiscordId;
-    private final boolean isPlayerCharacter;
     private final OffsetDateTime creationDate;
     private final OffsetDateTime lastUpdateDate;
 
@@ -19,8 +17,6 @@ public final class GetWorldLorebookEntryResult {
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
-        this.playerDiscordId = builder.playerDiscordId;
-        this.isPlayerCharacter = builder.isPlayerCharacter;
         this.creationDate = builder.creationDate;
         this.lastUpdateDate = builder.lastUpdateDate;
     }
@@ -45,14 +41,6 @@ public final class GetWorldLorebookEntryResult {
         return description;
     }
 
-    public String getPlayerDiscordId() {
-        return playerDiscordId;
-    }
-
-    public boolean isPlayerCharacter() {
-        return isPlayerCharacter;
-    }
-
     public OffsetDateTime getCreationDate() {
         return creationDate;
     }
@@ -67,8 +55,6 @@ public final class GetWorldLorebookEntryResult {
         private String name;
         private String regex;
         private String description;
-        private String playerDiscordId;
-        private boolean isPlayerCharacter;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
 
@@ -92,16 +78,6 @@ public final class GetWorldLorebookEntryResult {
 
         public Builder description(String description) {
             this.description = description;
-            return this;
-        }
-
-        public Builder playerDiscordId(String playerDiscordId) {
-            this.playerDiscordId = playerDiscordId;
-            return this;
-        }
-
-        public Builder isPlayerCharacter(boolean isPlayerCharacter) {
-            this.isPlayerCharacter = isPlayerCharacter;
             return this;
         }
 

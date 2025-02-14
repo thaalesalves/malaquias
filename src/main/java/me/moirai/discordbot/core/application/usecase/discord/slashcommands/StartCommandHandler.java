@@ -14,7 +14,7 @@ import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetails;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.AiModelRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
@@ -27,12 +27,12 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
     private static final String CHAT_FORMAT = "%s said: %s";
 
     private final AdventureRepository adventureRepository;
-    private final WorldDomainRepository worldRepository;
+    private final WorldRepository worldRepository;
     private final StoryGenerationHelper storyGenerationPort;
     private final DiscordChannelPort discordChannelPort;
 
     public StartCommandHandler(StoryGenerationHelper storyGenerationPort,
-            WorldDomainRepository worldRepository,
+            WorldRepository worldRepository,
             AdventureRepository adventureRepository,
             DiscordChannelPort discordChannelPort) {
 

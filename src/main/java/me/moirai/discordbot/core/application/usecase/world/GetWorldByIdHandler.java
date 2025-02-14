@@ -5,10 +5,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldById;
 import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult;
 import me.moirai.discordbot.core.domain.world.World;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @UseCaseHandler
 public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, GetWorldResult> {
@@ -16,10 +16,10 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be deleted was not found";
 
-    private final WorldQueryRepository queryRepository;
+    private final WorldRepository repository;
 
-    public GetWorldByIdHandler(WorldQueryRepository queryRepository) {
-        this.queryRepository = queryRepository;
+    public GetWorldByIdHandler(WorldRepository repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
     @Override
     public GetWorldResult execute(GetWorldById query) {
 
-        World world = queryRepository.findById(query.getId())
+        World world = repository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
         return mapResult(world);

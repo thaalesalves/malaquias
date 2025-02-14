@@ -5,10 +5,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.GetPersonaById;
 import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaResult;
 import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 
 @UseCaseHandler
 public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById, GetPersonaResult> {
@@ -16,10 +16,10 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
 
-    private final PersonaQueryRepository queryRepository;
+    private final PersonaRepository repository;
 
-    public GetPersonaByIdHandler(PersonaQueryRepository queryRepository) {
-        this.queryRepository = queryRepository;
+    public GetPersonaByIdHandler(PersonaRepository repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class GetPersonaByIdHandler extends AbstractUseCaseHandler<GetPersonaById
     @Override
     public GetPersonaResult execute(GetPersonaById query) {
 
-        Persona persona = queryRepository.findById(query.getId())
+        Persona persona = repository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         return mapResult(persona);

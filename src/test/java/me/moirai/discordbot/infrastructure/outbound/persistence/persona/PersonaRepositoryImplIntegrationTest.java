@@ -10,21 +10,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.transaction.Transactional;
 import me.moirai.discordbot.AbstractIntegrationTest;
-import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.SearchPersonas;
 import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaResult;
 import me.moirai.discordbot.core.application.usecase.persona.result.SearchPersonasResult;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
+import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteEntity;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
-public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrationTest {
+public class PersonaRepositoryImplIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
-    private PersonaQueryRepository repository;
+    private PersonaRepository repository;
 
     @Autowired
     private PersonaJpaRepository jpaRepository;
@@ -53,6 +55,117 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
 
         Persona retrievedPersona = retrievedPersonaOptional.get();
         assertThat(retrievedPersona.getId()).isEqualTo(persona.getId());
+    }
+
+    @Test
+    public void createPersona() {
+
+        // Given
+        Persona persona = PersonaFixture.privatePersona()
+                .id(null)
+                .build();
+
+        // When
+        Persona createdPersona = repository.save(persona);
+
+        // Then
+        assertThat(createdPersona).isNotNull();
+
+        assertThat(createdPersona.getCreationDate()).isNotNull();
+        assertThat(createdPersona.getLastUpdateDate()).isNotNull();
+
+        assertThat(createdPersona.getName()).isEqualTo(persona.getName());
+        assertThat(createdPersona.getPersonality()).isEqualTo(persona.getPersonality());
+        assertThat(createdPersona.getVisibility()).isEqualTo(persona.getVisibility());
+        assertThat(createdPersona.getUsersAllowedToWrite()).hasSameElementsAs(persona.getUsersAllowedToWrite());
+        assertThat(createdPersona.getUsersAllowedToRead()).hasSameElementsAs(persona.getUsersAllowedToRead());
+    }
+
+    @Test
+    public void existsById_ifPersonaExists_thenReturnTrue() {
+
+        // Given
+        Persona createdPersona = repository.save(PersonaFixture.publicPersona().build());
+
+        // When
+        boolean result = repository.existsById(createdPersona.getId());
+
+        // Then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void existsById_ifPersonaNotExists_thenReturnFalse() {
+
+        // Given
+        String personaId = "InvalidId";
+
+        // When
+        boolean result = repository.existsById(personaId);
+
+        // Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void deletePersona() {
+
+        // Given
+        Persona persona = repository.save(PersonaFixture.privatePersona()
+                .id(null)
+                .build());
+
+        // When
+        repository.deleteById(persona.getId());
+
+        // Then
+        assertThat(jpaRepository.findById(persona.getId())).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void updatePersona() {
+
+        // Given
+        Persona originalPersona = repository.save(PersonaFixture.privatePersona()
+                .id(null)
+                .build());
+
+        Persona worldToUbeUpdated = PersonaFixture.privatePersona()
+                .id(originalPersona.getId())
+                .visibility(Visibility.PUBLIC)
+                .version(originalPersona.getVersion())
+                .build();
+
+        // When
+        Persona updatedPersona = repository.save(worldToUbeUpdated);
+
+        // Then
+        assertThat(originalPersona.getVersion()).isZero();
+        assertThat(updatedPersona.getVersion()).isOne();
+    }
+
+    @Test
+    @Transactional
+    public void deletePersona_whenIsFavorite_thenDeleteFavorites() {
+
+        // Given
+        String userId = "1234";
+        Persona originalPersona = repository.save(PersonaFixture.privatePersona()
+                .id(null)
+                .build());
+
+        FavoriteEntity favorite = favoriteRepository.save(FavoriteEntity.builder()
+                .playerDiscordId(userId)
+                .assetId(originalPersona.getId())
+                .assetType("persona")
+                .build());
+
+        // When
+        repository.deleteById(originalPersona.getId());
+
+        // Then
+        assertThat(repository.findById(originalPersona.getId())).isNotNull().isEmpty();
+        assertThat(favoriteRepository.existsById(favorite.getId())).isFalse();
     }
 
     @Test
@@ -306,6 +419,49 @@ public class PersonaQueryRepositoryImplIntegrationTest extends AbstractIntegrati
         SearchPersonas query = SearchPersonas.builder()
                 .name("Number 2")
                 .requesterDiscordId(ownerDiscordId)
+                .build();
+
+        // When
+        SearchPersonasResult result = repository.search(query);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResults()).isNotNull().isNotEmpty().hasSize(1);
+
+        List<GetPersonaResult> personas = result.getResults();
+        assertThat(personas.get(0).getName()).isEqualTo(gpt4Mini.getName());
+    }
+
+    @Test
+    public void searchPersonaFilterByOwner() {
+
+        // Given
+        String ownerDiscordId = "586678721356875";
+
+        Persona gpt4Omni = PersonaFixture.publicPersona()
+                .id(null)
+                .name("Number 1")
+                .build();
+
+        Persona gpt4Mini = PersonaFixture.publicPersona()
+                .id(null)
+                .name("Number 2")
+                .build();
+
+        Persona gpt354k = PersonaFixture.publicPersona()
+                .id(null)
+                .name("Number 3")
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(ownerDiscordId)
+                        .build())
+                .build();
+
+        jpaRepository.saveAll(set(gpt4Omni, gpt4Mini, gpt354k));
+
+        SearchPersonas query = SearchPersonas.builder()
+                .name("Number 2")
+                .requesterDiscordId(ownerDiscordId)
+                .ownerDiscordId(ownerDiscordId)
                 .build();
 
         // When

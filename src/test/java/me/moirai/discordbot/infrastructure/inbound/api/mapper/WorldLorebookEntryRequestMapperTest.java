@@ -40,7 +40,6 @@ public class WorldLorebookEntryRequestMapperTest {
         assertThat(command.getName()).isEqualTo(request.getName());
         assertThat(command.getDescription()).isEqualTo(request.getDescription());
         assertThat(command.getRegex()).isEqualTo(request.getRegex());
-        assertThat(command.getPlayerDiscordId()).isEqualTo(request.getPlayerDiscordId());
         assertThat(command.getWorldId()).isEqualTo(worldId);
         assertThat(command.getRequesterDiscordId()).isEqualTo(requesterId);
     }
@@ -71,7 +70,6 @@ public class WorldLorebookEntryRequestMapperTest {
         assertThat(command.getName()).isEqualTo(request.getName());
         assertThat(command.getDescription()).isEqualTo(request.getDescription());
         assertThat(command.getRegex()).isEqualTo(request.getRegex());
-        assertThat(command.getPlayerDiscordId()).isEqualTo(request.getPlayerDiscordId());
         assertThat(command.getWorldId()).isEqualTo(worldId);
         assertThat(command.getRequesterDiscordId()).isEqualTo(requesterId);
     }

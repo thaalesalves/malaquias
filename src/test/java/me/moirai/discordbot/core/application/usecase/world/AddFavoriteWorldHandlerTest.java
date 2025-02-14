@@ -16,17 +16,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.AddFavoriteWorld;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AddFavoriteWorldHandlerTest {
 
     @Mock
-    private WorldQueryRepository worldQueryRepository;
+    private WorldRepository worldRepository;
 
     @Mock
     private FavoriteRepository favoriteRepository;
@@ -45,7 +45,7 @@ public class AddFavoriteWorldHandlerTest {
 
         World world = WorldFixture.publicWorld().build();
 
-        when(worldQueryRepository.findById(anyString())).thenReturn(Optional.of(world));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
 
         // When
         handler.handle(command);
@@ -63,7 +63,7 @@ public class AddFavoriteWorldHandlerTest {
                 .playerDiscordId("1234")
                 .build();
 
-        when(worldQueryRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(worldRepository.findById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));

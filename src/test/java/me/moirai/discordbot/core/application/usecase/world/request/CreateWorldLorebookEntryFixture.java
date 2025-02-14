@@ -19,7 +19,6 @@ public class CreateWorldLorebookEntryFixture {
         builder.name("Volin Habar");
         builder.description("Volin Habar is a warrior that fights with a sword.");
         builder.regex("[Vv]olin [Hh]abar|[Vv]oha");
-        builder.playerDiscordId("2423423423423");
         builder.worldId("WRLDID");
 
         return builder;

@@ -22,7 +22,7 @@ import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorld;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -31,7 +31,7 @@ import reactor.test.StepVerifier;
 public class UpdateWorldHandlerTest {
 
     @Mock
-    private WorldDomainRepository repository;
+    private WorldRepository repository;
 
     @Mock
     private TextModerationPort moderationPort;

@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ public class WorldServiceImplTest {
     private WorldLorebookEntryRepository lorebookEntryRepository;
 
     @Mock
-    private WorldDomainRepository worldRepository;
+    private WorldRepository worldRepository;
 
     @InjectMocks
     private WorldServiceImpl service;
@@ -287,48 +286,6 @@ public class WorldServiceImplTest {
         assertThat(createdLorebookEntry.getName()).isEqualTo(expectedLorebookEntry.getName());
         assertThat(createdLorebookEntry.getDescription()).isEqualTo(expectedLorebookEntry.getDescription());
         assertThat(createdLorebookEntry.getRegex()).isEqualTo(expectedLorebookEntry.getRegex());
-    }
-
-    @Test
-    public void updateLorebookEntry_whenPlayerIdProvided_thenMakeEntryPlayableCharacter() {
-
-        // Given
-        String name = "Eldrida";
-        String description = "Eldrida is a kingdom in an empire";
-        String regex = "[Ee]ldrida";
-        String worldId = "WRLDID";
-        String playerDiscordId = "123123123";
-
-        WorldLorebookEntry.Builder lorebookEntryBuilder = WorldLorebookEntryFixture.sampleLorebookEntry()
-                .name(name)
-                .description(description)
-                .regex(regex);
-
-        WorldLorebookEntry expectedLorebookEntry = lorebookEntryBuilder
-                .playerDiscordId(playerDiscordId)
-                .isPlayerCharacter(true)
-                .build();
-
-        UpdateWorldLorebookEntry command = UpdateWorldLorebookEntry.builder()
-                .id("ENTRID")
-                .playerDiscordId(playerDiscordId)
-                .isPlayerCharacter(true)
-                .worldId(worldId)
-                .requesterDiscordId("586678721356875")
-                .build();
-
-        World world = WorldFixture.privateWorld().build();
-
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
-        when(lorebookEntryRepository.findById(anyString())).thenReturn(Optional.of(expectedLorebookEntry));
-        when(lorebookEntryRepository.save(any(WorldLorebookEntry.class))).thenReturn(expectedLorebookEntry);
-
-        // When
-        WorldLorebookEntry createdLorebookEntry = service.updateLorebookEntry(command);
-
-        // Then
-        assertThat(createdLorebookEntry.getPlayerDiscordId()).isNotNull();
-        assertThat(createdLorebookEntry.getPlayerDiscordId()).isEqualTo(expectedLorebookEntry.getPlayerDiscordId());
     }
 
     @Test
@@ -615,44 +572,6 @@ public class WorldServiceImplTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> service.deleteLorebookEntry(query));
-    }
-
-    @Test
-    public void findAllEntriesByRegex_whenUserCanRead_thenReturnEntries() {
-
-        // Given
-        String worldId = "worldId";
-        String valueToSearch = "Armando";
-        World world = WorldFixture.privateWorld().build();
-
-        List<WorldLorebookEntry> expectedEntries = Collections
-                .singletonList(WorldLorebookEntryFixture.sampleLorebookEntry()
-                        .regex("[Aa]rmando")
-                        .build());
-
-        when(worldRepository.findById(worldId)).thenReturn(Optional.of(world));
-        when(lorebookEntryRepository.findAllByRegex(valueToSearch, worldId)).thenReturn(expectedEntries);
-
-        // When
-        List<WorldLorebookEntry> result = service.findAllLorebookEntriesByRegex(valueToSearch, worldId);
-
-        // Then
-        assertThat(result).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(result).isEqualTo(expectedEntries);
-    }
-
-    @Test
-    public void findAllEntriesByRegex_whenWorldNotFound_thenThrowAssetNotFoundException() {
-
-        // Given
-        String worldId = "worldId";
-        String valueToSearch = "Armando";
-
-        when(worldRepository.findById(worldId)).thenReturn(Optional.empty());
-
-        // Then
-        assertThrows(AssetNotFoundException.class,
-                () -> service.findAllLorebookEntriesByRegex(valueToSearch, worldId));
     }
 
     @Test

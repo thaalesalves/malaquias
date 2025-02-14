@@ -40,8 +40,6 @@ public class WorldLorebookEntryResponseMapper {
                 .name(result.getName())
                 .regex(result.getRegex())
                 .description(result.getDescription())
-                .playerDiscordId(result.getPlayerDiscordId())
-                .isPlayerCharacter(result.isPlayerCharacter())
                 .creationDate(result.getCreationDate())
                 .lastUpdateDate(result.getLastUpdateDate())
                 .build();
