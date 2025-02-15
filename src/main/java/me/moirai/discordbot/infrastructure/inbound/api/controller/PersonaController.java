@@ -90,7 +90,7 @@ public class PersonaController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetPersonaById query = GetPersonaById.build(personaId);
+            GetPersonaById query = GetPersonaById.build(personaId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -129,7 +129,7 @@ public class PersonaController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeletePersona command = DeletePersona.build(personaId);
+            DeletePersona command = DeletePersona.build(personaId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();

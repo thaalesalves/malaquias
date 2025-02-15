@@ -29,9 +29,9 @@ public class WorldAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean isOwner(String assetId, String userId) {
 
-        GetWorldById request = GetWorldById.build(assetId);
-        GetWorldResult worldDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetWorldById request = GetWorldById.build(assetId, principal.getDiscordId());
+        GetWorldResult worldDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = worldDetails.getOwnerDiscordId().equals(userId);
@@ -42,9 +42,9 @@ public class WorldAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean canModify(String assetId, String userId) {
 
-        GetWorldById request = GetWorldById.build(assetId);
-        GetWorldResult worldDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetWorldById request = GetWorldById.build(assetId, principal.getDiscordId());
+        GetWorldResult worldDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = worldDetails.getOwnerDiscordId().equals(userId);
@@ -56,9 +56,9 @@ public class WorldAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean canRead(String assetId, String userId) {
 
-        GetWorldById request = GetWorldById.build(assetId);
-        GetWorldResult worldDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetWorldById request = GetWorldById.build(assetId, principal.getDiscordId());
+        GetWorldResult worldDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = worldDetails.getOwnerDiscordId().equals(userId);

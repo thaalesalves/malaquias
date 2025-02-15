@@ -17,18 +17,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteWorldHandlerTest {
 
     @Mock
-    private WorldRepository domainRepository;
+    private WorldRepository repository;
 
     @InjectMocks
     private DeleteWorldHandler handler;
@@ -38,7 +39,8 @@ public class DeleteWorldHandlerTest {
 
         // Given
         String id = null;
-        DeleteWorld config = DeleteWorld.build(id);
+        String requesterDiscordId = "84REAC";
+        DeleteWorld config = DeleteWorld.build(id, requesterDiscordId);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(config));
@@ -50,7 +52,6 @@ public class DeleteWorldHandlerTest {
         // Given
         String requesterDiscordId = "84REAC";
         String id = "WRDID";
-
         World world = WorldFixture.publicWorld()
                 .permissions(PermissionsFixture.samplePermissions()
                         .ownerDiscordId(requesterDiscordId)
@@ -58,16 +59,16 @@ public class DeleteWorldHandlerTest {
                         .build())
                 .build();
 
-        DeleteWorld command = DeleteWorld.build(id);
+        DeleteWorld command = DeleteWorld.build(id, requesterDiscordId);
 
-        when(domainRepository.findById(anyString())).thenReturn(Optional.of(world));
-        doNothing().when(domainRepository).deleteById(anyString());
+        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+        doNothing().when(repository).deleteById(anyString());
 
         // When
         handler.handle(command);
 
         // Then
-        verify(domainRepository, times(1)).deleteById(anyString());
+        verify(repository, times(1)).deleteById(anyString());
     }
 
     @Test
@@ -75,12 +76,32 @@ public class DeleteWorldHandlerTest {
 
         // Given
         String id = "WRLDID";
-        DeleteWorld command = DeleteWorld.build(id);
+        String requesterDiscordId = "84REAC";
+        DeleteWorld command = DeleteWorld.build(id, requesterDiscordId);
 
-        when(domainRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void deleteWorld_whenAccessDenied_thenThrowException() {
+
+        // Given
+        String id = "PRSNID";
+        String requesterId = "RQSTRID";
+        DeleteWorld command = DeleteWorld.build(id, requesterId);
+
+        World world = WorldFixture.privateWorld()
+                .id(id)
+                .build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(world));
+
+        // Then
+        assertThatExceptionOfType(AssetAccessDeniedException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 }

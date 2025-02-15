@@ -1,6 +1,8 @@
 package me.moirai.discordbot.core.application.usecase.persona.request;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +17,7 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
     private final String name;
     private final String personality;
     private final String visibility;
+    private final String requesterDiscordId;
     private final Set<String> usersAllowedToWriteToAdd;
     private final Set<String> usersAllowedToWriteToRemove;
     private final Set<String> usersAllowedToReadToAdd;
@@ -26,10 +29,19 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
         this.name = builder.name;
         this.personality = builder.personality;
         this.visibility = builder.visibility;
-        this.usersAllowedToWriteToAdd = unmodifiableSet(builder.usersAllowedToWriteToAdd);
-        this.usersAllowedToWriteToRemove = unmodifiableSet(builder.usersAllowedToWriteToRemove);
-        this.usersAllowedToReadToAdd = unmodifiableSet(builder.usersAllowedToReadToAdd);
-        this.usersAllowedToReadToRemove = unmodifiableSet(builder.usersAllowedToReadToRemove);
+        this.requesterDiscordId = builder.requesterDiscordId;
+
+        this.usersAllowedToWriteToAdd = isEmpty(builder.usersAllowedToWriteToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToAdd);
+
+        this.usersAllowedToWriteToRemove = isEmpty(builder.usersAllowedToWriteToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToRemove);
+
+        this.usersAllowedToReadToAdd = isEmpty(builder.usersAllowedToReadToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToAdd);
+
+        this.usersAllowedToReadToRemove = isEmpty(builder.usersAllowedToReadToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToRemove);
     }
 
     public static Builder builder() {
@@ -50,6 +62,10 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
 
     public String getVisibility() {
         return visibility;
+    }
+
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
     }
 
     public Set<String> getUsersAllowedToWriteToAdd() {
@@ -73,6 +89,7 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
         private String name;
         private String personality;
         private String visibility;
+        private String requesterDiscordId;
         private Set<String> usersAllowedToWriteToAdd = new HashSet<>();
         private Set<String> usersAllowedToWriteToRemove = new HashSet<>();
         private Set<String> usersAllowedToReadToAdd = new HashSet<>();
@@ -98,6 +115,11 @@ public final class UpdatePersona extends UseCase<Mono<UpdatePersonaResult>> {
 
         public Builder visibility(String visibility) {
             this.visibility = visibility;
+            return this;
+        }
+
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
             return this;
         }
 

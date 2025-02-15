@@ -3,6 +3,7 @@ package me.moirai.discordbot.core.application.usecase.world;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldById;
@@ -15,6 +16,7 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
 
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "World ID cannot be null or empty";
     private static final String WORLD_NOT_FOUND = "World to be deleted was not found";
+    private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to view the persona";
 
     private final WorldRepository repository;
 
@@ -35,6 +37,10 @@ public class GetWorldByIdHandler extends AbstractUseCaseHandler<GetWorldById, Ge
 
         World world = repository.findById(query.getId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
+
+        if (!world.canUserRead(query.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
+        }
 
         return mapResult(world);
     }

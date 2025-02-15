@@ -90,7 +90,7 @@ public class WorldController extends SecurityContextAware {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldById query = GetWorldById.build(worldId);
+            GetWorldById query = GetWorldById.build(worldId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -126,7 +126,7 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorld command = DeleteWorld.build(worldId);
+            DeleteWorld command = DeleteWorld.build(worldId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();

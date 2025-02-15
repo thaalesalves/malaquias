@@ -13,9 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.persona.request.GetPersonaById;
 import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaResult;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
 import me.moirai.discordbot.core.domain.persona.PersonaRepository;
@@ -33,7 +35,8 @@ public class GetPersonaByIdHandlerTest {
     public void getPersonaById_whenIdIsNull_thenThrowException() {
 
         // Given
-        GetPersonaById query = GetPersonaById.build(null);
+        String requesterId = "RQSTRID";
+        GetPersonaById query = GetPersonaById.build(null, requesterId);
 
         // Then
         assertThrows(IllegalArgumentException.class, () -> handler.handle(query));
@@ -44,7 +47,8 @@ public class GetPersonaByIdHandlerTest {
 
         // Given
         String id = "HAUDHUAHD";
-        GetPersonaById query = GetPersonaById.build(id);
+        String requesterId = "RQSTRID";
+        GetPersonaById query = GetPersonaById.build(id, requesterId);
 
         when(repository.findById(anyString())).thenReturn(Optional.empty());
 
@@ -57,11 +61,15 @@ public class GetPersonaByIdHandlerTest {
 
         // Given
         String id = "HAUDHUAHD";
+        String requesterId = "RQSTRID";
         Persona persona = PersonaFixture.privatePersona()
                 .id(id)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
                 .build();
 
-        GetPersonaById query = GetPersonaById.build(id);
+        GetPersonaById query = GetPersonaById.build(id, requesterId);
 
         when(repository.findById(anyString())).thenReturn(Optional.of(persona));
 
@@ -71,5 +79,23 @@ public class GetPersonaByIdHandlerTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(id);
+    }
+
+    @Test
+    public void getPersonaById_whenAccessDenied_thenThrowException() {
+
+        // Given
+        String id = "HAUDHUAHD";
+        String requesterId = "RQSTRID";
+        Persona persona = PersonaFixture.privatePersona()
+                .id(id)
+                .build();
+
+        GetPersonaById query = GetPersonaById.build(id, requesterId);
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
+
+        // When
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));
     }
 }

@@ -29,9 +29,9 @@ public class PersonaAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean isOwner(String assetId, String userId) {
 
-        GetPersonaById request = GetPersonaById.build(assetId);
-        GetPersonaResult personaDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetPersonaById request = GetPersonaById.build(assetId, principal.getDiscordId());
+        GetPersonaResult personaDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = personaDetails.getOwnerDiscordId().equals(userId);
@@ -42,9 +42,9 @@ public class PersonaAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean canModify(String assetId, String userId) {
 
-        GetPersonaById request = GetPersonaById.build(assetId);
-        GetPersonaResult personaDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetPersonaById request = GetPersonaById.build(assetId, principal.getDiscordId());
+        GetPersonaResult personaDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = personaDetails.getOwnerDiscordId().equals(userId);
@@ -56,9 +56,9 @@ public class PersonaAuthorizer implements BaseAssetAuthorizer {
     @Override
     public boolean canRead(String assetId, String userId) {
 
-        GetPersonaById request = GetPersonaById.build(assetId);
-        GetPersonaResult personaDetails = useCaseRunner.run(request);
         MoiraiPrincipal principal = SecuritySessionContext.getAuthenticatedUser();
+        GetPersonaById request = GetPersonaById.build(assetId, principal.getDiscordId());
+        GetPersonaResult personaDetails = useCaseRunner.run(request);
 
         boolean isAdmin = principal.getRole().equals(ADMIN);
         boolean isOwner = personaDetails.getOwnerDiscordId().equals(userId);

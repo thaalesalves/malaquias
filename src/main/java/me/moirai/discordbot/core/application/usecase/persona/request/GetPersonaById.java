@@ -6,17 +6,24 @@ import me.moirai.discordbot.core.application.usecase.persona.result.GetPersonaRe
 public final class GetPersonaById extends UseCase<GetPersonaResult> {
 
     private final String id;
+    private final String requesterDiscordId;
 
-    public GetPersonaById(String id) {
+    private GetPersonaById(String id, String requesterDiscordId) {
+
         this.id = id;
+        this.requesterDiscordId = requesterDiscordId;
     }
 
-    public static GetPersonaById build(String id) {
+    public static GetPersonaById build(String id, String requesterDiscordId) {
 
-        return new GetPersonaById(id);
+        return new GetPersonaById(id, requesterDiscordId);
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
     }
 }

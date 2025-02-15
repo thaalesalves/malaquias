@@ -18,6 +18,7 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
     private final String description;
     private final String adventureStart;
     private final String visibility;
+    private final String requesterDiscordId;
     private final Set<String> usersAllowedToWriteToAdd;
     private final Set<String> usersAllowedToWriteToRemove;
     private final Set<String> usersAllowedToReadToAdd;
@@ -30,6 +31,7 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
         this.visibility = builder.visibility;
+        this.requesterDiscordId = builder.requesterDiscordId;
 
         this.usersAllowedToWriteToAdd = isEmpty(builder.usersAllowedToWriteToAdd) ? emptySet()
                 : unmodifiableSet(builder.usersAllowedToWriteToAdd);
@@ -68,6 +70,10 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         return visibility;
     }
 
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
+    }
+
     public Set<String> getUsersAllowedToWriteToAdd() {
         return usersAllowedToWriteToAdd;
     }
@@ -91,6 +97,7 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         private String description;
         private String adventureStart;
         private String visibility;
+        private String requesterDiscordId;
         private Set<String> usersAllowedToWriteToAdd = new HashSet<>();
         private Set<String> usersAllowedToWriteToRemove = new HashSet<>();
         private Set<String> usersAllowedToReadToAdd = new HashSet<>();
@@ -121,6 +128,11 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
 
         public Builder visibility(String visibility) {
             this.visibility = visibility;
+            return this;
+        }
+
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
             return this;
         }
 

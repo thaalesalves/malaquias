@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.persona.request.AddFavoritePersona;
 import me.moirai.discordbot.core.domain.persona.Persona;
@@ -67,5 +68,22 @@ public class AddFavoritePersonaHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+    }
+
+    @Test
+    public void addFavorite_whenAccessDenied_thenThrowException() {
+
+        // Given
+        AddFavoritePersona command = AddFavoritePersona.builder()
+                .assetId("1234")
+                .playerDiscordId("INVLDUSR")
+                .build();
+
+        Persona persona = PersonaFixture.privatePersona().build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 }

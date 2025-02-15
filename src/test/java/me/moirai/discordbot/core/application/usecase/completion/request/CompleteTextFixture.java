@@ -28,7 +28,7 @@ public class CompleteTextFixture {
 
         return CompleteText.builder()
                 .aiModel("GPT4_OMNI")
-                .authorDiscordId("123456")
+                .requesterDiscordId("123456")
                 .frequencyPenalty(0D)
                 .logitBias(emptyMap())
                 .maxTokenLimit(250)
@@ -48,7 +48,7 @@ public class CompleteTextFixture {
 
         return CompleteText.builder()
                 .aiModel("GPT4_OMNI")
-                .authorDiscordId("123456")
+                .requesterDiscordId("123456")
                 .frequencyPenalty(0D)
                 .logitBias(emptyMap())
                 .maxTokenLimit(250)
@@ -68,7 +68,7 @@ public class CompleteTextFixture {
 
         return CompleteText.builder()
                 .aiModel("GPT4_OMNI")
-                .authorDiscordId("123456")
+                .requesterDiscordId("123456")
                 .frequencyPenalty(0D)
                 .logitBias(emptyMap())
                 .maxTokenLimit(250)

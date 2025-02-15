@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import io.micrometer.common.util.StringUtils;
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
@@ -48,6 +49,8 @@ import reactor.core.publisher.Mono;
 @UseCaseHandler
 public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mono<CompleteTextResult>> {
 
+    private static final String USER_WORLD_NO_PERMISSION = "User is not authorized to view this world";
+    private static final String USER_PERSONA_NO_PERMISSION = "User is not authorized to view this persona";
     private static final String USER_NOT_FOUND = "Discord user not found";
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String WORLD_NOT_FOUND = "World was not found";
@@ -89,7 +92,15 @@ public class CompleteTextHandler extends AbstractUseCaseHandler<CompleteText, Mo
         World world = worldRepository.findById(useCase.getWorldId())
                 .orElseThrow(() -> new AssetNotFoundException(WORLD_NOT_FOUND));
 
-        DiscordUserDetails author = discordUserDetailsPort.getUserById(useCase.getAuthorDiscordId())
+        if (!persona.canUserRead(useCase.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_PERSONA_NO_PERMISSION);
+        }
+
+        if (!world.canUserRead(useCase.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_WORLD_NO_PERMISSION);
+        }
+
+        DiscordUserDetails author = discordUserDetailsPort.getUserById(useCase.getRequesterDiscordId())
                 .orElseThrow(() -> new AssetNotFoundException(USER_NOT_FOUND));
 
         List<ChatMessage> context = useCase.getMessages().stream()

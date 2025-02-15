@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AIModelNotSupportedException;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.helper.LorebookEnrichmentHelper;
@@ -36,6 +37,7 @@ import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetails;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetailsFixture;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResult;
 import me.moirai.discordbot.core.application.usecase.discord.slashcommands.TokenizeResultFixture;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
@@ -78,8 +80,18 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withModerationDisabled().build();
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
@@ -112,8 +124,18 @@ public class CompleteTextHandlerTest {
                 .messages(list(CompleteTextFixture.botMessage().build()))
                 .build();
 
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
@@ -141,8 +163,18 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withStrictModeration().build();
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
@@ -170,8 +202,18 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withPermissiveModeration().build();
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
         TokenizeResult tokenizeResult = TokenizeResultFixture.create().build();
@@ -199,8 +241,18 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withStrictModeration().build();
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
 
@@ -222,8 +274,18 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withPermissiveModeration().build();
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextModerationResult textModerationResult = TextModerationResultFixture.withFlags().build();
 
@@ -245,8 +307,18 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withPermissiveModeration().build();
-        Persona persona = PersonaFixture.privatePersona().build();
-        World world = WorldFixture.privateWorld().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
         DiscordUserDetails userDetails = DiscordUserDetailsFixture.create().build();
         TextGenerationResult textGenerationResult = TextGenerationResultFixture.create().build();
         TextModerationResult badModerationResult = TextModerationResultFixture.withFlags().build();
@@ -313,13 +385,84 @@ public class CompleteTextHandlerTest {
 
         // Given
         CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
 
-        when(personaRepository.findById(anyString())).thenReturn(Optional.of(mock(Persona.class)));
-        when(worldRepository.findById(anyString())).thenReturn(Optional.of(mock(World.class)));
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
         when(discordUserDetailsPort.getUserById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void whenPersonaAccessDenied_thenThrowException() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("someOtherUser")
+                        .usersAllowedToRead(null)
+                        .usersAllowedToWrite(null)
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("someOtherUser")
+                        .usersAllowedToRead(null)
+                        .usersAllowedToWrite(null)
+                        .build())
+                .build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+
+        // When
+
+        // Then
+        assertThatExceptionOfType(AssetAccessDeniedException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void whenWorldAccessDenied_thenThrowException() {
+
+        // Given
+        CompleteText command = CompleteTextFixture.withModerationDisabled().build();
+        Persona persona = PersonaFixture.privatePersona()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(command.getRequesterDiscordId())
+                        .build())
+                .build();
+
+        World world = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("someOtherUser")
+                        .usersAllowedToRead(null)
+                        .usersAllowedToWrite(null)
+                        .build())
+                .build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+
+        // When
+
+        // Then
+        assertThatExceptionOfType(AssetAccessDeniedException.class)
                 .isThrownBy(() -> handler.handle(command));
     }
 }

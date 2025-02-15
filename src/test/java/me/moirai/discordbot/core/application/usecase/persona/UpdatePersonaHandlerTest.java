@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.model.result.TextModerationResultFixture;
@@ -68,6 +69,43 @@ public class UpdatePersonaHandlerTest {
     }
 
     @Test
+    public void updatePersona_whenNotAuthorized_thenThrowException() {
+
+        // Given
+        String id = "PRSNID";
+        String requesterId = "RQSTRID";
+        UpdatePersona command = UpdatePersona.builder()
+                .id(id)
+                .name("MoirAI")
+                .personality("I am a Discord chatbot")
+                .visibility("PUBLIC")
+                .usersAllowedToReadToAdd(set("123456"))
+                .usersAllowedToWriteToAdd(set("123456"))
+                .usersAllowedToReadToRemove(set("123456"))
+                .usersAllowedToWriteToRemove(set("123456"))
+                .requesterDiscordId(requesterId)
+                .build();
+
+        Persona unchangedPersona = PersonaFixture.privatePersona()
+                .id(id)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId("SOMEOTHER")
+                        .build())
+                .build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
+        when(moderationPort.moderate(anyString()))
+                .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
+
+        // Then
+        StepVerifier.create(handler.handle(command))
+                .verifyErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(AssetAccessDeniedException.class);
+                    assertThat(error).message().isEqualTo("User does not have permission to modify the persona");
+                });
+    }
+
+    @Test
     public void updatePersona_whenValidData_thenPersonaIsUpdated() {
 
         // Given
@@ -82,6 +120,7 @@ public class UpdatePersonaHandlerTest {
                 .usersAllowedToWriteToAdd(set("123456"))
                 .usersAllowedToReadToRemove(set("123456"))
                 .usersAllowedToWriteToRemove(set("123456"))
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -127,6 +166,7 @@ public class UpdatePersonaHandlerTest {
                 .usersAllowedToWriteToAdd(null)
                 .usersAllowedToReadToRemove(set("4567"))
                 .usersAllowedToWriteToRemove(set("4567"))
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -172,6 +212,7 @@ public class UpdatePersonaHandlerTest {
                 .usersAllowedToWriteToAdd(set("123456"))
                 .usersAllowedToReadToRemove(set("4567"))
                 .usersAllowedToWriteToRemove(set("4567"))
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -217,6 +258,7 @@ public class UpdatePersonaHandlerTest {
                 .usersAllowedToWriteToAdd(set("123456"))
                 .usersAllowedToReadToRemove(null)
                 .usersAllowedToWriteToRemove(set("4567"))
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -262,6 +304,7 @@ public class UpdatePersonaHandlerTest {
                 .usersAllowedToWriteToAdd(set("123456"))
                 .usersAllowedToReadToRemove(set("4567"))
                 .usersAllowedToWriteToRemove(null)
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -301,6 +344,7 @@ public class UpdatePersonaHandlerTest {
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
                 .visibility("private")
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.publicPersona()
@@ -311,6 +355,9 @@ public class UpdatePersonaHandlerTest {
 
         Persona expectedUpdatedPersona = PersonaFixture.privatePersona()
                 .id(id)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
                 .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedPersona));
@@ -333,6 +380,7 @@ public class UpdatePersonaHandlerTest {
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
                 .visibility("invalid")
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()
@@ -384,6 +432,7 @@ public class UpdatePersonaHandlerTest {
         String requesterId = "RQSTRID";
         UpdatePersona command = UpdatePersona.builder()
                 .id(id)
+                .requesterDiscordId(requesterId)
                 .build();
 
         Persona unchangedPersona = PersonaFixture.privatePersona()

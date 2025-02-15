@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.persona.request.DeletePersona;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
@@ -35,7 +36,8 @@ public class DeletePersonaHandlerTest {
 
         // Given
         String id = null;
-        DeletePersona command = DeletePersona.build(id);
+        String requesterId = "RQSTRID";
+        DeletePersona command = DeletePersona.build(id, requesterId);
 
         // Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -47,7 +49,8 @@ public class DeletePersonaHandlerTest {
 
         // Given
         String id = "PRSNID";
-        DeletePersona command = DeletePersona.build(id);
+        String requesterId = "RQSTRID";
+        DeletePersona command = DeletePersona.build(id, requesterId);
 
         when(repository.findById(anyString())).thenReturn(Optional.empty());
 
@@ -57,12 +60,31 @@ public class DeletePersonaHandlerTest {
     }
 
     @Test
+    public void deletePersona_whenAccessDenied_thenThrowException() {
+
+        // Given
+        String id = "PRSNID";
+        String requesterId = "RQSTRID";
+        DeletePersona command = DeletePersona.build(id, requesterId);
+
+        Persona persona = PersonaFixture.privatePersona()
+                .id(id)
+                .build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(persona));
+
+        // Then
+        assertThatExceptionOfType(AssetAccessDeniedException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
     public void deletePersona_whenProperIdAndPermission_thenPersonaIsDeleted() {
 
         // Given
         String id = "PRSNID";
         String requesterId = "RQSTRID";
-        DeletePersona command = DeletePersona.build(id);
+        DeletePersona command = DeletePersona.build(id, requesterId);
 
         Persona persona = PersonaFixture.privatePersona()
                 .id(id)

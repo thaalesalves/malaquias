@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.world.request.AddFavoriteWorld;
 import me.moirai.discordbot.core.domain.world.World;
@@ -67,5 +68,22 @@ public class AddFavoriteWorldHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+    }
+
+    @Test
+    public void addFavorite_whenAccessDenied_thenThrowException() {
+
+        // Given
+        AddFavoriteWorld command = AddFavoriteWorld.builder()
+                .assetId("1234")
+                .playerDiscordId("INVLDUSR")
+                .build();
+
+        World world = WorldFixture.privateWorld().build();
+
+        when(worldRepository.findById(anyString())).thenReturn(Optional.of(world));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 }

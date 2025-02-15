@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
@@ -30,6 +31,7 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
     private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
+    private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to modify the persona";
 
     private final PersonaRepository repository;
     private final TextModerationPort moderationPort;
@@ -62,6 +64,10 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
 
         Persona persona = repository.findById(command.getId())
                 .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
+
+        if (!persona.canUserWrite(command.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
+        }
 
         if (isNotBlank(command.getName())) {
             persona.updateName(command.getName());

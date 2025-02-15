@@ -46,13 +46,13 @@ public class UpdateWorldHandlerTest {
         String id = "WRDID";
         String requesterId = "RQSTRID";
         String newName = "NEW NAME";
-
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
                 .name("MoirAI")
                 .description("This is an RPG world")
                 .adventureStart("As you enter the city, people around you start looking at you.")
                 .visibility("PUBLIC")
+                .requesterDiscordId(requesterId)
                 .build();
 
         World expectedUpdatedWorld = WorldFixture.privateWorld()
@@ -89,21 +89,31 @@ public class UpdateWorldHandlerTest {
 
         // Given
         String id = "WRLDID";
+        String requesterId = "RQSTRID";
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
                 .name("MoirAI")
                 .description("This is an RPG world")
                 .adventureStart("As you enter the city, people around you start looking at you.")
                 .visibility("PUBLIC")
+                .requesterDiscordId(requesterId)
                 .build();
 
-        World unchangedWorld = WorldFixture.privateWorld().build();
+        World unchangedWorld = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
+                .build();
+
         World expectedUpdatedWorld = WorldFixture.privateWorld()
                 .id(id)
                 .name("MoirAI")
                 .description("This is an RPG world")
                 .adventureStart("As you enter the city, people around you start looking at you.")
                 .visibility(Visibility.PUBLIC)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
                 .build();
 
         when(moderationPort.moderate(anyString()))
@@ -126,15 +136,21 @@ public class UpdateWorldHandlerTest {
 
         // Given
         String id = "WRLDID";
+        String requesterId = "RQSTRID";
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
                 .name(null)
                 .description(null)
                 .adventureStart(null)
                 .visibility(null)
+                .requesterDiscordId(requesterId)
                 .build();
 
-        World unchangedWorld = WorldFixture.privateWorld().build();
+        World unchangedWorld = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
+                .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
@@ -151,13 +167,24 @@ public class UpdateWorldHandlerTest {
 
         // Given
         String id = "WRLDID";
+        String requesterId = "RQSTRID";
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
                 .visibility("private")
+                .requesterDiscordId(requesterId)
                 .build();
 
-        World unchangedWorld = WorldFixture.publicWorld().build();
-        World expectedWorld = WorldFixture.privateWorld().build();
+        World unchangedWorld = WorldFixture.publicWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
+                .build();
+
+        World expectedWorld = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
+                .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(expectedWorld);
@@ -174,12 +201,18 @@ public class UpdateWorldHandlerTest {
 
         // Given
         String id = "WRLDID";
+        String requesterId = "RQSTRID";
         UpdateWorld command = UpdateWorld.builder()
                 .id(id)
                 .visibility("invalid")
+                .requesterDiscordId(requesterId)
                 .build();
 
-        World unchangedWorld = WorldFixture.privateWorld().build();
+        World unchangedWorld = WorldFixture.privateWorld()
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
+                .build();
 
         when(repository.findById(anyString())).thenReturn(Optional.of(unchangedWorld));
         when(repository.save(any(World.class))).thenReturn(unchangedWorld);
@@ -189,6 +222,37 @@ public class UpdateWorldHandlerTest {
                 .assertNext(result -> {
                     assertThat(result).isNotNull();
                 }).verifyComplete();
+    }
+
+    @Test
+    public void updateWorld_whenAccessDenied_thenExceptionIsThrown() {
+
+        // Given
+        String id = "WRDID";
+        String requesterId = "RQSTRID";
+        String newName = "NEW NAME";
+
+        UpdateWorld command = UpdateWorld.builder()
+                .id(id)
+                .name("MoirAI")
+                .description("This is an RPG world")
+                .adventureStart("As you enter the city, people around you start looking at you.")
+                .visibility("PUBLIC")
+                .requesterDiscordId(requesterId)
+                .build();
+
+        World unchangedWorld = WorldFixture.privateWorld()
+                .id(id)
+                .name(newName)
+                .build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(unchangedWorld));
+        when(moderationPort.moderate(anyString()))
+                .thenReturn(Mono.just(TextModerationResultFixture.withoutFlags().build()));
+
+        // Then
+        StepVerifier.create(handler.handle(command))
+                .verifyError(me.moirai.discordbot.common.exception.AssetAccessDeniedException.class);
     }
 
     @Test

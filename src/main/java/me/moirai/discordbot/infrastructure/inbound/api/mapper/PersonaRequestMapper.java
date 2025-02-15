@@ -36,6 +36,7 @@ public class PersonaRequestMapper {
                 .name(request.getName())
                 .personality(request.getPersonality())
                 .visibility(request.getVisibility())
+                .requesterDiscordId(requesterDiscordId)
                 .usersAllowedToWriteToAdd(emptyIfNull(request.getUsersAllowedToWriteToAdd())
                         .stream()
                         .collect(toSet()))
