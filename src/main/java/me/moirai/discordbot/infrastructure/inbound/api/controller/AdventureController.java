@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,7 +85,7 @@ public class AdventureController extends SecurityContextAware {
                     .direction(getDirection(searchParameters.getDirection()))
                     .visibility(getVisibility(searchParameters.getVisibility()))
                     .operation(getOperation(searchParameters.getOperation()))
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -93,49 +94,53 @@ public class AdventureController extends SecurityContextAware {
 
     @GetMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#adventureId, 'Adventure')")
     public Mono<AdventureResponse> getAdventureById(
             @PathVariable(required = true) String adventureId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetAdventureById query = GetAdventureById.build(adventureId, authenticatedUser.getId());
+            GetAdventureById query = GetAdventureById.build(adventureId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<CreateAdventureResponse> createAdventure(
             @Valid @RequestBody CreateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateAdventure command = requestMapper.toCommand(request, authenticatedUser.getId());
+            CreateAdventure command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
     }
 
     @PutMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#adventureId, 'Adventure') && canRead(#request.personaId, 'Persona') && canRead(#request.worldId, 'World')")
     public Mono<UpdateAdventureResponse> updateAdventure(
             @PathVariable(required = true) String adventureId,
             @Valid @RequestBody UpdateAdventureRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateAdventure command = requestMapper.toCommand(request, adventureId, authenticatedUser.getId());
+            UpdateAdventure command = requestMapper.toCommand(request, adventureId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
     }
 
     @DeleteMapping("/{adventureId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#adventureId, 'Adventure')")
     public Mono<Void> deleteAdventure(
             @PathVariable(required = true) String adventureId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteAdventure command = requestMapper.toCommand(adventureId, authenticatedUser.getId());
+            DeleteAdventure command = requestMapper.toCommand(adventureId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();
@@ -144,13 +149,14 @@ public class AdventureController extends SecurityContextAware {
 
     @PostMapping("/favorite")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.assetId, 'Adventure')")
     public Mono<Void> addFavoriteAdventure(@RequestBody FavoriteRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             AddFavoriteAdventure command = AddFavoriteAdventure.builder()
                     .assetId(request.getAssetId())
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
@@ -167,7 +173,7 @@ public class AdventureController extends SecurityContextAware {
 
             RemoveFavoriteAdventure command = RemoveFavoriteAdventure.builder()
                     .assetId(assetId)
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);

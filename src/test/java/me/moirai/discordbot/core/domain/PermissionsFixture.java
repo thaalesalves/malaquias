@@ -1,7 +1,7 @@
 package me.moirai.discordbot.core.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PermissionsFixture {
 
@@ -9,7 +9,7 @@ public class PermissionsFixture {
 
     public static Permissions.Builder samplePermissions() {
 
-        List<String> userList = new ArrayList<>();
+        Set<String> userList = new HashSet<>();
         userList.add("613226587696519");
         userList.add("910602820805797");
         userList.add("643337806686791");

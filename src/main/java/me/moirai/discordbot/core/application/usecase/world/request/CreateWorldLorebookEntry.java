@@ -9,7 +9,6 @@ public final class CreateWorldLorebookEntry extends UseCase<CreateWorldLorebookE
     private final String name;
     private final String regex;
     private final String description;
-    private final String playerDiscordId;
     private final String requesterDiscordId;
 
     private CreateWorldLorebookEntry(Builder builder) {
@@ -18,7 +17,6 @@ public final class CreateWorldLorebookEntry extends UseCase<CreateWorldLorebookE
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
-        this.playerDiscordId = builder.playerDiscordId;
         this.requesterDiscordId = builder.requesterDiscordId;
     }
 
@@ -42,10 +40,6 @@ public final class CreateWorldLorebookEntry extends UseCase<CreateWorldLorebookE
         return description;
     }
 
-    public String getPlayerDiscordId() {
-        return playerDiscordId;
-    }
-
     public String getRequesterDiscordId() {
         return requesterDiscordId;
     }
@@ -56,7 +50,6 @@ public final class CreateWorldLorebookEntry extends UseCase<CreateWorldLorebookE
         private String name;
         private String regex;
         private String description;
-        private String playerDiscordId;
         private String requesterDiscordId;
 
         private Builder() {
@@ -79,11 +72,6 @@ public final class CreateWorldLorebookEntry extends UseCase<CreateWorldLorebookE
 
         public Builder description(String description) {
             this.description = description;
-            return this;
-        }
-
-        public Builder playerDiscordId(String playerDiscordId) {
-            this.playerDiscordId = playerDiscordId;
             return this;
         }
 

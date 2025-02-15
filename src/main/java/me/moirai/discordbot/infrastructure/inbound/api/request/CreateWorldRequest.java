@@ -1,6 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.request;
 
 import java.util.List;
+import java.util.Set;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -22,8 +23,8 @@ public class CreateWorldRequest {
     @NotEmpty(message = "cannot be empty")
     @NotNull(message = "cannot be null")
     private String visibility;
-    private List<String> usersAllowedToWrite;
-    private List<String> usersAllowedToRead;
+    private Set<String> usersAllowedToWrite;
+    private Set<String> usersAllowedToRead;
     private List<CreateLorebookEntryRequest> lorebook;
 
     public CreateWorldRequest() {
@@ -45,11 +46,11 @@ public class CreateWorldRequest {
         return visibility;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -73,11 +74,11 @@ public class CreateWorldRequest {
         this.visibility = visibility;
     }
 
-    public void setUsersAllowedToWrite(List<String> usersAllowedToWrite) {
+    public void setUsersAllowedToWrite(Set<String> usersAllowedToWrite) {
         this.usersAllowedToWrite = usersAllowedToWrite;
     }
 
-    public void setUsersAllowedToRead(List<String> usersAllowedToRead) {
+    public void setUsersAllowedToRead(Set<String> usersAllowedToRead) {
         this.usersAllowedToRead = usersAllowedToRead;
     }
 

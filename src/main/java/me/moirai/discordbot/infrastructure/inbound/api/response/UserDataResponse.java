@@ -1,63 +1,65 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDataResponse {
 
-    private String id;
+    private String discordId;
     private String username;
-    private String globalNickname;
+    private String nickname;
     private String avatar;
-    private String email;
+    private OffsetDateTime joinDate;
 
     public UserDataResponse() {
     }
 
     private UserDataResponse(Builder builder) {
-        this.id = builder.id;
+        this.discordId = builder.discordId;
         this.username = builder.username;
-        this.globalNickname = builder.globalNickname;
+        this.nickname = builder.nickname;
         this.avatar = builder.avatar;
-        this.email = builder.email;
+        this.joinDate = builder.joinDate;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public String getId() {
-        return id;
+    public String getDiscordId() {
+        return discordId;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getGlobalNickname() {
-        return globalNickname;
+    public String getNickname() {
+        return nickname;
     }
 
     public String getAvatar() {
         return avatar;
     }
 
-    public String getEmail() {
-        return email;
+    public OffsetDateTime getJoinDate() {
+        return joinDate;
     }
 
     public static final class Builder {
-        private String id;
+        private String discordId;
         private String username;
-        private String globalNickname;
+        private String nickname;
         private String avatar;
-        private String email;
+        private OffsetDateTime joinDate;
 
         private Builder() {
         }
 
-        public Builder id(String id) {
-            this.id = id;
+        public Builder discordId(String discordId) {
+            this.discordId = discordId;
             return this;
         }
 
@@ -66,8 +68,8 @@ public class UserDataResponse {
             return this;
         }
 
-        public Builder globalNickname(String globalNickname) {
-            this.globalNickname = globalNickname;
+        public Builder nickname(String nickname) {
+            this.nickname = nickname;
             return this;
         }
 
@@ -76,8 +78,8 @@ public class UserDataResponse {
             return this;
         }
 
-        public Builder email(String email) {
-            this.email = email;
+        public Builder joinDate(OffsetDateTime joinDate) {
+            this.joinDate = joinDate;
             return this;
         }
 

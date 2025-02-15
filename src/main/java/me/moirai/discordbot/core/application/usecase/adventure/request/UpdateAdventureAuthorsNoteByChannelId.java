@@ -6,14 +6,16 @@ public final class UpdateAdventureAuthorsNoteByChannelId extends UseCase<Void> {
 
     private final String authorsNote;
     private final String channelId;
+    private final String requesterDiscordId;
 
-    private UpdateAdventureAuthorsNoteByChannelId(String authorsNote, String channelId) {
-        this.authorsNote = authorsNote;
-        this.channelId = channelId;
+    private UpdateAdventureAuthorsNoteByChannelId(Builder builder) {
+        this.authorsNote = builder.authorsNote;
+        this.channelId = builder.channelId;
+        this.requesterDiscordId = builder.requesterDiscordId;
     }
 
-    public static UpdateAdventureAuthorsNoteByChannelId build(String authorsNote, String channelId) {
-        return new UpdateAdventureAuthorsNoteByChannelId(authorsNote, channelId);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getAuthorsNote() {
@@ -22,5 +24,35 @@ public final class UpdateAdventureAuthorsNoteByChannelId extends UseCase<Void> {
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
+    }
+
+    public static final class Builder {
+
+        private String authorsNote;
+        private String channelId;
+        private String requesterDiscordId;
+
+        public Builder authorsNote(String authorsNote) {
+            this.authorsNote = authorsNote;
+            return this;
+        }
+
+        public Builder channelId(String channelId) {
+            this.channelId = channelId;
+            return this;
+        }
+
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
+            return this;
+        }
+
+        public UpdateAdventureAuthorsNoteByChannelId build() {
+            return new UpdateAdventureAuthorsNoteByChannelId(this);
+        }
     }
 }

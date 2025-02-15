@@ -1,108 +1,100 @@
 package me.moirai.discordbot.core.application.usecase.persona;
 
+import static me.moirai.discordbot.core.domain.Visibility.PRIVATE;
+import static me.moirai.discordbot.core.domain.Visibility.PUBLIC;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.persona.request.UpdatePersona;
 import me.moirai.discordbot.core.application.usecase.persona.result.UpdatePersonaResult;
-import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
 import me.moirai.discordbot.core.domain.persona.Persona;
-import me.moirai.discordbot.core.domain.persona.PersonaDomainRepository;
-import me.moirai.discordbot.core.domain.persona.PersonaService;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import reactor.core.publisher.Mono;
 
 @UseCaseHandler
 public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, Mono<UpdatePersonaResult>> {
 
+    private static final String PERSONA_NOT_FOUND = "Persona was not found";
     private static final String PERSONA_FLAGGED_BY_MODERATION = "Persona flagged by moderation";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Persona ID cannot be null or empty";
-    private static final String PERMISSION_MODIFY_DENIED = "User does not have permission to modify this persona";
+    private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to modify the persona";
 
-    private final PersonaDomainRepository repository;
-    private final PersonaService domainService;
+    private final PersonaRepository repository;
     private final TextModerationPort moderationPort;
 
-    public UpdatePersonaHandler(PersonaDomainRepository repository,
-            PersonaService domainService,
+    public UpdatePersonaHandler(PersonaRepository repository,
             TextModerationPort moderationPort) {
 
         this.repository = repository;
-        this.domainService = domainService;
         this.moderationPort = moderationPort;
     }
 
     @Override
-    public void validate(UpdatePersona command) {
+    public void validate(UpdatePersona request) {
 
-        if (StringUtils.isBlank(command.getId())) {
+        if (isBlank(request.getId())) {
             throw new IllegalArgumentException(ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }
 
     @Override
-    public Mono<UpdatePersonaResult> execute(UpdatePersona command) {
+    public Mono<UpdatePersonaResult> execute(UpdatePersona request) {
 
-        return moderateContent(command.getPersonality())
-                .flatMap(__ -> moderateContent(command.getName()))
-                .map(__ -> {
-                    Persona persona = domainService.getById(command.getId());
-                    if (!persona.canUserWrite(command.getRequesterDiscordId())) {
-                        throw new AssetAccessDeniedException(PERMISSION_MODIFY_DENIED);
-                    }
-
-                    return persona;
-                })
-                .map(persona -> updatePersona(command, persona))
+        return moderateContent(request.getPersonality())
+                .flatMap(__ -> moderateContent(request.getName()))
+                .map(__ -> updatePersona(request))
                 .map(personaUpdated -> UpdatePersonaResult.build(personaUpdated.getLastUpdateDate()));
     }
 
-    private Persona updatePersona(UpdatePersona command, Persona persona) {
+    private Persona updatePersona(UpdatePersona command) {
+
+        Persona persona = repository.findById(command.getId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_NOT_FOUND));
 
         if (!persona.canUserWrite(command.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(PERMISSION_MODIFY_DENIED);
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
         }
 
-        if (StringUtils.isNotBlank(command.getName())) {
+        if (isNotBlank(command.getName())) {
             persona.updateName(command.getName());
         }
 
-        if (StringUtils.isNotBlank(command.getPersonality())) {
+        if (isNotBlank(command.getPersonality())) {
             persona.updatePersonality(command.getPersonality());
         }
 
-        if (StringUtils.isNotBlank(command.getVisibility())) {
-            if (command.getVisibility().equalsIgnoreCase(Visibility.PUBLIC.name())) {
+        if (isNotBlank(command.getVisibility())) {
+            if (command.getVisibility().equalsIgnoreCase(PUBLIC.name())) {
                 persona.makePublic();
-            } else if (command.getVisibility().equalsIgnoreCase(Visibility.PRIVATE.name())) {
+            } else if (command.getVisibility().equalsIgnoreCase(PRIVATE.name())) {
                 persona.makePrivate();
             }
         }
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToAdd())
-                .stream()
-                .filter(userId -> !persona.canUserRead(userId))
+        emptyIfNull(command.getUsersAllowedToReadToAdd())
                 .forEach(persona::addReaderUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToAdd())
-                .stream()
-                .filter(userId -> !persona.canUserWrite(userId))
+        emptyIfNull(command.getUsersAllowedToWriteToAdd())
                 .forEach(persona::addWriterUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToReadToRemove())
+        emptyIfNull(command.getUsersAllowedToReadToRemove())
                 .forEach(persona::removeReaderUser);
 
-        CollectionUtils.emptyIfNull(command.getUsersAllowedToWriteToRemove())
+        emptyIfNull(command.getUsersAllowedToWriteToRemove())
                 .forEach(persona::removeWriterUser);
 
         return repository.save(persona);
@@ -110,13 +102,13 @@ public class UpdatePersonaHandler extends AbstractUseCaseHandler<UpdatePersona, 
 
     private Mono<List<String>> moderateContent(String personality) {
 
-        if (StringUtils.isBlank(personality)) {
+        if (isBlank(personality)) {
             return Mono.just(Collections.emptyList());
         }
 
         return getTopicsFlaggedByModeration(personality)
                 .map(flaggedTopics -> {
-                    if (CollectionUtils.isNotEmpty(flaggedTopics)) {
+                    if (isNotEmpty(flaggedTopics)) {
                         throw new ModerationException(PERSONA_FLAGGED_BY_MODERATION, flaggedTopics);
                     }
 

@@ -17,8 +17,6 @@ public class WorldLorebookPersistenceMapper {
                 .name(entry.getName())
                 .description(entry.getDescription())
                 .regex(entry.getRegex())
-                .playerDiscordId(entry.getPlayerDiscordId())
-                .isPlayerCharacter(entry.isPlayerCharacter())
                 .creationDate(entry.getCreationDate())
                 .lastUpdateDate(entry.getLastUpdateDate())
                 .build();

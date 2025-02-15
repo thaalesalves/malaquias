@@ -5,42 +5,51 @@ import static me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceM
 import java.util.List;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.CreateAdventure;
 import me.moirai.discordbot.core.application.usecase.adventure.result.CreateAdventureResult;
 import me.moirai.discordbot.core.domain.Permissions;
 import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntryRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.ContextAttributes;
 import me.moirai.discordbot.core.domain.adventure.GameMode;
 import me.moirai.discordbot.core.domain.adventure.ModelConfiguration;
 import me.moirai.discordbot.core.domain.adventure.Moderation;
+import me.moirai.discordbot.core.domain.persona.Persona;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntryRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @UseCaseHandler
 public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventure, CreateAdventureResult> {
 
+    private static final String USER_NO_PERMISSION_IN_WORLD = "User does not have permission to view the world to be linked to this adventure";
+    private static final String USER_NO_PERMISSION_IN_PERSONA = "User does not have permission to view the persona to be linked to this adventure";
     private static final String WORLD_DOES_NOT_EXIST = "The world to be linked to this adventure does not exist";
+    private static final String PERSONA_DOES_NOT_EXIST = "The persona to be linked to this adventure does not exist";
 
     private final WorldLorebookEntryRepository worldLorebookEntryRepository;
-    private final WorldQueryRepository worldQueryRepository;
-    private final AdventureDomainRepository repository;
+    private final WorldRepository worldRepository;
+    private final PersonaRepository personaRepository;
+    private final AdventureRepository repository;
     private final AdventureLorebookEntryRepository lorebookEntryRepository;
 
     public CreateAdventureHandler(
             WorldLorebookEntryRepository worldLorebookEntryRepository,
-            WorldQueryRepository worldQueryRepository,
-            AdventureDomainRepository repository,
+            WorldRepository worldRepository,
+            PersonaRepository personaRepository,
+            AdventureRepository repository,
             AdventureLorebookEntryRepository lorebookEntryRepository) {
 
         this.worldLorebookEntryRepository = worldLorebookEntryRepository;
-        this.worldQueryRepository = worldQueryRepository;
+        this.worldRepository = worldRepository;
+        this.personaRepository = personaRepository;
         this.repository = repository;
         this.lorebookEntryRepository = lorebookEntryRepository;
     }
@@ -48,8 +57,8 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
     @Override
     public CreateAdventureResult execute(CreateAdventure command) {
 
-        World world = worldQueryRepository.findById(command.getWorldId())
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_DOES_NOT_EXIST));
+        World world = getWorldTobeLinked(command);
+        Persona persona = getPersonaToBeLinked(command);
 
         ModelConfiguration modelConfiguration = buildModelConfiguration(command);
         Permissions permissions = buildPermissions(command);
@@ -59,8 +68,8 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
                 .modelConfiguration(modelConfiguration)
                 .permissions(permissions)
                 .name(command.getName())
-                .personaId(command.getPersonaId())
-                .worldId(command.getWorldId())
+                .personaId(persona.getId())
+                .worldId(world.getId())
                 .discordChannelId(command.getDiscordChannelId())
                 .gameMode(GameMode.fromString(command.getGameMode()))
                 .visibility(Visibility.fromString(command.getVisibility()))
@@ -77,6 +86,30 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
         return CreateAdventureResult.build(adventure.getId());
     }
 
+    private Persona getPersonaToBeLinked(CreateAdventure command) {
+
+        Persona persona = personaRepository.findById(command.getPersonaId())
+                .orElseThrow(() -> new AssetNotFoundException(PERSONA_DOES_NOT_EXIST));
+
+        if (!persona.canUserRead(command.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_PERSONA);
+        }
+
+        return persona;
+    }
+
+    private World getWorldTobeLinked(CreateAdventure command) {
+
+        World world = worldRepository.findById(command.getWorldId())
+                .orElseThrow(() -> new AssetNotFoundException(WORLD_DOES_NOT_EXIST));
+
+        if (!world.canUserRead(command.getRequesterDiscordId())) {
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION_IN_WORLD);
+        }
+
+        return world;
+    }
+
     private List<AdventureLorebookEntry> buildLorebook(World world, Adventure adventure) {
 
         return worldLorebookEntryRepository.findAllByWorldId(world.getId()).stream()
@@ -84,8 +117,6 @@ public class CreateAdventureHandler extends AbstractUseCaseHandler<CreateAdventu
                         .name(worldEntry.getName())
                         .regex(worldEntry.getRegex())
                         .description(worldEntry.getDescription())
-                        .playerDiscordId(worldEntry.getPlayerDiscordId())
-                        .isPlayerCharacter(worldEntry.isPlayerCharacter())
                         .adventureId(adventure.getId())
                         .build())
                 .toList();

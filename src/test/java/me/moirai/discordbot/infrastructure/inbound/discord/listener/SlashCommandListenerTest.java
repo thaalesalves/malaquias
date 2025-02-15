@@ -616,7 +616,7 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
         ArgumentCaptor<Modal> modalCaptor = ArgumentCaptor.forClass(Modal.class);
 
         when(useCaseRunner.run(any(GetAdventureByChannelId.class)))
-                .thenReturn(GetAdventureResultFixture.sample().build());
+                .thenReturn(GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         when(event.getFullCommandName()).thenReturn(command);
         when(event.getChannel()).thenReturn(channelUnion);
@@ -650,7 +650,7 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
         ArgumentCaptor<Modal> modalCaptor = ArgumentCaptor.forClass(Modal.class);
 
         when(useCaseRunner.run(any(GetAdventureByChannelId.class)))
-                .thenReturn(GetAdventureResultFixture.sample().build());
+                .thenReturn(GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         when(event.getFullCommandName()).thenReturn(command);
         when(event.getChannel()).thenReturn(channelUnion);
@@ -684,7 +684,7 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
         ArgumentCaptor<Modal> modalCaptor = ArgumentCaptor.forClass(Modal.class);
 
         when(useCaseRunner.run(any(GetAdventureByChannelId.class)))
-                .thenReturn(GetAdventureResultFixture.sample().build());
+                .thenReturn(GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         when(event.getFullCommandName()).thenReturn(command);
         when(event.getChannel()).thenReturn(channelUnion);
@@ -718,7 +718,7 @@ public class SlashCommandListenerTest extends AbstractDiscordTest {
         ArgumentCaptor<Modal> modalCaptor = ArgumentCaptor.forClass(Modal.class);
 
         when(useCaseRunner.run(any(GetAdventureByChannelId.class)))
-                .thenReturn(GetAdventureResultFixture.sample().build());
+                .thenReturn(GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         when(event.getFullCommandName()).thenReturn(command);
         when(event.getChannel()).thenReturn(channelUnion);

@@ -1,9 +1,11 @@
 package me.moirai.discordbot.core.application.usecase.world.request;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableSet;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 import me.moirai.discordbot.core.application.usecase.world.result.UpdateWorldResult;
@@ -16,11 +18,11 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
     private final String description;
     private final String adventureStart;
     private final String visibility;
-    private final List<String> usersAllowedToWriteToAdd;
-    private final List<String> usersAllowedToWriteToRemove;
-    private final List<String> usersAllowedToReadToAdd;
-    private final List<String> usersAllowedToReadToRemove;
     private final String requesterDiscordId;
+    private final Set<String> usersAllowedToWriteToAdd;
+    private final Set<String> usersAllowedToWriteToRemove;
+    private final Set<String> usersAllowedToReadToAdd;
+    private final Set<String> usersAllowedToReadToRemove;
 
     private UpdateWorld(Builder builder) {
 
@@ -29,11 +31,19 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         this.description = builder.description;
         this.adventureStart = builder.adventureStart;
         this.visibility = builder.visibility;
-        this.usersAllowedToWriteToAdd = unmodifiableList(builder.usersAllowedToWriteToAdd);
-        this.usersAllowedToWriteToRemove = unmodifiableList(builder.usersAllowedToWriteToRemove);
-        this.usersAllowedToReadToAdd = unmodifiableList(builder.usersAllowedToReadToAdd);
-        this.usersAllowedToReadToRemove = unmodifiableList(builder.usersAllowedToReadToRemove);
         this.requesterDiscordId = builder.requesterDiscordId;
+
+        this.usersAllowedToWriteToAdd = isEmpty(builder.usersAllowedToWriteToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToAdd);
+
+        this.usersAllowedToWriteToRemove = isEmpty(builder.usersAllowedToWriteToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToWriteToRemove);
+
+        this.usersAllowedToReadToAdd = isEmpty(builder.usersAllowedToReadToAdd) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToAdd);
+
+        this.usersAllowedToReadToRemove = isEmpty(builder.usersAllowedToReadToRemove) ? emptySet()
+                : unmodifiableSet(builder.usersAllowedToReadToRemove);
     }
 
     public static Builder builder() {
@@ -60,24 +70,24 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         return visibility;
     }
 
-    public List<String> getUsersAllowedToWriteToAdd() {
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
+    }
+
+    public Set<String> getUsersAllowedToWriteToAdd() {
         return usersAllowedToWriteToAdd;
     }
 
-    public List<String> getUsersAllowedToWriteToRemove() {
+    public Set<String> getUsersAllowedToWriteToRemove() {
         return usersAllowedToWriteToRemove;
     }
 
-    public List<String> getUsersAllowedToReadToAdd() {
+    public Set<String> getUsersAllowedToReadToAdd() {
         return usersAllowedToReadToAdd;
     }
 
-    public List<String> getUsersAllowedToReadToRemove() {
+    public Set<String> getUsersAllowedToReadToRemove() {
         return usersAllowedToReadToRemove;
-    }
-
-    public String getRequesterDiscordId() {
-        return requesterDiscordId;
     }
 
     public static final class Builder {
@@ -87,11 +97,11 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
         private String description;
         private String adventureStart;
         private String visibility;
-        private List<String> usersAllowedToWriteToAdd = new ArrayList<>();
-        private List<String> usersAllowedToWriteToRemove = new ArrayList<>();
-        private List<String> usersAllowedToReadToAdd = new ArrayList<>();
-        private List<String> usersAllowedToReadToRemove = new ArrayList<>();
         private String requesterDiscordId;
+        private Set<String> usersAllowedToWriteToAdd = new HashSet<>();
+        private Set<String> usersAllowedToWriteToRemove = new HashSet<>();
+        private Set<String> usersAllowedToReadToAdd = new HashSet<>();
+        private Set<String> usersAllowedToReadToRemove = new HashSet<>();
 
         private Builder() {
         }
@@ -121,44 +131,32 @@ public final class UpdateWorld extends UseCase<Mono<UpdateWorldResult>> {
             return this;
         }
 
-        public Builder usersAllowedToWriteToAdd(List<String> usersAllowedToWriteToAdd) {
-
-            if (usersAllowedToWriteToAdd != null) {
-                this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
-            }
-
-            return this;
-        }
-
-        public Builder usersAllowedToWriteToRemove(List<String> usersAllowedToWriteToRemove) {
-
-            if (usersAllowedToWriteToRemove != null) {
-                this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
-            }
-
-            return this;
-        }
-
-        public Builder usersAllowedToReadToAdd(List<String> usersAllowedToReadToAdd) {
-
-            if (usersAllowedToReadToAdd != null) {
-                this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
-            }
-
-            return this;
-        }
-
-        public Builder usersAllowedToReadToRemove(List<String> usersAllowedToReadToRemove) {
-
-            if (usersAllowedToReadToRemove != null) {
-                this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
-            }
-
-            return this;
-        }
-
         public Builder requesterDiscordId(String requesterDiscordId) {
             this.requesterDiscordId = requesterDiscordId;
+            return this;
+        }
+
+        public Builder usersAllowedToWriteToAdd(Set<String> usersAllowedToWriteToAdd) {
+
+            this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
+            return this;
+        }
+
+        public Builder usersAllowedToWriteToRemove(Set<String> usersAllowedToWriteToRemove) {
+
+            this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
+            return this;
+        }
+
+        public Builder usersAllowedToReadToAdd(Set<String> usersAllowedToReadToAdd) {
+
+            this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
+            return this;
+        }
+
+        public Builder usersAllowedToReadToRemove(Set<String> usersAllowedToReadToRemove) {
+
+            this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
             return this;
         }
 

@@ -8,16 +8,18 @@ import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.usecase.adventure.request.DeleteAdventure;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 
 @UseCaseHandler
 public class DeleteAdventureHandler extends AbstractUseCaseHandler<DeleteAdventure, Void> {
 
+    private static final String USER_NO_PERMISSION = "User does not have permission to delete adventure";
+    private static final String ADVENTURE_NOT_FOUND = "Adventure to be deleted was not found";
     private static final String ID_CANNOT_BE_NULL_OR_EMPTY = "Adventure ID cannot be null or empty";
 
-    private final AdventureDomainRepository repository;
+    private final AdventureRepository repository;
 
-    public DeleteAdventureHandler(AdventureDomainRepository repository) {
+    public DeleteAdventureHandler(AdventureRepository repository) {
         this.repository = repository;
     }
 
@@ -33,10 +35,10 @@ public class DeleteAdventureHandler extends AbstractUseCaseHandler<DeleteAdventu
     public Void execute(DeleteAdventure command) {
 
         Adventure adventure = repository.findById(command.getId())
-                .orElseThrow(() -> new AssetNotFoundException("Adventure to be deleted was not found"));
+                .orElseThrow(() -> new AssetNotFoundException(ADVENTURE_NOT_FOUND));
 
         if (!adventure.canUserWrite(command.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException("User does not have permission to delete this adventure");
+            throw new AssetAccessDeniedException(USER_NO_PERMISSION);
         }
 
         repository.deleteById(command.getId());

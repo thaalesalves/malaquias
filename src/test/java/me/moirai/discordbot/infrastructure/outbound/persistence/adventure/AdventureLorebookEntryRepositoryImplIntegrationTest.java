@@ -15,7 +15,7 @@ import me.moirai.discordbot.core.application.usecase.adventure.request.SearchAdv
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureLorebookEntryResult;
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventureLorebookEntriesResult;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntry;
 import me.moirai.discordbot.core.domain.adventure.AdventureLorebookEntryFixture;
@@ -33,7 +33,7 @@ public class AdventureLorebookEntryRepositoryImplIntegrationTest extends Abstrac
     private AdventureJpaRepository adventureJpaRepository;
 
     @Autowired
-    private AdventureDomainRepository adventureRepository;
+    private AdventureRepository adventureRepository;
 
     @BeforeEach
     public void before() {

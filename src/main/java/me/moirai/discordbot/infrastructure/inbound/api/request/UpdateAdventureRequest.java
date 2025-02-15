@@ -1,7 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.request;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -58,14 +58,14 @@ public class UpdateAdventureRequest {
 
     private String gameMode;
     private boolean isMultiplayer;
-    private List<String> stopSequencesToAdd;
-    private List<String> stopSequencesToRemove;
+    private Set<String> stopSequencesToAdd;
+    private Set<String> stopSequencesToRemove;
     private Map<String, Double> logitBiasToAdd;
-    private List<String> logitBiasToRemove;
-    private List<String> usersAllowedToWriteToAdd;
-    private List<String> usersAllowedToWriteToRemove;
-    private List<String> usersAllowedToReadToAdd;
-    private List<String> usersAllowedToReadToRemove;
+    private Set<String> logitBiasToRemove;
+    private Set<String> usersAllowedToWriteToAdd;
+    private Set<String> usersAllowedToWriteToRemove;
+    private Set<String> usersAllowedToReadToAdd;
+    private Set<String> usersAllowedToReadToRemove;
     private String adventureStart;
     private String nudge;
     private String authorsNote;
@@ -128,11 +128,11 @@ public class UpdateAdventureRequest {
         return presencePenalty;
     }
 
-    public List<String> getStopSequencesToAdd() {
+    public Set<String> getStopSequencesToAdd() {
         return stopSequencesToAdd;
     }
 
-    public List<String> getStopSequencesToRemove() {
+    public Set<String> getStopSequencesToRemove() {
         return stopSequencesToRemove;
     }
 
@@ -140,23 +140,23 @@ public class UpdateAdventureRequest {
         return logitBiasToAdd;
     }
 
-    public List<String> getLogitBiasToRemove() {
+    public Set<String> getLogitBiasToRemove() {
         return logitBiasToRemove;
     }
 
-    public List<String> getUsersAllowedToWriteToAdd() {
+    public Set<String> getUsersAllowedToWriteToAdd() {
         return usersAllowedToWriteToAdd;
     }
 
-    public List<String> getUsersAllowedToWriteToRemove() {
+    public Set<String> getUsersAllowedToWriteToRemove() {
         return usersAllowedToWriteToRemove;
     }
 
-    public List<String> getUsersAllowedToReadToAdd() {
+    public Set<String> getUsersAllowedToReadToAdd() {
         return usersAllowedToReadToAdd;
     }
 
-    public List<String> getUsersAllowedToReadToRemove() {
+    public Set<String> getUsersAllowedToReadToRemove() {
         return usersAllowedToReadToRemove;
     }
 
@@ -212,11 +212,11 @@ public class UpdateAdventureRequest {
         this.presencePenalty = presencePenalty;
     }
 
-    public void setStopSequencesToAdd(List<String> stopSequencesToAdd) {
+    public void setStopSequencesToAdd(Set<String> stopSequencesToAdd) {
         this.stopSequencesToAdd = stopSequencesToAdd;
     }
 
-    public void setStopSequencesToRemove(List<String> stopSequencesToRemove) {
+    public void setStopSequencesToRemove(Set<String> stopSequencesToRemove) {
         this.stopSequencesToRemove = stopSequencesToRemove;
     }
 
@@ -224,23 +224,23 @@ public class UpdateAdventureRequest {
         this.logitBiasToAdd = logitBiasToAdd;
     }
 
-    public void setLogitBiasToRemove(List<String> logitBiasToRemove) {
+    public void setLogitBiasToRemove(Set<String> logitBiasToRemove) {
         this.logitBiasToRemove = logitBiasToRemove;
     }
 
-    public void setUsersAllowedToWriteToAdd(List<String> usersAllowedToWriteToAdd) {
+    public void setUsersAllowedToWriteToAdd(Set<String> usersAllowedToWriteToAdd) {
         this.usersAllowedToWriteToAdd = usersAllowedToWriteToAdd;
     }
 
-    public void setUsersAllowedToWriteToRemove(List<String> usersAllowedToWriteToRemove) {
+    public void setUsersAllowedToWriteToRemove(Set<String> usersAllowedToWriteToRemove) {
         this.usersAllowedToWriteToRemove = usersAllowedToWriteToRemove;
     }
 
-    public void setUsersAllowedToReadToAdd(List<String> usersAllowedToReadToAdd) {
+    public void setUsersAllowedToReadToAdd(Set<String> usersAllowedToReadToAdd) {
         this.usersAllowedToReadToAdd = usersAllowedToReadToAdd;
     }
 
-    public void setUsersAllowedToReadToRemove(List<String> usersAllowedToReadToRemove) {
+    public void setUsersAllowedToReadToRemove(Set<String> usersAllowedToReadToRemove) {
         this.usersAllowedToReadToRemove = usersAllowedToReadToRemove;
     }
 

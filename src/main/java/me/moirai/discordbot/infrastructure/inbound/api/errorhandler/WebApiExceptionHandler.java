@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -160,19 +161,24 @@ public class WebApiExceptionHandler extends AbstractErrorWebExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
+    @ResponseStatus(code = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDeniedError(AuthorizationDeniedException exception) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(HttpStatus.FORBIDDEN)
+                .message(exception.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationFailedException.class)
     public ResponseEntity<ErrorResponse> authenticationError(AuthenticationFailedException exception) {
 
         LOG.error("Error during authentication", exception);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(HttpStatus.UNAUTHORIZED)
-                .message(exception.getMessage())
-                .details(Collections.singletonList(exception.getResponseMessage()))
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)

@@ -15,18 +15,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.PersonaQueryRepository;
 import me.moirai.discordbot.core.application.usecase.persona.request.AddFavoritePersona;
 import me.moirai.discordbot.core.domain.persona.Persona;
 import me.moirai.discordbot.core.domain.persona.PersonaFixture;
+import me.moirai.discordbot.core.domain.persona.PersonaRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AddFavoritePersonaHandlerTest {
 
     @Mock
-    private PersonaQueryRepository personaQueryRepository;
+    private PersonaRepository personaRepository;
 
     @Mock
     private FavoriteRepository favoriteRepository;
@@ -45,7 +46,7 @@ public class AddFavoritePersonaHandlerTest {
 
         Persona persona = PersonaFixture.publicPersona().build();
 
-        when(personaQueryRepository.findById(anyString())).thenReturn(Optional.of(persona));
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
 
         // When
         handler.handle(command);
@@ -63,9 +64,26 @@ public class AddFavoritePersonaHandlerTest {
                 .playerDiscordId("1234")
                 .build();
 
-        when(personaQueryRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(personaRepository.findById(anyString())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+    }
+
+    @Test
+    public void addFavorite_whenAccessDenied_thenThrowException() {
+
+        // Given
+        AddFavoritePersona command = AddFavoritePersona.builder()
+                .assetId("1234")
+                .playerDiscordId("INVLDUSR")
+                .build();
+
+        Persona persona = PersonaFixture.privatePersona().build();
+
+        when(personaRepository.findById(anyString())).thenReturn(Optional.of(persona));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 }

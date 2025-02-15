@@ -14,7 +14,6 @@ public final class GetAdventureById extends UseCase<GetAdventureResult> {
     }
 
     public static GetAdventureById build(String id, String requesterDiscordId) {
-
         return new GetAdventureById(id, requesterDiscordId);
     }
 

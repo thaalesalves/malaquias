@@ -105,7 +105,11 @@ public class ModalListener extends ListenerAdapter {
         InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
         String nudgeContent = event.getValue("nudgeContent").getAsString();
 
-        useCaseRunner.run(UpdateAdventureNudgeByChannelId.build(nudgeContent, textChannel.getId()));
+        useCaseRunner.run(UpdateAdventureNudgeByChannelId.builder()
+                .nudge(nudgeContent)
+                .channelId(textChannel.getId())
+                .requesterDiscordId(event.getMember().getId())
+                .build());
 
         discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
     }
@@ -115,7 +119,11 @@ public class ModalListener extends ListenerAdapter {
         String authorsNoteContent = event.getValue("authorsNoteContent").getAsString();
 
         useCaseRunner
-                .run(UpdateAdventureAuthorsNoteByChannelId.build(authorsNoteContent, textChannel.getId()));
+                .run(UpdateAdventureAuthorsNoteByChannelId.builder()
+                        .authorsNote(authorsNoteContent)
+                        .channelId(textChannel.getId())
+                        .requesterDiscordId(event.getMember().getId())
+                        .build());
 
         discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
     }
@@ -124,7 +132,11 @@ public class ModalListener extends ListenerAdapter {
         InteractionHook interactionHook = discordListenerHelper.sendNotification(event, WAITING_FOR_INPUT);
         String rememberContent = event.getValue("rememberContent").getAsString();
 
-        useCaseRunner.run(UpdateAdventureRememberByChannelId.build(rememberContent, textChannel.getId()));
+        useCaseRunner.run(UpdateAdventureRememberByChannelId.builder()
+                .remember(rememberContent)
+                .channelId(textChannel.getId())
+                .requesterDiscordId(event.getMember().getId())
+                .build());
 
         discordListenerHelper.updateNotification(interactionHook, UPDATED_ADVENTURE_CONTEXT_MODIFIER);
     }

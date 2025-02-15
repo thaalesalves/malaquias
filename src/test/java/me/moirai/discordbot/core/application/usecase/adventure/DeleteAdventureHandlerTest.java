@@ -19,14 +19,14 @@ import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.adventure.request.DeleteAdventure;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteAdventureHandlerTest {
 
     @Mock
-    private AdventureDomainRepository repository;
+    private AdventureRepository repository;
 
     @InjectMocks
     private DeleteAdventureHandler handler;
@@ -44,6 +44,25 @@ public class DeleteAdventureHandlerTest {
     }
 
     @Test
+    public void deleteAdventure_whenNoAdventurePermission_thenThrowException() {
+
+        // Given
+        String id = "ADVID";
+        String requesterId = "RQSTRID";
+        DeleteAdventure command = DeleteAdventure.build(id, requesterId);
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+                .id(id)
+                .name("New name")
+                .build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
+    }
+
+    @Test
     public void deleteAdventure_whenAdventureNotFound_thenThrowException() {
 
         // Given
@@ -55,28 +74,6 @@ public class DeleteAdventureHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
-    }
-
-    @Test
-    public void deleteAdventure_whenInvalidPermission_thenThrowException() {
-
-        // Given
-        String id = "ADVID";
-        String requesterId = "RQSTRID";
-        DeleteAdventure command = DeleteAdventure.build(id, requesterId);
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("ANTHRUSR")
-                        .build())
-                .build();
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 
     @Test

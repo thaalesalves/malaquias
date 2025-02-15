@@ -48,10 +48,10 @@ public class UpdateAdventureLorebookEntryHandler
     public Mono<UpdateAdventureLorebookEntryResult> execute(UpdateAdventureLorebookEntry command) {
 
         return service.updateLorebookEntry(command)
-                .map(this::mapResult);
+                .map(this::toResult);
     }
 
-    private UpdateAdventureLorebookEntryResult mapResult(AdventureLorebookEntry savedEntry) {
+    private UpdateAdventureLorebookEntryResult toResult(AdventureLorebookEntry savedEntry) {
 
         return UpdateAdventureLorebookEntryResult.build(savedEntry.getLastUpdateDate());
     }

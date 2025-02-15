@@ -31,8 +31,8 @@ public class AdventureResponseMapperTest {
     public void searchAdventureResultToResponse() {
 
         // Given
-        List<GetAdventureResult> results = Lists.list(GetAdventureResultFixture.sample().build(),
-                GetAdventureResultFixture.sample().build());
+        List<GetAdventureResult> results = Lists.list(GetAdventureResultFixture.privateMultiplayerAdventure().build(),
+                GetAdventureResultFixture.privateMultiplayerAdventure().build());
 
         SearchAdventuresResult result = SearchAdventuresResult.builder()
                 .page(1)
@@ -57,7 +57,7 @@ public class AdventureResponseMapperTest {
     public void getAdventureResultToResponse() {
 
         // Given
-        GetAdventureResult result = GetAdventureResultFixture.sample().build();
+        GetAdventureResult result = GetAdventureResultFixture.privateMultiplayerAdventure().build();
 
         // When
         AdventureResponse response = mapper.toResponse(result);

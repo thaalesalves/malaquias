@@ -4,8 +4,8 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -136,7 +136,7 @@ public class PersonaTest {
         String userId = "1234567890";
         Persona.Builder personaBuilder = PersonaFixture.publicPersona();
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToWrite(new ArrayList<>()).build();
+                .usersAllowedToWrite(new HashSet<>()).build();
 
         personaBuilder.permissions(permissions);
 
@@ -158,7 +158,7 @@ public class PersonaTest {
         String userId = "1234567890";
         Persona.Builder personaBuilder = PersonaFixture.publicPersona();
         Permissions permissions = PermissionsFixture.samplePermissions()
-                .usersAllowedToRead(new ArrayList<>()).build();
+                .usersAllowedToRead(new HashSet<>()).build();
 
         personaBuilder.permissions(permissions);
 
@@ -180,7 +180,7 @@ public class PersonaTest {
         String userId = "1234567890";
         Persona.Builder personaBuilder = PersonaFixture.privatePersona();
 
-        List<String> usersAllowedToRead = new ArrayList<>();
+        Set<String> usersAllowedToRead = new HashSet<>();
         usersAllowedToRead.add(userId);
 
         Permissions permissions = PermissionsFixture.samplePermissions()
@@ -206,7 +206,7 @@ public class PersonaTest {
         String userId = "1234567890";
         Persona.Builder personaBuilder = PersonaFixture.privatePersona();
 
-        List<String> usersAllowedToWrite = new ArrayList<>();
+        Set<String> usersAllowedToWrite = new HashSet<>();
         usersAllowedToWrite.add(userId);
 
         Permissions permissions = PermissionsFixture.samplePermissions()

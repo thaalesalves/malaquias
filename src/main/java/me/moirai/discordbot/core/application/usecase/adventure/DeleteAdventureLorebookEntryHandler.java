@@ -1,6 +1,6 @@
 package me.moirai.discordbot.core.application.usecase.adventure;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
@@ -22,11 +22,11 @@ public class DeleteAdventureLorebookEntryHandler extends AbstractUseCaseHandler<
     @Override
     public void validate(DeleteAdventureLorebookEntry command) {
 
-        if (StringUtils.isBlank(command.getLorebookEntryId())) {
+        if (isBlank(command.getLorebookEntryId())) {
             throw new IllegalArgumentException(ENTRY_ID_CANNOT_BE_NULL_OR_EMPTY);
         }
 
-        if (StringUtils.isBlank(command.getAdventureId())) {
+        if (isBlank(command.getAdventureId())) {
             throw new IllegalArgumentException(ADVENTURE_ID_CANNOT_BE_NULL_OR_EMPTY);
         }
     }

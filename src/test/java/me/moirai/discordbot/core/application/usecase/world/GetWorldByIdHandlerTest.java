@@ -1,11 +1,11 @@
 package me.moirai.discordbot.core.application.usecase.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -15,18 +15,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
+import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldById;
 import me.moirai.discordbot.core.application.usecase.world.result.GetWorldResult;
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetWorldByIdHandlerTest {
 
     @Mock
-    private WorldQueryRepository repository;
+    private WorldRepository repository;
 
     @InjectMocks
     private GetWorldByIdHandler handler;
@@ -45,9 +46,15 @@ public class GetWorldByIdHandlerTest {
     public void getWorldById() {
 
         // Given
-        String requesterDiscordId = "586678721356875";
         String id = "HAUDHUAHD";
-        World world = WorldFixture.privateWorld().id(id).build();
+        String requesterDiscordId = "84REAC";
+        World world = WorldFixture.privateWorld()
+                .id(id)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterDiscordId)
+                        .build())
+                .build();
+
         GetWorldById query = GetWorldById.build(id, requesterDiscordId);
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
@@ -61,25 +68,48 @@ public class GetWorldByIdHandlerTest {
     }
 
     @Test
-    public void findWorld_whenNotEnoughPermission_thenThrowException() {
+    public void updateWorld_whenIdIsNull_thenExceptionIsThrown() {
+
+        // Given
+        String id = null;
+        String requesterDiscordId = "84REAC";
+        GetWorldById command = GetWorldById.build(id, requesterDiscordId);
+
+        // Then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void updateWorld_whenWorldNotFound_thenExceptionIsThrown() {
 
         // Given
         String id = "WRLDID";
-        String requesterId = "RQSTRID";
-        GetWorldById query = GetWorldById.build(id, requesterId);
+        String requesterDiscordId = "84REAC";
+        GetWorldById command = GetWorldById.build(id, requesterDiscordId);
 
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Then
+        assertThatExceptionOfType(AssetNotFoundException.class)
+                .isThrownBy(() -> handler.handle(command));
+    }
+
+    @Test
+    public void getWorldById_whenAccessDenied_thenThrowException() {
+
+        // Given
+        String id = "HAUDHUAHD";
+        String requesterId = "RQSTRID";
         World world = WorldFixture.privateWorld()
                 .id(id)
-                .name("New name")
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("ANTHRUSR")
-                        .usersAllowedToRead(Collections.emptyList())
-                        .build())
                 .build();
+
+        GetWorldById query = GetWorldById.build(id, requesterId);
 
         when(repository.findById(anyString())).thenReturn(Optional.of(world));
 
-        // Then
+        // When
         assertThrows(AssetAccessDeniedException.class, () -> handler.handle(query));
     }
 }

@@ -2,16 +2,16 @@ package me.moirai.discordbot.core.application.usecase.world;
 
 import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.SearchWorlds;
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldsResult;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @UseCaseHandler
 public class SearchWorldsHandler extends AbstractUseCaseHandler<SearchWorlds, SearchWorldsResult> {
 
-    private final WorldQueryRepository repository;
+    private final WorldRepository repository;
 
-    public SearchWorldsHandler(WorldQueryRepository repository) {
+    public SearchWorldsHandler(WorldRepository repository) {
         this.repository = repository;
     }
 

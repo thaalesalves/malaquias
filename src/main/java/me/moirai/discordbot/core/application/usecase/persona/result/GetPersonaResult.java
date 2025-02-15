@@ -1,10 +1,10 @@
 package me.moirai.discordbot.core.application.usecase.persona.result;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class GetPersonaResult {
 
@@ -13,8 +13,8 @@ public final class GetPersonaResult {
     private final String personality;
     private final String visibility;
     private final String ownerDiscordId;
-    private final List<String> usersAllowedToWrite;
-    private final List<String> usersAllowedToRead;
+    private final Set<String> usersAllowedToWrite;
+    private final Set<String> usersAllowedToRead;
     private final OffsetDateTime creationDate;
     private final OffsetDateTime lastUpdateDate;
 
@@ -25,8 +25,8 @@ public final class GetPersonaResult {
         this.personality = builder.personality;
         this.visibility = builder.visibility;
         this.ownerDiscordId = builder.ownerDiscordId;
-        this.usersAllowedToWrite = unmodifiableList(builder.usersAllowedToWrite);
-        this.usersAllowedToRead = unmodifiableList(builder.usersAllowedToRead);
+        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
         this.creationDate = builder.creationDate;
         this.lastUpdateDate = builder.lastUpdateDate;
     }
@@ -55,11 +55,11 @@ public final class GetPersonaResult {
         return ownerDiscordId;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -78,8 +78,8 @@ public final class GetPersonaResult {
         private String personality;
         private String visibility;
         private String ownerDiscordId;
-        private List<String> usersAllowedToWrite = new ArrayList<>();
-        private List<String> usersAllowedToRead = new ArrayList<>();
+        private Set<String> usersAllowedToWrite = new HashSet<>();
+        private Set<String> usersAllowedToRead = new HashSet<>();
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
 
@@ -111,7 +111,7 @@ public final class GetPersonaResult {
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
             if (usersAllowedToWrite != null) {
                 this.usersAllowedToWrite = usersAllowedToWrite;
@@ -120,7 +120,7 @@ public final class GetPersonaResult {
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
             if (usersAllowedToRead != null) {
                 this.usersAllowedToRead = usersAllowedToRead;

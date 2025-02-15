@@ -1,10 +1,11 @@
 package me.moirai.discordbot.infrastructure.inbound.api.mapper;
 
-import org.apache.commons.collections4.CollectionUtils;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 import org.springframework.stereotype.Component;
 
 import me.moirai.discordbot.core.application.usecase.persona.request.CreatePersona;
-import me.moirai.discordbot.core.application.usecase.persona.request.DeletePersona;
 import me.moirai.discordbot.core.application.usecase.persona.request.UpdatePersona;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreatePersonaRequest;
 import me.moirai.discordbot.infrastructure.inbound.api.request.UpdatePersonaRequest;
@@ -19,12 +20,12 @@ public class PersonaRequestMapper {
                 .personality(request.getPersonality())
                 .visibility(request.getVisibility())
                 .requesterDiscordId(requesterDiscordId)
-                .usersAllowedToRead(CollectionUtils.emptyIfNull(request.getUsersAllowedToRead())
+                .usersAllowedToRead(emptyIfNull(request.getUsersAllowedToRead())
                         .stream()
-                        .toList())
-                .usersAllowedToWrite(CollectionUtils.emptyIfNull(request.getUsersAllowedToWrite())
+                        .collect(toSet()))
+                .usersAllowedToWrite(emptyIfNull(request.getUsersAllowedToWrite())
                         .stream()
-                        .toList())
+                        .collect(toSet()))
                 .build();
     }
 
@@ -36,23 +37,18 @@ public class PersonaRequestMapper {
                 .personality(request.getPersonality())
                 .visibility(request.getVisibility())
                 .requesterDiscordId(requesterDiscordId)
-                .usersAllowedToWriteToAdd(CollectionUtils.emptyIfNull(request.getUsersAllowedToWriteToAdd())
+                .usersAllowedToWriteToAdd(emptyIfNull(request.getUsersAllowedToWriteToAdd())
                         .stream()
-                        .toList())
-                .usersAllowedToReadToAdd(CollectionUtils.emptyIfNull(request.getUsersAllowedToReadToAdd())
+                        .collect(toSet()))
+                .usersAllowedToReadToAdd(emptyIfNull(request.getUsersAllowedToReadToAdd())
                         .stream()
-                        .toList())
-                .usersAllowedToWriteToRemove(CollectionUtils.emptyIfNull(request.getUsersAllowedToWriteToRemove())
+                        .collect(toSet()))
+                .usersAllowedToWriteToRemove(emptyIfNull(request.getUsersAllowedToWriteToRemove())
                         .stream()
-                        .toList())
-                .usersAllowedToReadToRemove(CollectionUtils.emptyIfNull(request.getUsersAllowedToReadToRemove())
+                        .collect(toSet()))
+                .usersAllowedToReadToRemove(emptyIfNull(request.getUsersAllowedToReadToRemove())
                         .stream()
-                        .toList())
+                        .collect(toSet()))
                 .build();
-    }
-
-    public DeletePersona toCommand(String personaId, String requesterId) {
-
-        return DeletePersona.build(personaId, requesterId);
     }
 }

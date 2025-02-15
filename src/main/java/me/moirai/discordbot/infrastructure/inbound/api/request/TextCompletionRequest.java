@@ -2,6 +2,7 @@ package me.moirai.discordbot.infrastructure.inbound.api.request;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -45,7 +46,7 @@ public class TextCompletionRequest {
     @NotNull(message = "cannot be null")
     private String moderationLevel;
 
-    private List<String> stopSequences;
+    private Set<String> stopSequences;
     private Map<String, Double> logitBias;
 
     public static final class Message {
@@ -135,11 +136,11 @@ public class TextCompletionRequest {
         this.aiModel = aiModel;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
-    public void setStopSequences(List<String> stopSequences) {
+    public void setStopSequences(Set<String> stopSequences) {
         this.stopSequences = stopSequences;
     }
 

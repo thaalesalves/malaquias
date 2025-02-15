@@ -7,7 +7,8 @@ public final class DeleteWorld extends UseCase<Void> {
     private final String id;
     private final String requesterDiscordId;
 
-    public DeleteWorld(String id, String requesterDiscordId) {
+    private DeleteWorld(String id, String requesterDiscordId) {
+
         this.id = id;
         this.requesterDiscordId = requesterDiscordId;
     }

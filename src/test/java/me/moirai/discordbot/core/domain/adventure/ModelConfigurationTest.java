@@ -6,8 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +32,7 @@ public class ModelConfigurationTest {
         logitBias.put("ABC", 50.0);
         logitBias.put("DEF", 5.0);
 
-        List<String> stopSequences = new ArrayList<>();
+        Set<String> stopSequences = new HashSet<>();
         stopSequences.add("ABC");
 
         modelConfigurationBuilder.logitBias(logitBias);

@@ -228,7 +228,6 @@ public class WorldControllerTest extends AbstractRestWebTest {
         // Given
         String worldId = "WRLDID";
 
-        when(worldRequestMapper.toCommand(anyString(), anyString())).thenReturn(mock(DeleteWorld.class));
         when(useCaseRunner.run(any(DeleteWorld.class))).thenReturn(null);
 
         // Then

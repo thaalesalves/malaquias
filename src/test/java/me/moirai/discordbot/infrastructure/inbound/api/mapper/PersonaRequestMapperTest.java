@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.core.application.usecase.persona.request.CreatePersona;
-import me.moirai.discordbot.core.application.usecase.persona.request.DeletePersona;
 import me.moirai.discordbot.core.application.usecase.persona.request.UpdatePersona;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreatePersonaRequest;
 import me.moirai.discordbot.infrastructure.inbound.api.request.CreatePersonaRequestFixture;
@@ -57,26 +56,9 @@ public class PersonaRequestMapperTest {
         assertThat(command.getName()).isEqualTo(request.getName());
         assertThat(command.getPersonality()).isEqualTo(request.getPersonality());
         assertThat(command.getVisibility()).isEqualTo(request.getVisibility());
-        assertThat(command.getRequesterDiscordId()).isEqualTo(requesterId);
         assertThat(command.getUsersAllowedToWriteToAdd()).hasSameElementsAs(request.getUsersAllowedToWriteToAdd());
         assertThat(command.getUsersAllowedToWriteToRemove()).isEmpty();
         assertThat(command.getUsersAllowedToReadToAdd()).hasSameElementsAs(request.getUsersAllowedToReadToAdd());
         assertThat(command.getUsersAllowedToReadToRemove()).isEmpty();
-    }
-
-    @Test
-    public void deleteRequestToCommand() {
-
-        // Given
-        String personaId = "WRLDID";
-        String requesterId = "RQSTRID";
-
-        // When
-        DeletePersona command = mapper.toCommand(personaId, requesterId);
-
-        // Then
-        assertThat(command).isNotNull();
-        assertThat(command.getId()).isEqualTo(personaId);
-        assertThat(command.getRequesterDiscordId()).isEqualTo(requesterId);
     }
 }

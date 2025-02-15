@@ -67,12 +67,6 @@ public class WorldLorebookEntryRepositoryImpl implements WorldLorebookEntryRepos
     }
 
     @Override
-    public Optional<WorldLorebookEntry> findByPlayerDiscordId(String playerDiscordId, String worldId) {
-
-        return jpaRepository.findByPlayerDiscordId(playerDiscordId, worldId);
-    }
-
-    @Override
     public void deleteById(String id) {
 
         jpaRepository.deleteById(id);

@@ -15,18 +15,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.AddFavoriteAdventure;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.infrastructure.outbound.persistence.FavoriteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class AddFavoriteAdventureHandlerTest {
 
     @Mock
-    private AdventureQueryRepository adventureQueryRepository;
+    private AdventureRepository adventureQueryRepository;
 
     @Mock
     private FavoriteRepository favoriteRepository;
@@ -38,12 +39,11 @@ public class AddFavoriteAdventureHandlerTest {
     public void addFavorite_whenValidAsset_thenCreateFavorite() {
 
         // Given
-        AddFavoriteAdventure command = AddFavoriteAdventure.builder()
-                .assetId("1234")
-                .playerDiscordId("1234")
-                .build();
-
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+        AddFavoriteAdventure command = AddFavoriteAdventure.builder()
+                .assetId(adventure.getId())
+                .playerDiscordId(adventure.getOwnerDiscordId())
+                .build();
 
         when(adventureQueryRepository.findById(anyString())).thenReturn(Optional.of(adventure));
 
@@ -67,5 +67,22 @@ public class AddFavoriteAdventureHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.handle(command));
+    }
+
+    @Test
+    public void addFavorite_whenNoViewingPermission_thenThrowException() {
+
+        // Given
+        String userId = "12345";
+        Adventure unallowedAdventure = AdventureFixture.privateMultiplayerAdventure().build();
+        AddFavoriteAdventure command = AddFavoriteAdventure.builder()
+                .assetId(unallowedAdventure.getId())
+                .playerDiscordId(userId)
+                .build();
+
+        when(adventureQueryRepository.findById(anyString())).thenReturn(Optional.of(unallowedAdventure));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.handle(command));
     }
 }

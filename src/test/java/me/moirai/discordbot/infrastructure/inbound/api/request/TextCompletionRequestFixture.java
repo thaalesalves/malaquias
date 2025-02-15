@@ -2,6 +2,7 @@ package me.moirai.discordbot.infrastructure.inbound.api.request;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class TextCompletionRequestFixture {
@@ -31,7 +32,7 @@ public class TextCompletionRequestFixture {
         request.setModerationLevel("disabled");
         request.setPersonaId("1234");
         request.setPresencePenalty(1D);
-        request.setStopSequences(new ArrayList<>());
+        request.setStopSequences(new HashSet<>());
         request.setTemperature(0.8);
         request.setWorldId("1234");
 
@@ -53,7 +54,7 @@ public class TextCompletionRequestFixture {
         request.setModerationLevel("strict");
         request.setPersonaId("1234");
         request.setPresencePenalty(1D);
-        request.setStopSequences(new ArrayList<>());
+        request.setStopSequences(new HashSet<>());
         request.setTemperature(0.8);
         request.setWorldId("1234");
 
@@ -75,7 +76,7 @@ public class TextCompletionRequestFixture {
         request.setModerationLevel("permissive");
         request.setPersonaId("1234");
         request.setPresencePenalty(1D);
-        request.setStopSequences(new ArrayList<>());
+        request.setStopSequences(new HashSet<>());
         request.setTemperature(0.8);
         request.setWorldId("1234");
 

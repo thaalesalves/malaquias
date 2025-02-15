@@ -8,13 +8,13 @@ import me.moirai.discordbot.common.annotation.UseCaseHandler;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
 import me.moirai.discordbot.common.usecases.AbstractUseCaseHandler;
 import me.moirai.discordbot.core.application.helper.StoryGenerationHelper;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.port.DiscordChannelPort;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordMessageData;
 import me.moirai.discordbot.core.application.usecase.discord.DiscordUserDetails;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.AiModelRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModelConfigurationRequest;
 import me.moirai.discordbot.infrastructure.outbound.adapter.request.ModerationConfigurationRequest;
@@ -26,14 +26,14 @@ public class StartCommandHandler extends AbstractUseCaseHandler<StartCommand, Mo
 
     private static final String CHAT_FORMAT = "%s said: %s";
 
-    private final AdventureQueryRepository adventureRepository;
-    private final WorldDomainRepository worldRepository;
+    private final AdventureRepository adventureRepository;
+    private final WorldRepository worldRepository;
     private final StoryGenerationHelper storyGenerationPort;
     private final DiscordChannelPort discordChannelPort;
 
     public StartCommandHandler(StoryGenerationHelper storyGenerationPort,
-            WorldDomainRepository worldRepository,
-            AdventureQueryRepository adventureRepository,
+            WorldRepository worldRepository,
+            AdventureRepository adventureRepository,
             DiscordChannelPort discordChannelPort) {
 
         this.adventureRepository = adventureRepository;

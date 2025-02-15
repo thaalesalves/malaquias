@@ -1,9 +1,9 @@
 package me.moirai.discordbot.infrastructure.outbound.adapter.request;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import me.moirai.discordbot.core.domain.adventure.ArtificialIntelligenceModel;
 
@@ -26,7 +26,7 @@ public class ModelConfigurationRequestFixture {
         logitBias.put("ABC", 50.0);
         logitBias.put("DEF", 5.0);
 
-        List<String> stopSequences = new ArrayList<>();
+        Set<String> stopSequences = new HashSet<>();
         stopSequences.add("ABC");
 
         modelConfigurationBuilder.logitBias(logitBias);
@@ -52,7 +52,7 @@ public class ModelConfigurationRequestFixture {
         logitBias.put("ABC", 50.0);
         logitBias.put("DEF", 5.0);
 
-        List<String> stopSequences = new ArrayList<>();
+        Set<String> stopSequences = new HashSet<>();
         stopSequences.add("ABC");
 
         modelConfigurationBuilder.logitBias(logitBias);

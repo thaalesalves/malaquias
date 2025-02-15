@@ -16,18 +16,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.WorldQueryRepository;
 import me.moirai.discordbot.core.application.usecase.world.request.SearchWorldLorebookEntries;
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldLorebookEntriesResult;
 import me.moirai.discordbot.core.domain.world.World;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntryRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchWorldLorebookEntriesHandlerTest {
 
     @Mock
-    private WorldQueryRepository worldRepository;
+    private WorldRepository worldRepository;
 
     @Mock
     private WorldLorebookEntryRepository repository;

@@ -10,8 +10,6 @@ public final class UpdateWorldLorebookEntry extends UseCase<UpdateWorldLorebookE
     private final String name;
     private final String regex;
     private final String description;
-    private final String playerDiscordId;
-    private final boolean isPlayerCharacter;
     private final String requesterDiscordId;
 
     private UpdateWorldLorebookEntry(Builder builder) {
@@ -21,8 +19,6 @@ public final class UpdateWorldLorebookEntry extends UseCase<UpdateWorldLorebookE
         this.name = builder.name;
         this.regex = builder.regex;
         this.description = builder.description;
-        this.playerDiscordId = builder.playerDiscordId;
-        this.isPlayerCharacter = builder.isPlayerCharacter;
         this.requesterDiscordId = builder.requesterDiscordId;
     }
 
@@ -50,14 +46,6 @@ public final class UpdateWorldLorebookEntry extends UseCase<UpdateWorldLorebookE
         return description;
     }
 
-    public String getPlayerDiscordId() {
-        return playerDiscordId;
-    }
-
-    public boolean isPlayerCharacter() {
-        return isPlayerCharacter;
-    }
-
     public String getRequesterDiscordId() {
         return requesterDiscordId;
     }
@@ -69,8 +57,6 @@ public final class UpdateWorldLorebookEntry extends UseCase<UpdateWorldLorebookE
         private String name;
         private String regex;
         private String description;
-        private String playerDiscordId;
-        private boolean isPlayerCharacter;
         private String requesterDiscordId;
 
         private Builder() {
@@ -98,16 +84,6 @@ public final class UpdateWorldLorebookEntry extends UseCase<UpdateWorldLorebookE
 
         public Builder description(String description) {
             this.description = description;
-            return this;
-        }
-
-        public Builder playerDiscordId(String playerDiscordId) {
-            this.playerDiscordId = playerDiscordId;
-            return this;
-        }
-
-        public Builder isPlayerCharacter(boolean isPlayerCharacter) {
-            this.isPlayerCharacter = isPlayerCharacter;
             return this;
         }
 

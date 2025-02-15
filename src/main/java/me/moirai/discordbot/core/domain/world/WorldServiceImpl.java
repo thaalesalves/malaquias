@@ -1,8 +1,5 @@
 package me.moirai.discordbot.core.domain.world;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +15,6 @@ import me.moirai.discordbot.common.exception.ModerationException;
 import me.moirai.discordbot.core.application.port.TextModerationPort;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.CreateWorldLorebookEntry;
-import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorld;
 import me.moirai.discordbot.core.application.usecase.world.request.DeleteWorldLorebookEntry;
 import me.moirai.discordbot.core.application.usecase.world.request.GetWorldLorebookEntryById;
 import me.moirai.discordbot.core.application.usecase.world.request.UpdateWorldLorebookEntry;
@@ -41,35 +37,15 @@ public class WorldServiceImpl implements WorldService {
 
     private final TextModerationPort moderationPort;
     private final WorldLorebookEntryRepository lorebookEntryRepository;
-    private final WorldDomainRepository repository;
+    private final WorldRepository repository;
 
     public WorldServiceImpl(TextModerationPort moderationPort,
             WorldLorebookEntryRepository lorebookEntryRepository,
-            WorldDomainRepository repository) {
+            WorldRepository repository) {
 
         this.moderationPort = moderationPort;
         this.lorebookEntryRepository = lorebookEntryRepository;
         this.repository = repository;
-    }
-
-    @Override
-    public World getWorldById(String worldId) {
-
-        return repository.findById(worldId)
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-    }
-
-    @Override
-    public void deleteWorld(DeleteWorld command) {
-
-        World world = repository.findById(command.getId())
-                .orElseThrow(() -> new AssetNotFoundException("World to be deleted was not found"));
-
-        if (!world.canUserWrite(command.getRequesterDiscordId())) {
-            throw new AssetAccessDeniedException(USER_DOES_NOT_HAVE_PERMISSION_TO_MODIFY_THIS_WORLD);
-        }
-
-        repository.deleteById(command.getId());
     }
 
     @Override
@@ -99,33 +75,12 @@ public class WorldServiceImpl implements WorldService {
                                     .name(entry.getName())
                                     .description(entry.getDescription())
                                     .regex(entry.getRegex())
-                                    .playerDiscordId(entry.getPlayerDiscordId())
-                                    .isPlayerCharacter(isNotEmpty(entry.getPlayerDiscordId()))
                                     .worldId(world.getId())
                                     .build())
                             .forEach(lorebookEntryRepository::save);
 
                     return world;
                 });
-    }
-
-    @Override
-    public WorldLorebookEntry findLorebookEntryByPlayerDiscordId(String playerDiscordId, String worldId) {
-
-        repository.findById(worldId)
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-
-        return lorebookEntryRepository.findByPlayerDiscordId(playerDiscordId, worldId)
-                .orElseThrow(() -> new AssetNotFoundException(LOREBOOK_ENTRY_TO_BE_VIEWED_NOT_FOUND));
-    }
-
-    @Override
-    public List<WorldLorebookEntry> findAllLorebookEntriesByRegex(String valueToMatch, String worldId) {
-
-        repository.findById(worldId)
-                .orElseThrow(() -> new AssetNotFoundException(WORLD_TO_BE_VIEWED_WAS_NOT_FOUND));
-
-        return lorebookEntryRepository.findAllByRegex(valueToMatch, worldId);
     }
 
     @Override
@@ -156,8 +111,6 @@ public class WorldServiceImpl implements WorldService {
                 .name(command.getName())
                 .regex(command.getRegex())
                 .description(command.getDescription())
-                .playerDiscordId(command.getPlayerDiscordId())
-                .isPlayerCharacter(isEmpty(command.getPlayerDiscordId()))
                 .worldId(world.getId())
                 .creatorDiscordId(command.getRequesterDiscordId())
                 .build();
@@ -188,12 +141,6 @@ public class WorldServiceImpl implements WorldService {
 
         if (StringUtils.isNotBlank(command.getDescription())) {
             lorebookEntry.updateDescription(command.getDescription());
-        }
-
-        if (command.isPlayerCharacter()) {
-            lorebookEntry.assignPlayer(command.getPlayerDiscordId());
-        } else {
-            lorebookEntry.unassignPlayer();
         }
 
         return lorebookEntryRepository.save(lorebookEntry);

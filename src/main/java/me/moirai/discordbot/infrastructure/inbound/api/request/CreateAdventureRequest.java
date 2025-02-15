@@ -1,7 +1,7 @@
 package me.moirai.discordbot.infrastructure.inbound.api.request;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -58,10 +58,10 @@ public class CreateAdventureRequest {
 
     private String gameMode;
     private boolean isMultiplayer;
-    private List<String> stopSequences;
+    private Set<String> stopSequences;
     private Map<String, Double> logitBias;
-    private List<String> usersAllowedToWrite;
-    private List<String> usersAllowedToRead;
+    private Set<String> usersAllowedToWrite;
+    private Set<String> usersAllowedToRead;
     private String nudge;
     private String authorsNote;
     private String remember;
@@ -123,7 +123,7 @@ public class CreateAdventureRequest {
         return presencePenalty;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -131,11 +131,11 @@ public class CreateAdventureRequest {
         return logitBias;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -191,7 +191,7 @@ public class CreateAdventureRequest {
         this.presencePenalty = presencePenalty;
     }
 
-    public void setStopSequences(List<String> stopSequences) {
+    public void setStopSequences(Set<String> stopSequences) {
         this.stopSequences = stopSequences;
     }
 
@@ -199,11 +199,11 @@ public class CreateAdventureRequest {
         this.logitBias = logitBias;
     }
 
-    public void setUsersAllowedToWrite(List<String> usersAllowedToWrite) {
+    public void setUsersAllowedToWrite(Set<String> usersAllowedToWrite) {
         this.usersAllowedToWrite = usersAllowedToWrite;
     }
 
-    public void setUsersAllowedToRead(List<String> usersAllowedToRead) {
+    public void setUsersAllowedToRead(Set<String> usersAllowedToRead) {
         this.usersAllowedToRead = usersAllowedToRead;
     }
 

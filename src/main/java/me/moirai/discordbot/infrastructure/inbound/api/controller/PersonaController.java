@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,7 +76,7 @@ public class PersonaController extends SecurityContextAware {
                     .direction(getDirection(searchParameters.getDirection()))
                     .visibility(getVisibility(searchParameters.getVisibility()))
                     .operation(getOperation(searchParameters.getOperation()))
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -84,11 +85,12 @@ public class PersonaController extends SecurityContextAware {
 
     @GetMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#personaId, 'Persona')")
     public Mono<PersonaResponse> getPersonaById(@PathVariable(required = true) String personaId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetPersonaById query = GetPersonaById.build(personaId, authenticatedUser.getId());
+            GetPersonaById query = GetPersonaById.build(personaId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -99,13 +101,14 @@ public class PersonaController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreatePersona command = requestMapper.toCommand(request, authenticatedUser.getId());
+            CreatePersona command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
     }
 
     @PutMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canWrite(#personaId, 'Persona')")
     public Mono<UpdatePersonaResponse> updatePersona(
             @PathVariable(required = true) String personaId,
             @Valid @RequestBody UpdatePersonaRequest request) {
@@ -113,7 +116,7 @@ public class PersonaController extends SecurityContextAware {
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             UpdatePersona command = requestMapper.toCommand(request, personaId,
-                    authenticatedUser.getId());
+                    authenticatedUser.getDiscordId());
 
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
@@ -121,11 +124,12 @@ public class PersonaController extends SecurityContextAware {
 
     @DeleteMapping("/{personaId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canWrite(#personaId, 'Persona')")
     public Mono<Void> deletePersona(@PathVariable(required = true) String personaId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeletePersona command = requestMapper.toCommand(personaId, authenticatedUser.getId());
+            DeletePersona command = DeletePersona.build(personaId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();
@@ -134,13 +138,14 @@ public class PersonaController extends SecurityContextAware {
 
     @PostMapping("/favorite")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.assetId, 'Persona')")
     public Mono<Void> addFavoritePersona(@RequestBody FavoriteRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             AddFavoritePersona command = AddFavoritePersona.builder()
                     .assetId(request.getAssetId())
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
@@ -157,7 +162,7 @@ public class PersonaController extends SecurityContextAware {
 
             RemoveFavoritePersona command = RemoveFavoritePersona.builder()
                     .assetId(assetId)
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);

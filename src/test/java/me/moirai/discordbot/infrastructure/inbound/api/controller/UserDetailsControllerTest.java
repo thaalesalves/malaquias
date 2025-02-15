@@ -2,7 +2,6 @@ package me.moirai.discordbot.infrastructure.inbound.api.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -11,8 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import me.moirai.discordbot.AbstractRestWebTest;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.DiscordUserDetailsResult;
-import me.moirai.discordbot.core.application.usecase.discord.userdetails.GetUserDetailsById;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.DeleteUserByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.request.GetUserDetailsByDiscordId;
+import me.moirai.discordbot.core.application.usecase.discord.userdetails.result.UserDetailsResult;
 import me.moirai.discordbot.infrastructure.inbound.api.mapper.UserDataResponseMapper;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponse;
 import me.moirai.discordbot.infrastructure.inbound.api.response.UserDataResponseFixture;
@@ -36,14 +36,20 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
 
         // Given
         String userId = "1234";
-        UserDataResponse result = UserDataResponseFixture.create()
-                .id(userId)
+        UserDataResponse response = UserDataResponseFixture.create()
+                .discordId(userId)
                 .build();
 
-        when(useCaseRunner.run(any(GetUserDetailsById.class)))
-                .thenReturn(mock(DiscordUserDetailsResult.class));
+        UserDetailsResult result = UserDetailsResult.builder()
+                .avatarUrl(response.getAvatar())
+                .discordId(response.getDiscordId())
+                .nickname(response.getNickname())
+                .username(response.getUsername())
+                .joinDate(response.getJoinDate())
+                .build();
 
-        when(responseMapper.toResponse(any(DiscordUserDetailsResult.class))).thenReturn(result);
+        when(useCaseRunner.run(any(GetUserDetailsByDiscordId.class))).thenReturn(result);
+        when(responseMapper.toResponse(any(UserDetailsResult.class))).thenReturn(response);
 
         // Then
         webTestClient.get()
@@ -51,14 +57,27 @@ public class UserDetailsControllerTest extends AbstractRestWebTest {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(UserDataResponse.class)
-                .value(response -> {
+                .value(r -> {
                     assertThat(response).isNotNull();
-                    assertThat(response.getId()).isEqualTo(result.getId());
-                    assertThat(response.getEmail()).isEqualTo(result.getEmail());
-                    assertThat(response.getGlobalNickname()).isEqualTo(result.getGlobalNickname());
-                    assertThat(response.getUsername()).isEqualTo(result.getUsername());
-                    assertThat(response.getAvatar()).isEqualTo(result.getAvatar());
+                    assertThat(response.getDiscordId()).isEqualTo(r.getDiscordId());
+                    assertThat(response.getNickname()).isEqualTo(r.getNickname());
+                    assertThat(response.getUsername()).isEqualTo(r.getUsername());
+                    assertThat(response.getAvatar()).isEqualTo(r.getAvatar());
                 });
+    }
 
+    @Test
+    public void http200WhenUserIsDeleted() {
+
+        // Given
+        String userId = "1234";
+
+        when(useCaseRunner.run(any(DeleteUserByDiscordId.class))).thenReturn(null);
+
+        // Then
+        webTestClient.delete()
+                .uri(String.format(USER_ID_BASE_URL, userId))
+                .exchange()
+                .expectStatus().is2xxSuccessful();
     }
 }

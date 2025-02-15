@@ -8,7 +8,8 @@ public final class GetPersonaById extends UseCase<GetPersonaResult> {
     private final String id;
     private final String requesterDiscordId;
 
-    public GetPersonaById(String id, String requesterDiscordId) {
+    private GetPersonaById(String id, String requesterDiscordId) {
+
         this.id = id;
         this.requesterDiscordId = requesterDiscordId;
     }

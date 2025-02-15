@@ -10,6 +10,18 @@ public class AuthenticationFailedException extends RuntimeException {
         this.responseMessage = responseMessage;
     }
 
+    public AuthenticationFailedException(String responseMessage) {
+        super(responseMessage);
+
+        this.responseMessage = responseMessage;
+    }
+
+    public AuthenticationFailedException(String message, Throwable t) {
+        super(message, t);
+
+        this.responseMessage = null;
+    }
+
     public String getResponseMessage() {
         return responseMessage;
     }

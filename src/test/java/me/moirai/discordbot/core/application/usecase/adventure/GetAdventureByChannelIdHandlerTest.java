@@ -13,18 +13,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import me.moirai.discordbot.common.exception.AssetAccessDeniedException;
 import me.moirai.discordbot.common.exception.AssetNotFoundException;
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.GetAdventureByChannelId;
 import me.moirai.discordbot.core.application.usecase.adventure.result.GetAdventureResult;
+import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAdventureByChannelIdHandlerTest {
 
     @Mock
-    private AdventureQueryRepository queryRepository;
+    private AdventureRepository queryRepository;
 
     @InjectMocks
     private GetAdventureByChannelIdHandler handler;
@@ -34,7 +36,8 @@ public class GetAdventureByChannelIdHandlerTest {
 
         // Given
         String adventureId = "123123";
-        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId);
+        String requesterId = "123123";
+        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
 
         when(queryRepository.findByDiscordChannelId(anyString())).thenReturn(Optional.empty());
 
@@ -45,13 +48,36 @@ public class GetAdventureByChannelIdHandlerTest {
     }
 
     @Test
+    public void getAdventure_whenNoAdventurePermission_thenThrowException() {
+
+        // Given
+        String adventureId = "123123";
+        String requesterId = "123123";
+        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
+                .id(adventureId)
+                .build();
+
+        when(queryRepository.findByDiscordChannelId(anyString())).thenReturn(Optional.of(adventure));
+
+        // Then
+        assertThatThrownBy(() -> handler.execute(command))
+                .isInstanceOf(AssetAccessDeniedException.class)
+                .hasMessage("User does not have permission to view adventure");
+    }
+
+    @Test
     public void getAdventure_whenAdventureIsFound_thenReturnResult() {
 
         // Given
         String adventureId = "123123";
-        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId);
+        String requesterId = "123123";
+        GetAdventureByChannelId command = GetAdventureByChannelId.build(adventureId, requesterId);
         Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
                 .id(adventureId)
+                .permissions(PermissionsFixture.samplePermissions()
+                        .ownerDiscordId(requesterId)
+                        .build())
                 .build();
 
         when(queryRepository.findByDiscordChannelId(anyString())).thenReturn(Optional.of(adventure));

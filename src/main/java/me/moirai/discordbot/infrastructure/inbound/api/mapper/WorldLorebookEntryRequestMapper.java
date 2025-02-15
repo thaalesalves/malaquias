@@ -17,7 +17,6 @@ public class WorldLorebookEntryRequestMapper {
         return CreateWorldLorebookEntry.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .playerDiscordId(request.getPlayerDiscordId())
                 .regex(request.getRegex())
                 .worldId(worldId)
                 .requesterDiscordId(requesterDiscordId)
@@ -31,9 +30,7 @@ public class WorldLorebookEntryRequestMapper {
                 .id(entryId)
                 .name(request.getName())
                 .description(request.getDescription())
-                .playerDiscordId(request.getPlayerDiscordId())
                 .regex(request.getRegex())
-                .isPlayerCharacter(request.isPlayerCharacter())
                 .requesterDiscordId(requesterDiscordId)
                 .worldId(worldId)
                 .build();

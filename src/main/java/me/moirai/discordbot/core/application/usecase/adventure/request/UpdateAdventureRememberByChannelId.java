@@ -6,14 +6,16 @@ public final class UpdateAdventureRememberByChannelId extends UseCase<Void> {
 
     private final String remember;
     private final String channelId;
+    private final String requesterDiscordId;
 
-    private UpdateAdventureRememberByChannelId(String remember, String channelId) {
-        this.remember = remember;
-        this.channelId = channelId;
+    private UpdateAdventureRememberByChannelId(Builder builder) {
+        this.remember = builder.remember;
+        this.channelId = builder.channelId;
+        this.requesterDiscordId = builder.requesterDiscordId;
     }
 
-    public static UpdateAdventureRememberByChannelId build(String remember, String channelId) {
-        return new UpdateAdventureRememberByChannelId(remember, channelId);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public String getRemember() {
@@ -22,5 +24,35 @@ public final class UpdateAdventureRememberByChannelId extends UseCase<Void> {
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
+    }
+
+    public static final class Builder {
+
+        private String remember;
+        private String channelId;
+        private String requesterDiscordId;
+
+        public Builder remember(String remember) {
+            this.remember = remember;
+            return this;
+        }
+
+        public Builder channelId(String channelId) {
+            this.channelId = channelId;
+            return this;
+        }
+
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
+            return this;
+        }
+
+        public UpdateAdventureRememberByChannelId build() {
+            return new UpdateAdventureRememberByChannelId(this);
+        }
     }
 }

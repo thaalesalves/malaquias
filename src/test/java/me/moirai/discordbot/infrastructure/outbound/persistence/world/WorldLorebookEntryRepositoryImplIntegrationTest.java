@@ -1,6 +1,7 @@
 package me.moirai.discordbot.infrastructure.outbound.persistence.world;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Lists.list;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import me.moirai.discordbot.core.application.usecase.world.request.SearchWorldLo
 import me.moirai.discordbot.core.application.usecase.world.result.GetWorldLorebookEntryResult;
 import me.moirai.discordbot.core.application.usecase.world.result.SearchWorldLorebookEntriesResult;
 import me.moirai.discordbot.core.domain.world.World;
-import me.moirai.discordbot.core.domain.world.WorldDomainRepository;
+import me.moirai.discordbot.core.domain.world.WorldRepository;
 import me.moirai.discordbot.core.domain.world.WorldFixture;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntry;
 import me.moirai.discordbot.core.domain.world.WorldLorebookEntryFixture;
@@ -33,7 +34,7 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
     private WorldJpaRepository worldJpaRepository;
 
     @Autowired
-    private WorldDomainRepository worldRepository;
+    private WorldRepository worldRepository;
 
     @BeforeEach
     public void before() {
@@ -439,5 +440,22 @@ public class WorldLorebookEntryRepositoryImplIntegrationTest extends AbstractInt
         // Then
         assertThat(originalEntry.getVersion()).isZero();
         assertThat(updatedWorldLorebookEntry.getVersion()).isOne();
+    }
+
+    @Test
+    public void findAllByWorldId() {
+
+        // Given
+        World world = worldRepository.save(WorldFixture.publicWorld().build());
+        jpaRepository.saveAll(list(
+                WorldLorebookEntryFixture.sampleLorebookEntry().id(null).worldId(world.getId()).build(),
+                WorldLorebookEntryFixture.sampleLorebookEntry().id(null).worldId(world.getId()).build(),
+                WorldLorebookEntryFixture.sampleLorebookEntry().id(null).worldId(world.getId()).build()));
+
+        // When
+        List<WorldLorebookEntry> result = repository.findAllByWorldId(world.getId());
+
+        // Then
+        assertThat(result).isNotNull().isNotEmpty().hasSize(3);
     }
 }

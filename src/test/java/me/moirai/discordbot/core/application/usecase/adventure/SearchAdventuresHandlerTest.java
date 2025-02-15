@@ -10,15 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import me.moirai.discordbot.core.application.port.AdventureQueryRepository;
 import me.moirai.discordbot.core.application.usecase.adventure.request.SearchAdventures;
 import me.moirai.discordbot.core.application.usecase.adventure.result.SearchAdventuresResult;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SearchAdventuresHandlerTest {
 
     @Mock
-    private AdventureQueryRepository repository;
+    private AdventureRepository repository;
 
     @InjectMocks
     private SearchAdventuresHandler handler;

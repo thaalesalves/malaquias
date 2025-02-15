@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +57,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<SearchLorebookEntriesResponse> search(
             @PathVariable(required = true) String worldId,
             LorebookSearchParameters searchParameters) {
@@ -68,7 +70,7 @@ public class WorldLorebookController extends SecurityContextAware {
                     .sortingField(getSortingField(searchParameters.getSortingField()))
                     .direction(getDirection(searchParameters.getDirection()))
                     .name(searchParameters.getName())
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .worldId(worldId)
                     .build();
 
@@ -78,6 +80,7 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @GetMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<LorebookEntryResponse> getLorebookEntryById(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId) {
@@ -87,7 +90,7 @@ public class WorldLorebookController extends SecurityContextAware {
             GetWorldLorebookEntryById query = GetWorldLorebookEntryById.builder()
                     .entryId(entryId)
                     .worldId(worldId)
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -96,19 +99,21 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<CreateLorebookEntryResponse> createLorebookEntry(
             @PathVariable(required = true) String worldId,
             @Valid @RequestBody CreateLorebookEntryRequest request) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorldLorebookEntry command = requestMapper.toCommand(request, worldId, authenticatedUser.getId());
+            CreateWorldLorebookEntry command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
     }
 
     @PutMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<UpdateLorebookEntryResponse> updateLorebookEntry(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId,
@@ -117,7 +122,7 @@ public class WorldLorebookController extends SecurityContextAware {
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
             UpdateWorldLorebookEntry command = requestMapper.toCommand(request, entryId,
-                    worldId, authenticatedUser.getId());
+                    worldId, authenticatedUser.getDiscordId());
 
             return responseMapper.toResponse(useCaseRunner.run(command));
         });
@@ -125,13 +130,14 @@ public class WorldLorebookController extends SecurityContextAware {
 
     @DeleteMapping("/{entryId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<Void> deleteLorebookEntry(
             @PathVariable(required = true) String worldId,
             @PathVariable(required = true) String entryId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorldLorebookEntry command = requestMapper.toCommand(entryId, worldId, authenticatedUser.getId());
+            DeleteWorldLorebookEntry command = requestMapper.toCommand(entryId, worldId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();

@@ -1,12 +1,12 @@
 package me.moirai.discordbot.core.application.usecase.adventure.request;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -35,9 +35,9 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
     private final Double frequencyPenalty;
     private final Double presencePenalty;
     private final Map<String, Double> logitBias;
-    private final List<String> stopSequences;
-    private final List<String> usersAllowedToWrite;
-    private final List<String> usersAllowedToRead;
+    private final Set<String> stopSequences;
+    private final Set<String> usersAllowedToWrite;
+    private final Set<String> usersAllowedToRead;
     private final boolean isMultiplayer;
 
     private CreateAdventure(Builder builder) {
@@ -66,14 +66,14 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
         this.logitBias = MapUtils.isEmpty(builder.logitBias) ? Collections.emptyMap()
                 : unmodifiableMap(builder.logitBias);
 
-        this.stopSequences = isEmpty(builder.stopSequences) ? Collections.emptyList()
-                : unmodifiableList(builder.stopSequences);
+        this.stopSequences = isEmpty(builder.stopSequences) ? Collections.emptySet()
+                : unmodifiableSet(builder.stopSequences);
 
-        this.usersAllowedToWrite = isEmpty(builder.usersAllowedToWrite) ? Collections.emptyList()
-                : unmodifiableList(builder.usersAllowedToWrite);
+        this.usersAllowedToWrite = isEmpty(builder.usersAllowedToWrite) ? Collections.emptySet()
+                : unmodifiableSet(builder.usersAllowedToWrite);
 
-        this.usersAllowedToRead = isEmpty(builder.usersAllowedToRead) ? Collections.emptyList()
-                : unmodifiableList(builder.usersAllowedToRead);
+        this.usersAllowedToRead = isEmpty(builder.usersAllowedToRead) ? Collections.emptySet()
+                : unmodifiableSet(builder.usersAllowedToRead);
     }
 
     public static Builder builder() {
@@ -156,7 +156,7 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
         return presencePenalty;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -164,11 +164,11 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
         return logitBias;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -198,9 +198,9 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
         private Double frequencyPenalty;
         private Double presencePenalty;
         private Map<String, Double> logitBias;
-        private List<String> stopSequences;
-        private List<String> usersAllowedToWrite;
-        private List<String> usersAllowedToRead;
+        private Set<String> stopSequences;
+        private Set<String> usersAllowedToWrite;
+        private Set<String> usersAllowedToRead;
         private boolean isMultiplayer;
 
         private Builder() {
@@ -301,7 +301,7 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
             return this;
         }
 
-        public Builder stopSequences(List<String> stopSequences) {
+        public Builder stopSequences(Set<String> stopSequences) {
 
             this.stopSequences = stopSequences;
             return this;
@@ -313,13 +313,13 @@ public final class CreateAdventure extends UseCase<CreateAdventureResult> {
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
             this.usersAllowedToWrite = usersAllowedToWrite;
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
             this.usersAllowedToRead = usersAllowedToRead;
             return this;

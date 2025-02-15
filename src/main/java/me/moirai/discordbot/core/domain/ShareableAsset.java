@@ -1,8 +1,9 @@
 package me.moirai.discordbot.core.domain;
 
+import static java.util.Collections.unmodifiableSet;
+
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -103,14 +104,14 @@ public abstract class ShareableAsset extends Asset {
         this.permissions = newPermissions;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
 
-        return Collections.unmodifiableList(this.permissions.getUsersAllowedToWrite());
+        return unmodifiableSet(this.permissions.getUsersAllowedToWrite());
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
 
-        return Collections.unmodifiableList(this.permissions.getUsersAllowedToRead());
+        return unmodifiableSet(this.permissions.getUsersAllowedToRead());
     }
 
     public String getOwnerDiscordId() {

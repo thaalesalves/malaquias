@@ -1,9 +1,9 @@
 package me.moirai.discordbot.infrastructure.inbound.api.response;
 
-import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.apache.commons.collections4.SetUtils.emptyIfNull;
 
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -16,8 +16,8 @@ public class WorldResponse {
     private String adventureStart;
     private String visibility;
     private String ownerDiscordId;
-    private List<String> usersAllowedToRead;
-    private List<String> usersAllowedToWrite;
+    private Set<String> usersAllowedToRead;
+    private Set<String> usersAllowedToWrite;
     private OffsetDateTime creationDate;
     private OffsetDateTime lastUpdateDate;
 
@@ -65,11 +65,11 @@ public class WorldResponse {
         return ownerDiscordId;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
@@ -88,8 +88,8 @@ public class WorldResponse {
         private String adventureStart;
         private String visibility;
         private String ownerDiscordId;
-        private List<String> usersAllowedToRead;
-        private List<String> usersAllowedToWrite;
+        private Set<String> usersAllowedToRead;
+        private Set<String> usersAllowedToWrite;
         private OffsetDateTime creationDate;
         private OffsetDateTime lastUpdateDate;
 
@@ -126,12 +126,12 @@ public class WorldResponse {
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
             this.usersAllowedToRead = emptyIfNull(usersAllowedToRead);
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
             this.usersAllowedToWrite = emptyIfNull(usersAllowedToWrite);
             return this;
         }

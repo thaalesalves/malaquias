@@ -1,23 +1,23 @@
 package me.moirai.discordbot.core.domain.adventure;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import me.moirai.discordbot.common.dbutil.StringListConverter;
 import me.moirai.discordbot.common.dbutil.StringMapDoubleConverter;
+import me.moirai.discordbot.common.dbutil.StringSetConverter;
 import me.moirai.discordbot.common.exception.BusinessRuleViolationException;
 
 @Embeddable
@@ -43,8 +43,8 @@ public final class ModelConfiguration {
     private Double presencePenalty;
 
     @Column(name = "stop_sequences")
-    @Convert(converter = StringListConverter.class)
-    private List<String> stopSequences;
+    @Convert(converter = StringSetConverter.class)
+    private Set<String> stopSequences;
 
     @Column(name = "logit_bias")
     @Convert(converter = StringMapDoubleConverter.class)
@@ -58,8 +58,8 @@ public final class ModelConfiguration {
         this.frequencyPenalty = builder.frequencyPenalty;
         this.presencePenalty = builder.presencePenalty;
 
-        this.stopSequences = unmodifiableList(
-                builder.stopSequences == null ? emptyList() : new ArrayList<>(builder.stopSequences));
+        this.stopSequences = unmodifiableSet(
+                builder.stopSequences == null ? emptySet() : new HashSet<>(builder.stopSequences));
 
         this.logitBias = unmodifiableMap(
                 builder.logitBias == null ? emptyMap() : new HashMap<>(builder.logitBias));
@@ -106,7 +106,7 @@ public final class ModelConfiguration {
         return presencePenalty;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -157,7 +157,7 @@ public final class ModelConfiguration {
 
     public ModelConfiguration addStopSequence(String stopSequence) {
 
-        List<String> newStopSequences = new ArrayList<>(this.stopSequences);
+        Set<String> newStopSequences = new HashSet<>(this.stopSequences);
         newStopSequences.add(stopSequence);
 
         return cloneFrom(this).stopSequences(newStopSequences).build();
@@ -165,7 +165,7 @@ public final class ModelConfiguration {
 
     public ModelConfiguration removeStopSequence(String stopSequence) {
 
-        List<String> newStopSequences = new ArrayList<>(this.stopSequences);
+        Set<String> newStopSequences = new HashSet<>(this.stopSequences);
         newStopSequences.remove(stopSequence);
 
         return cloneFrom(this).stopSequences(newStopSequences).build();
@@ -232,7 +232,7 @@ public final class ModelConfiguration {
         private Double temperature;
         private Double frequencyPenalty;
         private Double presencePenalty;
-        private List<String> stopSequences;
+        private Set<String> stopSequences;
         private Map<String, Double> logitBias;
 
         private Builder() {
@@ -268,7 +268,7 @@ public final class ModelConfiguration {
             return this;
         }
 
-        public Builder stopSequences(List<String> stopSequences) {
+        public Builder stopSequences(Set<String> stopSequences) {
 
             this.stopSequences = stopSequences;
             return this;

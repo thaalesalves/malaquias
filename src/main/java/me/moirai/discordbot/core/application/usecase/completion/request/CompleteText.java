@@ -2,6 +2,7 @@ package me.moirai.discordbot.core.application.usecase.completion.request;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 import me.moirai.discordbot.core.application.usecase.completion.result.CompleteTextResult;
@@ -16,9 +17,9 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
     private final Double frequencyPenalty;
     private final Double presencePenalty;
     private final String aiModel;
-    private final List<String> stopSequences;
+    private final Set<String> stopSequences;
     private final Map<String, Double> logitBias;
-    private final String authorDiscordId;
+    private final String requesterDiscordId;
     private final String moderationLevel;
     private final List<Message> messages;
 
@@ -77,7 +78,7 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
         this.aiModel = builder.aiModel;
         this.stopSequences = builder.stopSequences;
         this.logitBias = builder.logitBias;
-        this.authorDiscordId = builder.authorDiscordId;
+        this.requesterDiscordId = builder.requesterDiscordId;
         this.moderationLevel = builder.moderationLevel;
     }
 
@@ -113,7 +114,7 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
         return aiModel;
     }
 
-    public List<String> getStopSequences() {
+    public Set<String> getStopSequences() {
         return stopSequences;
     }
 
@@ -121,8 +122,8 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
         return logitBias;
     }
 
-    public String getAuthorDiscordId() {
-        return authorDiscordId;
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
     }
 
     public String getModerationLevel() {
@@ -142,9 +143,9 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
         private Double frequencyPenalty;
         private Double presencePenalty;
         private String aiModel;
-        private List<String> stopSequences;
+        private Set<String> stopSequences;
         private Map<String, Double> logitBias;
-        private String authorDiscordId;
+        private String requesterDiscordId;
         private String moderationLevel;
         private List<Message> messages;
 
@@ -191,7 +192,7 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
             return this;
         }
 
-        public Builder stopSequences(List<String> stopSequences) {
+        public Builder stopSequences(Set<String> stopSequences) {
             this.stopSequences = stopSequences;
             return this;
         }
@@ -201,8 +202,8 @@ public class CompleteText extends UseCase<Mono<CompleteTextResult>> {
             return this;
         }
 
-        public Builder authorDiscordId(String authorDiscordId) {
-            this.authorDiscordId = authorDiscordId;
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
             return this;
         }
 

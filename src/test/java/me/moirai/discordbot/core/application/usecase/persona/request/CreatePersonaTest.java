@@ -1,10 +1,10 @@
 package me.moirai.discordbot.core.application.usecase.persona.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Sets.set;
 
-import java.util.List;
+import java.util.Set;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
 public class CreatePersonaTest {
@@ -17,8 +17,8 @@ public class CreatePersonaTest {
         String personality = "personality";
         String visibility = "PRIVATE";
         String requesterDiscordId = "123123";
-        List<String> usersAllowedToRead = Lists.list("123123", "123123");
-        List<String> usersAllowedToWrite = Lists.list("123123", "123123");
+        Set<String> usersAllowedToRead = set("123123", "123123");
+        Set<String> usersAllowedToWrite = set("123123", "123123");
 
         CreatePersona.Builder createPersonaBuilder = CreatePersona.builder()
                 .name(name)
@@ -49,8 +49,8 @@ public class CreatePersonaTest {
         String personality = "personality";
         String visibility = "PRIVATE";
         String requesterDiscordId = "123123";
-        List<String> usersAllowedToRead = Lists.list("123123", "123123");
-        List<String> usersAllowedToWrite = null;
+        Set<String> usersAllowedToRead = set("123123", "123123");
+        Set<String> usersAllowedToWrite = null;
 
         CreatePersona.Builder createPersonaBuilder = CreatePersona.builder()
                 .name(name)
@@ -81,8 +81,8 @@ public class CreatePersonaTest {
         String personality = "personality";
         String visibility = "PRIVATE";
         String requesterDiscordId = "123123";
-        List<String> usersAllowedToRead = null;
-        List<String> usersAllowedToWrite = Lists.list("123123", "123123");
+        Set<String> usersAllowedToRead = null;
+        Set<String> usersAllowedToWrite = set("123123", "123123");
 
         CreatePersona.Builder createPersonaBuilder = CreatePersona.builder()
                 .name(name)

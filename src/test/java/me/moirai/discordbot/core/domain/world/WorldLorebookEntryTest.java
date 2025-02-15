@@ -44,31 +44,4 @@ public class WorldLorebookEntryTest {
         // Then
         assertThat(entry.getRegex()).isEqualTo("[Rr]egex");
     }
-
-    @Test
-    public void assignUserToLorebookEntry() {
-
-        // Given
-        String expectedPlayerDiscordId = "4234234234";
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.sampleLorebookEntry().build();
-
-        // When
-        entry.assignPlayer(expectedPlayerDiscordId);
-
-        // Then
-        assertThat(expectedPlayerDiscordId).isEqualTo(entry.getPlayerDiscordId());
-    }
-
-    @Test
-    public void unassignUserToLorebookEntry() {
-
-        // Given
-        WorldLorebookEntry entry = WorldLorebookEntryFixture.samplePlayerCharacterLorebookEntry().build();
-
-        // When
-        entry.unassignPlayer();
-
-        // Then
-        assertThat(entry.getPlayerDiscordId()).isBlank();
-    }
 }

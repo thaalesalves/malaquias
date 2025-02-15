@@ -1,9 +1,9 @@
 package me.moirai.discordbot.core.application.usecase.persona.request;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import me.moirai.discordbot.common.usecases.UseCase;
 import me.moirai.discordbot.core.application.usecase.persona.result.CreatePersonaResult;
@@ -15,16 +15,16 @@ public final class CreatePersona extends UseCase<Mono<CreatePersonaResult>> {
     private final String personality;
     private final String visibility;
     private final String requesterDiscordId;
-    private final List<String> usersAllowedToWrite;
-    private final List<String> usersAllowedToRead;
+    private final Set<String> usersAllowedToWrite;
+    private final Set<String> usersAllowedToRead;
 
     public CreatePersona(Builder builder) {
         this.name = builder.name;
         this.personality = builder.personality;
         this.visibility = builder.visibility;
         this.requesterDiscordId = builder.requesterDiscordId;
-        this.usersAllowedToWrite = unmodifiableList(builder.usersAllowedToWrite);
-        this.usersAllowedToRead = unmodifiableList(builder.usersAllowedToRead);
+        this.usersAllowedToWrite = unmodifiableSet(builder.usersAllowedToWrite);
+        this.usersAllowedToRead = unmodifiableSet(builder.usersAllowedToRead);
     }
 
     public static Builder builder() {
@@ -43,11 +43,11 @@ public final class CreatePersona extends UseCase<Mono<CreatePersonaResult>> {
         return visibility;
     }
 
-    public List<String> getUsersAllowedToWrite() {
+    public Set<String> getUsersAllowedToWrite() {
         return usersAllowedToWrite;
     }
 
-    public List<String> getUsersAllowedToRead() {
+    public Set<String> getUsersAllowedToRead() {
         return usersAllowedToRead;
     }
 
@@ -61,8 +61,8 @@ public final class CreatePersona extends UseCase<Mono<CreatePersonaResult>> {
         private String personality;
         private String visibility;
         private String requesterDiscordId;
-        private List<String> usersAllowedToWrite = new ArrayList<>();
-        private List<String> usersAllowedToRead = new ArrayList<>();
+        private Set<String> usersAllowedToWrite = new HashSet<>();
+        private Set<String> usersAllowedToRead = new HashSet<>();
 
         private Builder() {
         }
@@ -82,7 +82,7 @@ public final class CreatePersona extends UseCase<Mono<CreatePersonaResult>> {
             return this;
         }
 
-        public Builder usersAllowedToWrite(List<String> usersAllowedToWrite) {
+        public Builder usersAllowedToWrite(Set<String> usersAllowedToWrite) {
 
             if (usersAllowedToWrite != null) {
                 this.usersAllowedToWrite = usersAllowedToWrite;
@@ -91,7 +91,7 @@ public final class CreatePersona extends UseCase<Mono<CreatePersonaResult>> {
             return this;
         }
 
-        public Builder usersAllowedToRead(List<String> usersAllowedToRead) {
+        public Builder usersAllowedToRead(Set<String> usersAllowedToRead) {
 
             if (usersAllowedToRead != null) {
                 this.usersAllowedToRead = usersAllowedToRead;

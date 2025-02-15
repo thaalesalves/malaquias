@@ -23,17 +23,30 @@ import me.moirai.discordbot.core.application.usecase.adventure.result.UpdateAdve
 import me.moirai.discordbot.core.domain.PermissionsFixture;
 import me.moirai.discordbot.core.domain.Visibility;
 import me.moirai.discordbot.core.domain.adventure.Adventure;
-import me.moirai.discordbot.core.domain.adventure.AdventureDomainRepository;
+import me.moirai.discordbot.core.domain.adventure.AdventureRepository;
 import me.moirai.discordbot.core.domain.adventure.AdventureFixture;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateAdventureHandlerTest {
 
     @Mock
-    private AdventureDomainRepository repository;
+    private AdventureRepository repository;
 
     @InjectMocks
     private UpdateAdventureHandler handler;
+
+    @Test
+    public void errorWhenIdIsNull() {
+
+        // Given
+        String id = null;
+        UpdateAdventure command = UpdateAdventureFixture.sample()
+                .id(id)
+                .build();
+
+        // Then
+        assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
+    }
 
     @Test
     public void updateAdventure() {
@@ -69,27 +82,6 @@ public class UpdateAdventureHandlerTest {
     }
 
     @Test
-    public void updateAdventure_whenUserCantWrite_thenThrowException() {
-
-        // Given
-        String requesterUserId = "LALALA";
-        UpdateAdventure updateAdventure = UpdateAdventureFixture.sample()
-                .requesterDiscordId(requesterUserId)
-                .build();
-
-        Adventure adventure = AdventureFixture.privateMultiplayerAdventure()
-                .permissions(PermissionsFixture.samplePermissions()
-                        .ownerDiscordId("INVLD")
-                        .build())
-                .build();
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
-
-        // Then
-        assertThrows(AssetAccessDeniedException.class, () -> handler.execute(updateAdventure));
-    }
-
-    @Test
     public void updateAdventure_whenAdventureToUpdateNotFound_thenThrowException() {
 
         // Given
@@ -102,6 +94,23 @@ public class UpdateAdventureHandlerTest {
 
         // Then
         assertThrows(AssetNotFoundException.class, () -> handler.execute(updateAdventure));
+    }
+
+    @Test
+    public void updateAdventure_whenNoAdventurePermission_thenThrowException() {
+
+        // Given
+        String requesterUserId = "LALALA";
+        UpdateAdventure updateAdventure = UpdateAdventureFixture.sample()
+                .requesterDiscordId(requesterUserId)
+                .build();
+
+        Adventure adventure = AdventureFixture.privateMultiplayerAdventure().build();
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(adventure));
+
+        // Then
+        assertThrows(AssetAccessDeniedException.class, () -> handler.execute(updateAdventure));
     }
 
     @Test

@@ -7,11 +7,13 @@ public final class UpdateAdventureBumpByChannelId extends UseCase<Void> {
     private final String bump;
     private final int bumpFrequency;
     private final String channelId;
+    private final String requesterDiscordId;
 
     private UpdateAdventureBumpByChannelId(Builder builder) {
         this.bump = builder.bump;
         this.bumpFrequency = builder.bumpFrequency;
         this.channelId = builder.channelId;
+        this.requesterDiscordId = builder.requesterDiscordId;
     }
 
     public static Builder builder() {
@@ -30,11 +32,16 @@ public final class UpdateAdventureBumpByChannelId extends UseCase<Void> {
         return bumpFrequency;
     }
 
+    public String getRequesterDiscordId() {
+        return requesterDiscordId;
+    }
+
     public static final class Builder {
 
         private String bump;
         private int bumpFrequency;
         private String channelId;
+        private String requesterDiscordId;
 
         public Builder bump(String bump) {
             this.bump = bump;
@@ -48,6 +55,11 @@ public final class UpdateAdventureBumpByChannelId extends UseCase<Void> {
 
         public Builder channelId(String channelId) {
             this.channelId = channelId;
+            return this;
+        }
+
+        public Builder requesterDiscordId(String requesterDiscordId) {
+            this.requesterDiscordId = requesterDiscordId;
             return this;
         }
 

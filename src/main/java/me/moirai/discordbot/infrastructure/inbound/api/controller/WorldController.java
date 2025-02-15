@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,7 +76,7 @@ public class WorldController extends SecurityContextAware {
                     .direction(getDirection(searchParameters.getDirection()))
                     .visibility(getVisibility(searchParameters.getVisibility()))
                     .operation(getOperation(searchParameters.getOperation()))
-                    .requesterDiscordId(authenticatedUser.getId())
+                    .requesterDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             return responseMapper.toResponse(useCaseRunner.run(query));
@@ -84,11 +85,12 @@ public class WorldController extends SecurityContextAware {
 
     @GetMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canRead(#worldId, 'World')")
     public Mono<WorldResponse> getWorldById(@PathVariable(required = true) String worldId) {
 
         return mapWithAuthenticatedUser(authenticatedUser -> {
 
-            GetWorldById query = GetWorldById.build(worldId, authenticatedUser.getId());
+            GetWorldById query = GetWorldById.build(worldId, authenticatedUser.getDiscordId());
             return responseMapper.toResponse(useCaseRunner.run(query));
         });
     }
@@ -99,30 +101,32 @@ public class WorldController extends SecurityContextAware {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            CreateWorld command = requestMapper.toCommand(request, authenticatedUser.getId());
+            CreateWorld command = requestMapper.toCommand(request, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
     }
 
     @PutMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<UpdateWorldResponse> updateWorld(@PathVariable(required = true) String worldId,
             @Valid @RequestBody UpdateWorldRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            UpdateWorld command = requestMapper.toCommand(request, worldId, authenticatedUser.getId());
+            UpdateWorld command = requestMapper.toCommand(request, worldId, authenticatedUser.getDiscordId());
             return useCaseRunner.run(command);
         }).map(responseMapper::toResponse);
     }
 
     @DeleteMapping("/{worldId}")
     @ResponseStatus(code = HttpStatus.OK)
+    @PreAuthorize("canModify(#worldId, 'World')")
     public Mono<Void> deleteWorld(@PathVariable(required = true) String worldId) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
-            DeleteWorld command = requestMapper.toCommand(worldId, authenticatedUser.getId());
+            DeleteWorld command = DeleteWorld.build(worldId, authenticatedUser.getDiscordId());
             useCaseRunner.run(command);
 
             return Mono.empty();
@@ -131,13 +135,14 @@ public class WorldController extends SecurityContextAware {
 
     @PostMapping("/favorite")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @PreAuthorize("canRead(#request.assetId, 'World')")
     public Mono<Void> addFavoriteWorld(@RequestBody FavoriteRequest request) {
 
         return flatMapWithAuthenticatedUser(authenticatedUser -> {
 
             AddFavoriteWorld command = AddFavoriteWorld.builder()
                     .assetId(request.getAssetId())
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
@@ -154,7 +159,7 @@ public class WorldController extends SecurityContextAware {
 
             RemoveFavoriteWorld command = RemoveFavoriteWorld.builder()
                     .assetId(assetId)
-                    .playerDiscordId(authenticatedUser.getId())
+                    .playerDiscordId(authenticatedUser.getDiscordId())
                     .build();
 
             useCaseRunner.run(command);
