@@ -1,14 +1,9 @@
 package me.moirai.discordbot.infrastructure.inbound.api.controller;
 
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Controller;
 
-import jakarta.validation.Valid;
 import me.moirai.discordbot.common.usecases.UseCaseRunner;
 import me.moirai.discordbot.common.web.SecurityContextAware;
 import me.moirai.discordbot.core.application.usecase.notification.request.SendNotification;
@@ -21,8 +16,7 @@ import me.moirai.discordbot.infrastructure.inbound.api.response.SendNotification
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RestController
-@RequestMapping("/notification")
+@Controller
 public class NotificationController extends SecurityContextAware {
 
     private final UseCaseRunner useCaseRunner;
@@ -31,30 +25,32 @@ public class NotificationController extends SecurityContextAware {
         this.useCaseRunner = useCaseRunner;
     }
 
-    @GetMapping(value = "/{receiverDiscordId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<NotificationResponse> subscribeToNotifications(@PathVariable String receiverDiscordId) {
+    @MessageMapping("notifications.stream")
+    public Flux<NotificationResponse> subscribeToNotifications(@Payload String receiverDiscordId) {
 
         StreamNotificationsForUser query = StreamNotificationsForUser.create(receiverDiscordId);
         return useCaseRunner.run(query).map(this::toResponse);
     }
 
-    @PostMapping
-    public Mono<SendNotificationResponse> sendNotification(@RequestBody @Valid SendNotificationRequest request) {
+    @MessageMapping("notifications.send")
+    public Mono<SendNotificationResponse> sendNotification(@Payload SendNotificationRequest request) {
 
-        return mapWithAuthenticatedUser(authenticatedUser -> {
-            SendNotification command = SendNotification.builder()
-                    .isGlobal(request.isGlobal())
-                    .isInteractable(request.isInteractable())
-                    .message(request.getMessage())
-                    .metadata(request.getMetadata())
-                    .receiverDiscordId(request.getReceiverDiscordId())
-                    .senderDiscordId(request.getSenderDiscordId())
-                    .type(request.getType())
-                    .build();
+        SendNotification command = SendNotification.builder()
+                .isGlobal(request.isGlobal())
+                .isInteractable(request.isInteractable())
+                .message(request.getMessage())
+                .metadata(request.getMetadata())
+                .receiverDiscordId(request.getReceiverDiscordId())
+                .senderDiscordId(request.getSenderDiscordId())
+                .type(request.getType())
+                .build();
 
-            SendNotificationResult result = useCaseRunner.run(command);
-            return SendNotificationResponse.withIdAndCreationDateTime(result.getId(), result.getCreationDateTime());
-        });
+        return Mono.just(useCaseRunner.run(command))
+                .map(this::toResponse);
+    }
+
+    private SendNotificationResponse toResponse(SendNotificationResult result) {
+        return SendNotificationResponse.withIdAndCreationDateTime(result.getId(), result.getCreationDateTime());
     }
 
     private NotificationResponse toResponse(NotificationResult result) {
